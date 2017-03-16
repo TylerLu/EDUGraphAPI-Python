@@ -1,0 +1,45 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+	 		<a class="navbar-brand" href="">Edu Demo App</a>
+		</div>
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="">Home</a></li>
+				{% if isInAschool %}
+				<li><a href="">Classes</a></li>
+				<li><a href="">Teachers & Students</a></li>
+				{% endif %}
+				{% if isauthenticated and isadmin %}
+				<li><a href="">Admin</a></li>
+				{% endif %}
+			</ul>
+		{% if isauthenticated %}
+		<form action="" class="navbar-right" id="logoutForm" method="post">{% csrf_token %}
+        	<div class="userinfo">
+				<a href="javascript:void(0);" id="userinfolink">Logged in as: {{ role }}. Hello {{ username }}</a>
+            	<span class="caret" id="caret"></span>
+        	</div>
+			<div class="popupcontainer" id="userinfoContainer">
+            	<div class="popuserinfo">
+                	<div class="subitem">
+                    	<a href="/AboutMe">About Me</a>
+                	</div>
+                	<div class="subitem">
+                    	<a href="/link">Link</a>
+                	</div>
+                	<div class="subitem">
+                    	<a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+                	</div>
+            	</div>
+			</div>
+    	</form>
+		{% endif %}
+		</div>
+	</div>
+</div>

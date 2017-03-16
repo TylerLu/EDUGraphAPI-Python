@@ -1,0 +1,510 @@
+﻿/*   
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+ */
+@font-face {
+  font-family: 'Helvetica Neue LT Std Light';
+  src: url("../fonts/HelveticaNeueLTStd-Light.eot"); /* IE9 Compat Modes */
+  src: url("../fonts/HelveticaNeueLTStd-Light.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
+       url("../fonts/HelveticaNeueLTStd-Light.woff2") format("woff2"), /* Pretty Modern Browsers */
+       url("../fonts/HelveticaNeueLTStd-Light.woff") format("woff"),
+       url("../fonts/HelveticaNeueLTStd-Light.ttf") format("truetype"), /* Safari, Android, iOS */
+       url("../fonts/HelveticaNeueLTStd-Light.svg#Helvetica Neue LT Std Light") format("svg"); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'Helvetica Neue LT Std Roman';
+  src: url('../fonts/HelveticaNeueLTStd-Roman.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/HelveticaNeueLTStd-Roman.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/HelveticaNeueLTStd-Roman.woff2') format('woff2'), /* Pretty Modern Browsers */
+       url('../fonts/HelveticaNeueLTStd-Roman.woff') format('woff'),
+       url('../fonts/HelveticaNeueLTStd-Roman.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/HelveticaNeueLTStd-Roman.svg#Helvetica Neue LT Std Roman') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'Helvetica Neue LT Std Bold';
+  src: url('../fonts/HelveticaNeueLTStd-Bd.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/HelveticaNeueLTStd-Bd.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/HelveticaNeueLTStd-Bd.woff2') format('woff2'), /* Pretty Modern Browsers */
+       url('../fonts/HelveticaNeueLTStd-Bd.woff') format('woff'),
+       url('../fonts/HelveticaNeueLTStd-Bd.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/HelveticaNeueLTStd-Bd.svg#Helvetica Neue LT Std Bold') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'Helvetica Neue LT Std Th';
+  src: url('../fonts/HelveticaNeueLTStd-Th.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/HelveticaNeueLTStd-Th.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/HelveticaNeueLTStd-Th.woff2') format('woff2'), /* Pretty Modern Browsers */
+       url('../fonts/HelveticaNeueLTStd-Th.woff') format('woff'),
+       url('../fonts/HelveticaNeueLTStd-Th.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/HelveticaNeueLTStd-Th.svg#Helvetica Neue LT Std Th') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+  font-family: 'Helvetica Neue LT Std It';
+  src: url('../fonts/HelveticaNeueLTStd-It.eot'); /* IE9 Compat Modes */
+  src: url('../fonts/HelveticaNeueLTStd-It.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/HelveticaNeueLTStd-It.woff2') format('woff2'), /* Pretty Modern Browsers */
+       url('../fonts/HelveticaNeueLTStd-It.woff') format('woff'),
+       url('../fonts/HelveticaNeueLTStd-It.ttf')  format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/HelveticaNeueLTStd-It.svg#Helvetica Neue LT Std It') format('svg'); /* Legacy iOS */
+}
+
+html{height:100%;}
+body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    height:100%;
+    font-family: "Helvetica Neue LT Std Roman", "Helvetica Neue Roman", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+}
+.containerbg{    background: linear-gradient(to bottom, white, #9e9e9e);height:auto; height: auto;
+    min-height: 100%;padding-bottom:20px;
+}
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+    height:100%;
+}
+
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+.empty-result {
+    color: gray;
+    font-style: italic;
+}
+
+/*Top navigation*/
+.navbar-inverse{background-color:#127605;border-color:#127605;}
+.navbar-inverse .navbar-brand, 
+.navbar-inverse .navbar-nav > li > a {color:white;}
+.navbar-inverse .navbar-brand{font-size:14px}
+
+/* Message */
+.message-container {
+    font-size: 14px;
+    padding: 0.5em 1em;
+    border: 1px solid #b0b0b0;
+    border-radius: 8px;
+    margin: 0.5em 0;
+}
+
+.message-container p {margin: 0.25em 0;}
+
+/* Filters */
+.filterlink-container{text-align:right; padding-top:10px; width:48%; float:right; font-family:'Helvetica Neue LT Std Bold'}
+.filterlink-container .filterlink{text-decoration:none;color:#4b67f8;cursor:pointer;}
+.filterlink-container .filterlink.selected{text-decoration:none;color:black;cursor:default;font-weight:bold;}
+.filterlink-container .filterlink:not(.selected){font-family:'Helvetica Neue LT Std Roman';}
+
+/* Pagination */
+.pagination{width:100%;text-align:center;}
+.pagination span{font-size:12px; color:#444344; background-color:transparent; margin:0 10px; font-family:'Helvetica Neue LT Std Bold'; cursor:pointer}
+.pagination .disabled, .pagination .current{color:#c2c2c2; background-color:transparent; cursor:default}
+
+/*Schools and sections */
+.displayname{text-align:right;padding:12px 30px 12px 12px;}
+.secondnav{padding:20px 0 12px 0;}
+.a-heading{font-family:'Helvetica Neue LT Std Th'; font-size:48px; color:#666565; padding-left:0; text-transform:uppercase;}
+.infocontainer {
+    text-align: center;
+    border: 1px solid #c2c2c2;
+    width: 160px;
+    min-height: 60px;
+    background-image: url('/static/Images/contaerbg.gif');
+    float: right;
+    margin-right: 15px;
+     color:#666565;
+    -webkit-border-radius: 5px;
+    border-radius: 5px; 
+    -moz-border-radius : 5px; 
+}
+.infocontainer .infoheader{font-size:12px;font-family:'Helvetica Neue LT Std Bold';text-align:center;height:25px;line-height:25px; text-transform:uppercase;}
+.infocontainer .infobody{font-size:18px; text-align:center; height:30px; line-height:30px; margin-bottom:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.infocontainer:nth-child(2) .infobody{font-size:12px;}
+.myschool{padding: 12px 0 12px 0;float:left;}
+.myschool .schoolenrolled{float:right; font-size:14px;padding-right:15px;}
+.myschool .greenicon{width:12px;height:12px;float:right;margin:5px 6px 0 0;background-color:#277F79;}
+.sectionschoolname{font-size:24px;color:#666565;padding-left: 0;}
+.tophero{background-color:#f8f8f8;padding-left:0px;}
+#myMap{position:absolute;}
+.bingMapLink{margin-left:12px;}
+.schooladdress{width:auto;float:left;}
+.schoolmap{float:left;}
+.toptiles{
+    padding: 10px 0 15px 0;
+    border: 1px solid #117605;
+    border-top: none;
+    border-bottom-color:#127605;
+    background-color: white;
+    border-radius:5px;
+    border-top-left-radius:0;
+    border-top-right-radius:0;
+}
+.schoolname{margin-top:20px;}
+.schooltiles{margin:20px 0 20px 0; padding-right: 0;}
+.schooltiles .infocontainer{margin-right:0;}
+
+.table-green { border:none;background-color:white}
+.table-green tr.tr-content:nth-child(2n+1){background-color:#f8f8f8}
+.table-green> tbody > tr > th{ border:none; padding:20px 0 20px 6px;}
+.table-green .table-green-header{ background:#127605;color:white; }
+.table-green .tdleft{border-collapse:inherit;}
+.table-green .table-green-header th{text-transform:uppercase; padding:10px 0 10px 6px; border-top:0; border-bottom:1px solid white;}
+.table-green .tr-content td{padding-top:10px;padding-bottom:10px; vertical-align: inherit; border-bottom:1px solid white;}
+.table-green > tbody > tr > td{border-top:1px solid white;}
+.table-green .td-green, .table-green .td-green a{font-family:'Helvetica Neue LT Std Bold'; background-color:#277F79; color:white;}
+.table-green  a.btnlink{
+    color:black;text-transform: uppercase;
+    font-family:'Helvetica Neue LT Std Bold';
+    font-size:12px;
+    color: #fff;
+    background-image: url(/static/Images/btngreenbg.png);
+    padding: 3px 12px;
+    border: 1px solid #127605;
+    text-decoration:none;
+}
+.table-green .td-green a.btnlink{background-color:white !important; background-image:none;color:black;text-transform:uppercase;}
+.table-student .tr-content td img{max-width:40px;height:auto;margin-right:6px;}
+.table-student .tr-content td:nth-child(1){width:25%;}
+.schools .table-schools tr td:nth-child(1){width:20%;}
+.schools .table-schools tr td:nth-child(2){width:15%;}
+.schools .table-schools tr td:nth-child(3){width:16%;}
+.schools .table-schools tr td:nth-child(4){width:23%;}
+.schools .table-schools tr td:nth-child(5){width:26%;}
+.schools .table-schools .table-green-header th {font-family: 'Helvetica Neue LT Std Bold';}
+
+.ignore{display:none;}
+.container>div.row{height:auto;background-color:#fff;}
+.container.body-content{height:100%; background-color:#fff;}
+.schools{height:auto;background-color:#fff;padding:0;}
+.schools .toptiles{float:right;padding-left: 15px;}
+.hr-green{border: 0;height: 10px;margin-top: 10px;}
+
+/*sections*/
+.sections .tophero{border-bottom:5px solid #127605;}
+.sections .tophero .usericon{margin-top:10px;}
+.sections .tophero .usericon div{float:left;}
+.sections .tophero .usericon .icon{width:12px; height:12px; margin:5px 6px 0 0; background:-prefix-linear-zgradient(top, #434345, #BBBBBB); background:linear-gradient(to bottom, #434345, #BBBBBB);}
+.sections .tophero .usericon .icon.my-class{margin-left:12px; background:-prefix-linear-zgradient(top, #4E9F42, #B8E2B2); background:linear-gradient(to bottom, #4E9F42, #B8E2B2);}
+
+.section-tiles{padding:0 17.14px; background-color:white}
+.section-tiles .tile-container{margin-right:17.14px;float: left;margin-bottom: 5px;margin-top: 12px;position:relative;}
+.section-tiles .tile-container:nth-child(6n){margin-right:0;}
+.section-tiles .tile{display:inline-block;width:175px;height:175px;box-sizing:border-box;border:1px solid #C2C2C2;border-radius:5px;-moz-border-radius:5px;background: -prefix-linear-zgradient(top, #434345, #BBBBBB); background: linear-gradient(to bottom, #434345, #BBBBBB); color:#fff;}
+.mysectionlink .tile{border:1px solid #C2C2C2;border-radius:5px;-moz-border-radius:5px;background: -prefix-linear-zgradient(top, #4E9F42, #B8E2B2); background: linear-gradient(to bottom, #4E9F42, #B8E2B2); }
+.section-tiles .tile>h5{text-align: center;margin: 60px 5px 0 5px;font-size:14px;font-style: normal;font-variant: normal;text-overflow:ellipsis}
+.section-tiles .tile>h2{text-align: center;margin-top:4px;font-size:30px;}
+.section-tiles .tile:hover{background-image:url('/static/Images/ClassDetailsTiles-bg.jpg');color:#000;border:2px solid green;}
+.section-tiles .tile:hover>h5{font-family:'Helvetica Neue LT Std Bold';font-size:16px;}
+.section-tiles .tile:hover>h2{font-family:'Helvetica Neue LT Std Bold';font-size:36px;}
+.section-tiles .detail {display:none;position:absolute; background:#fff; color:#000;top:-5px; left:188px;width:360px; min-height:230px;padding:8px 20px 30px 20px;z-index:10;border:solid #C2C2C2 1px;border-radius:5px;-moz-border-radius:5px;-moz-box-shadow:1px 2px 1px 2px #c2c2c2;-webkit-box-shadow: 1px 2px 1px 2px #c2c2c2;box-shadow:1px 2px 1px 2px #c2c2c2;}
+.section-tiles .detail h5{font-family:'Helvetica Neue LT Std Bold';}
+.section-tiles .tile-container:nth-child(6n) .detail,.section-tiles .tile-container:nth-child(6n-1) .detail{left:-380px;}
+.section-tiles .detail>h5{margin-top: 10px;font-weight: 800;font-size:12px;text-transform:uppercase;}
+.section-tiles .detail>h6{margin-top: 10px;font-size:12px;}
+.section-school-name{font-size:18px; width:100%; padding:0 20px 10px 0; text-align:right;}
+
+.sections .tiles-root-container .tiles-secondary-container{display:none}
+.sections .allclasses-container #allclasses.tiles-secondary-container, .sections .myclasses-container #myclasses.tiles-secondary-container{display:block}
+
+.sections .seemore{text-align:center; margin:20px 10px}
+.sections .seemore span{font-family:'Helvetica Neue LT Std Bold'; font-size:14px; color:#444344; text-decoration:none; cursor:pointer}
+.sections .seemore span.disabled, .sections .seemore span.nomore{cursor:default; color:#c2c2c2}
+
+/*section detail*/
+.b-title{font-size:24px;color:#666565;}
+.class-details .b-title{font-family:'Helvetica Neue LT Std Th'}
+.coursedetail .col-md-6{padding:12px 0 6px 0;}
+.coursedetail .col-md-6 span:not(#termdate):not(#termdate-separator){font-family:'Helvetica Neue LT Std Bold'}
+.coursedetail .col-md-6:last-child{padding:12px 0 6px 0;}
+.coursedetail .col-md-6:last-child > b{color:#F7F7F7;}
+.coursedetail .col-md-6:last-child > b:first-child{color:#333;}
+.students .col-md-6:nth-child(1){padding-left:0;padding-right:8px;}
+.students .col-md-6:nth-child(2){padding-left:8px;padding-right:0;}
+.students .b-title{padding-left:6px;}
+
+.students{margin-top:20px;}
+.students > ul > li{width:22%;margin-right:20px;text-align: center;}
+.students > ul > li:first-child{margin-left:20px;}
+.students > ul > li>a{font-family:'Helvetica Neue LT Std Th'; color:#ABABAB; height:56px; font-size:18px; text-transform:uppercase; background-color:#fff; border-radius:0 0 0 0; padding-top:15px;}
+.students > ul > li.active > a,.students > ul > li.active > a:hover,.students > ul > li.active > a:focus {font-family:'Helvetica Neue LT Std Bold'; background-color:#127605; color:white;}
+.students .table-green .table-green-header{border-bottom:1px solid #127605;background-color:#127605;}
+.students .table-green .table-green-header th {background-color:#127605;border-bottom:1px solid #127605; padding-top:15px; padding-bottom:15px}
+.students .table-green .tdleft{border-left-color:#ABABAB;}
+.students .table-green tbody tr{font-family:'Helvetica Neue LT Std Roman'; font-size:18px; color:#000000}
+.students #students .table-green tbody tr{font-size:14px}
+.students #stuconv.table-green tbody tr{font-family:'Helvetica Neue LT Std Th'}
+.students .see-more{margin-left:12px;}
+.students  ul  li.active a span{border-bottom:3px solid white; padding-bottom: 6px;}
+.students #students.active{border:none;}
+.students #documents, .students #conversations{padding-bottom:40px}
+.students #stuconv.table-green{margin-top:40px; margin-bottom:40px}
+.students #stuconv.table-green tbody tr{font-family:'Helvetica Neue LT Std Th'}
+.students #studoc.table-green tr.tr-content:nth-child(2n+1), .students #conversations .table-green tr.tr-content:nth-child(2n+1){background-color:transparent}
+.students #studoc.table-green tbody tr.tr-content td:nth-child(3) a, .students #stuconv.table-green tbody tr.tr-content td:nth-child(3) a{display:inline-block; color:#000000; padding-left:68px; line-height:58px; background:url('/static/Images/document_icon.png') center left no-repeat; background-size:contain}
+.students #stuconv.table-green tbody tr.tr-content td:nth-child(3) a{padding-left:64px; line-height:39px; background-image:url('/static/Images/conversation_icon.png')}
+.students #studoc.table-green tbody tr.tr-content.selected td:nth-child(3) a, .students #stuconv.table-green tbody tr.tr-content.selected td:nth-child(3) a{color:#ffffff}
+.students #studoc.table-green tbody tr.tr-content:hover td:not(.space-holder):not(.border-holder), .students #stuconv.table-green tbody tr.tr-content:hover td:not(.space-holder):not(.border-holder){background-color:#f8f8f8}
+.students #studoc.table-green .space-holder, .students #stuconv.table-green .space-holder{background-color:transparent; width:16px; padding:0; background-image:none}
+.students #studoc.table-green .space-holder.left, .students #stuconv.table-green .space-holder.left{width:6px}
+.students #studoc.table-green .border-holder, .students #stuconv.table-green .border-holder{background-color:transparent; width:10px; padding:0; background-image:none}
+.students #studoc.table-green tbody tr.tr-content:hover td:nth-child(3) a{background-image:url('/static/Images/document_icon_hover.png')}
+.students #stuconv.table-green tbody tr.tr-content:hover td:nth-child(3) a{background-image:url('/static/Images/conversation_icon_hover.png')}
+.students #studoc.table-green tbody tr.tr-content.selected td:not(.space-holder):not(.border-holder), .students #stuconv.table-green tbody tr.tr-content.selected td:not(.space-holder):not(.border-holder){background-color:#707070; color:#ffffff}
+.students #studoc.table-green tbody tr.tr-content.selected td:nth-child(3) a{background-image:url('/static/Images/document_icon_selected.png')}
+.students #stuconv.table-green tbody tr.tr-content.selected td:nth-child(3) a{background-image:url('/static/Images/conversation_icon_selected.png')}
+.students #studoc.table-green tbody tr.tr-content.selected td.border-holder, .students #stuconv.table-green tbody tr.tr-content.selected td.border-holder{background-color:#127605}
+.students #documents .see-more, .students #conversations .see-more{float:right; margin-right:16px; padding:2px 10px; background:-prefix-linear-zgradient(top, #137A05, #28BB14); background:linear-gradient(to bottom, #137A05, #28BB14);}
+.students #documents .see-more a, .students #conversations .see-more a{color:#ffffff; font-size:12px; font-family:'Helvetica Neue LT Std Bold'; text-decoration:none}
+
+/*User info popup window*/
+.navbar-right a{color:white;text-decoration:none;}
+.userinfo .caret{color:white;font-size:20px;}
+.transformcaret{transform: rotate(180deg);}
+.userinfo{height:50px;line-height:50px;}
+.popupcontainer{display:none;}
+.navbar-collapse{position:relative;}
+.popuserinfo{position:absolute;top:40px;z-index:999;background-color:white;padding:15px 0;
+             width:200px;border:1px solid #dedede;box-sizing: border-box;left:955px;}
+@-moz-document url-prefix() 
+{   
+.popuserinfo{left:955px;}
+}
+.subitem{float:left;width:100%;}
+.subitem a{color:black;text-decoration:none;width:100%;height:100%;display:block;padding:10px 0 10px 20px;}
+.subitem:hover{background-color:#127605;color:white;}
+.subitem a:hover{color:white;}
+.container {width: 1170px;}
+
+.mygroups b{float:left;}
+.mygroups div{float:left;margin-left:6px;}
+.margin-btm-12{margin-bottom:12px;}
+.margin-top-12{margin-top:12px;}
+
+#skipLinkAccount{width:90px;}
+.tab-content div.tab-pane{border:2px solid #127605;background-color:white;position:relative;}
+#seatingchart{padding:24px 12px;}
+#seatingchart .left{width:25%;float:left;}
+#seatingchart .right{width:65%;float:left;border-left:2px solid #666565;}
+#seatingchart .dvedit{width:10%;float:right;}
+#seatingchart .dvedit img{margin-top:12px;}
+#seatingchart ul li{list-style-type:none; margin-bottom:6px;}
+#seatingchart .greenicon{width:14px;height:14px;background:#237e17;float:left;margin:3px 6px 0 0;}
+.assignseat{margin:12px 0;}
+#lstproducts{padding-left:0;}
+#lstproducts img, .deskicon img, #studentsTable img, .userinfo img, .aboutme img{
+border-radius: 30px;
+-webkit-border-radius: 30px;
+-moz-border-radius: 30px;
+border: 1px solid #e4e4e4;
+max-width: 50px;
+height: auto;
+}
+.userinfo img, .aboutme img{max-width:36px;}
+#lstproducts li{width:100%;min-height:60px;}
+#lstproducts li *{float:left;}
+#lstproducts li .disname{
+max-width: 140px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: block;
+    float: left;
+    margin:16px 6px 0 12px;
+}
+#lstproducts li .seated {margin:20px 0 0 0;}
+
+#dvleft .tip{font-weight:600;margin-bottom:20px;}
+
+.deskcontainer{width:100px;height:100px ; background-color:#f2f2f2;color:black; position:relative;   padding-top: 6px;}
+.deskicon{padding-top:6px;text-align:center;}
+.stuname{font-size:8px; padding:6px; text-align:center; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; display:block;}
+.deskicon img{max-height:60px;width:auto;}
+.deskclose{ width:20px; height:20px; float:right; position:absolute; right:-9px; top:-10px; cursor:pointer;}
+.hideitem{display:none;}
+.showitem{display:block;}
+#graybg{width:660px;margin:auto;}
+.desktile{color:white; width:100px;height:100px;float:left;margin-right:10px;margin-bottom:10px; 
+          background:url('/static/Images/seat.png') no-repeat center center; 
+}
+.desktileseated{background-color:#CECECE;}
+.deskcontainer.green{background-color:#5DCB50;color:white;border-color:#2B4E26;}
+.deskcontainer.green .stuname{font-family:'Helvetica Neue LT Std Bold'}
+.seated{color:#237e17;text-transform:uppercase;font-family:'Helvetica Neue LT Std Bold'; font-size:10px;}
+
+.teacherdesk{font-family:'Helvetica Neue LT Std Bold'; font-size:10px; color:white; width:200px; margin:auto; border:1px solid gray; background-color:#ABABAB; text-transform:uppercase; margin-bottom:20px; height:60px; line-height:60px; text-align:center;}
+.deskclose, #imgsave, #imgcancel{display:none;}
+.greenlist{background-color: #287F79;}
+.greenlist *{color:white;}
+.greenTileTooltip{font-family:'Helvetica Neue LT Std Bold'; background-color:#287F79;color:white;text-align:center;height:98px;width:98px;text-transform:uppercase;padding-top:20px;}
+#saveResult{position: absolute;
+    width: 220px;
+    margin: auto;
+    z-index: 999;
+    height: 65px;
+    line-height:60px;
+    text-align:center;
+    left: 990px;
+    top: 45px;
+    right: 0;
+    text-align:center;
+    font-size:15px;
+    box-shadow: 0 0 5px #000;
+    background-color: #4B67F7;
+    color: white;
+    border: 1px solid white;
+}
+
+
+
+/*Teachers & Students page*/
+.teacher-student .tophero{border-bottom:5px solid #127605;}
+.teacher-student .usericon{margin-top:10px;}
+.teacher-student .usericon div{float:left;}
+.teacher-student .usericon .stuicon{width:12px; height:12px; margin:5px 6px 0 0; background-color:#444444;}
+.teacher-student .usericon .teacicon{width:12px; height:12px; margin:5px 6px 0 12px; background-color:#4DA143;}
+.teacher-student .tiles-root-container{background-color:white; padding:12px 17.14px;}
+.teacher-student .tiles-root-container .element{margin:12px 17.14px 12px 0; float:left; width:175px; height:175px; border-radius:12px; background-color:gray;}
+.teacher-student .tiles-root-container .element:nth-child(6n){margin-right:0;}
+.teacher-student .tiles-root-container .element .userimg{height:100px;text-align:center;position:relative;}
+.teacher-student .tiles-root-container .element .username{height:70px;color:white; text-align:center;padding-top:12px;}
+.teacher-student .tiles-root-container .element img{
+    border-radius: 60px;
+    -webkit-border-radius: 60px;
+    -moz-border-radius: 60px;
+    border: 1px solid #e4e4e4;
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    position: absolute;
+    top: 12px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+.teacher-student .tiles-root-container .student-bg{background-color:#444444}
+.teacher-student .tiles-root-container .teacher-bg{background-color:#4DA143;}
+.teacher-student .tiles-root-container .tiles-secondary-container{display:none}
+.teacher-student .users-container #users.tiles-secondary-container, .teacher-student .students-container #students.tiles-secondary-container, .teacher-student .teachers-container #teachers.tiles-secondary-container{display:block}
+
+/* Demo Helper Control */
+.demo-helper-control {
+    position: absolute;
+    right: 0;
+    top: 72px;
+    font-size: 11px;
+}
+.demo-helper-control p {
+    margin: 0;
+}
+
+.demo-helper-control .header {
+    float: left;
+    width: 65px;
+    height: 77px;
+    background: url(/static/Images/demo-helper-header-expanded.png) 15px 9px no-repeat white;      
+    padding: 47px 4px 4px 4px;
+    text-align: center;
+    font-family: 'Helvetica Neue LT Std Bold';
+    font-weight: 700;
+    line-height: 1.1em;
+    cursor: pointer;
+    -webkit-border-radius: 5px 0px 0px 5px;
+    -moz-border-radius: 5px 0px 0px 5px;
+    border-radius: 5px 0px 0px 5px;
+    -webkit-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.75);
+}
+.demo-helper-control.collapsed .header {
+    background: url(/static/Images/demo-helper-header-collapsed.png) 15px 9px no-repeat white;
+} 
+
+.demo-helper-control .header-right-shadow-mask {        
+    float: left;
+    width: 12px;
+    height: 89px;
+    background-color:white;
+}
+.demo-helper-control.collapsed .header-right-shadow-mask{
+    width: 0px;
+}
+
+.demo-helper-control .body {
+    display: block;
+    min-height: 95px;
+    padding: 7px 7px 0px 7px;
+    margin-left: 65px;
+    font-size: 12px;
+    background-color: white;
+    -webkit-border-radius: 0px 0px 0px 5px;
+    -moz-border-radius: 0px 0px 0px 5px;
+    border-radius: 0px 0px 0px 5px;
+    -webkit-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.75);
+}
+.demo-helper-control.collapsed .body {
+    display: none;
+}
+
+.demo-helper-control .body .desc {
+    font-family: 'Helvetica Neue LT Std Roman';
+}
+
+.demo-helper-control .body ul {
+    list-style-image: url(/static/Images/black-square.png);
+    padding:2px 2px 2px 24px;
+    margin-bottom: 0px
+}
+.demo-helper-control .body ul li {
+    margin: 4px 0 6px 0;
+}
+.demo-helper-control .body ul li a{
+    font-family: 'Helvetica Neue LT Std Roman';
+    color: #3366ff;
+}
+.demo-helper-control .body ul li a:hover {
+    text-decoration: none;
+}
+.demo-helper-control .body ul li .title {
+    font-family: 'Helvetica Neue LT Std Bold';
+}
+
+.demo-helper-control .body .empty-result {
+    margin: 1.5em 0;
+    text-align: center;
+}
+
+.nodata{width:100%;text-align:center;padding:20px 0; background-color:white;}
+.saveresult{margin-left:6px;color:green;}
+.tablesorter .header{background-image:url('/static/Images/arrow-all.png');background-repeat:no-repeat;background-position-y:center;background-size:10px;}
+.tablesorter .headerSortDown{background-image:url('/static/Images/arrow-up.png');background-repeat:no-repeat;background-position-y:center;background-size:10px;}
+.tablesorter .headerSortUp{background-image:url('/static/Images/arrow-down.png');background-repeat:no-repeat;background-position-y:center;background-size:10px;}
+.tablesorter .header:nth-child(1){background-position-x:125px;}
+.tablesorter .header:nth-child(2){background-position-x:64px;}
+#studoc .header:nth-child(3){background-position-x:140px;}
+#studoc .header:nth-child(4){background-position-x:82px;}
+#studoc .header:nth-child(5){background-position-x:105px;}
+
+.blanktr th{border:none !important;height:20px;visibility:hidden}

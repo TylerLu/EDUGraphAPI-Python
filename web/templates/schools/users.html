@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}Teachers & Students{% endblock %}
+
+{% block content %}
+<div class="row schools teacher-student">
+<div class="tophero">
+	<div class="col-md-8">
+		<div class="secondnav">
+			<a href="/schools">All Schools</a> > {{ schoolname }}
+		</div>
+		<div class="a-heading">
+			Teachers & Students
+		</div>
+	</div>
+	<div class="toptiles">
+		<div class="section-school-name">
+			{{ schoolname }}
+		</div>
+		<div class="infocontainer">
+			<div class="infoheader">PRINCIPAL</div>
+			<div class="infobody" title="{{ principalname }}">
+				{{ principalname }}
+			</div>
+		</div>
+		<div class="infocontainer">
+			<div class="infoheader">Grade level</div>
+			<div class="infobody" title="{{ lowestgrade }} - {{ highestgrade }}">
+				{{ lowestgrade }} - {{ highestgrade }}
+			</div>
+		</div>
+	</div>
+	<div>
+		<div class="col-md-6 usericon">
+			<div class="stuicon"></div><div>Student</div>
+			<div class="teacicon"></div><div>Teacher</div>
+		</div>
+		<div class="col-md-6 filterlink-container">
+			<span>FILTER:</span> <a id="filterteacher" class="filterlink" data-type="teachers">Teachers</a> | <a id="filterstudnet" class="filterlink" data-type="students">Students</a> | <a id="filterall" class="filterlink selected" data-type="users">All</a>
+		</div>
+	</div>
+	<br style="clear:both;"/>
+</div>
+<div class="users-container tiles-root-container">
+	<div id="users" class="tiles-secondary-container">
+		{% if users|length == 0 %}
+		<div class="nodata"> There is no data available for this page at this time.</div>
+		{% else %}
+		<div class="content">
+		{% for user in users %}
+			{% if user.type == 'teacher' %}
+			<div class="element teacher-bg">
+			{% else %}
+			<div class="element student-bg">
+			{% endif %}
+				<div class="userimg">
+					<img src="/static/Images/header-default.jpg"/>
+				</div>
+				<div class="username">{{ user.displayname }}</div>
+			</div>
+		{% endfor %}
+		</div>
+		{% if usersnextlink %}
+		<div class="pagination">
+		{% else %}
+		<div class="pagination hideitem">
+		{% endif %}
+			<input id="nextlink" type="hidden" value="{{ usersnextlink }}" />
+			<input id="curpage" type="hidden" value="1"/>
+			<span class="current prev">Previous</span>
+			<span class="next">Next</span>
+		</div>
+		{% endif %}
+	</div>
+	<div id="students" class="tiles-secondary-container">
+		{% if students|length == 0 %}
+		<div class="nodata"> There is no data available for this page at this time.</div>
+		{% else %}
+		<div class="content">
+		{% for student in students %}
+			{% if student.type == 'teacher' %}
+			<div class="element teacher-bg">
+			{% else %}
+			<div class="element student-bg">
+			{% endif %}
+				<div class="userimg">
+					<img src="/static/Images/header-default.jpg"/>
+				</div>
+				<div class="username">{{ student.displayname }}</div>
+		</div>
+		{% endfor %}
+		</div>
+		{% if studentsnextlink %}
+		<div class="pagination">
+		{% else %}
+		<div class="pagination hideitem">
+		{% endif %}
+			<input id="nextlink" type="hidden" value="{{ studentsnextlink }}" />
+			<input id="curpage" type="hidden" value="1"/>
+			<span class="current prev">Previous</span>
+			<span class="next">Next</span>
+		</div>
+		{% endif %}
+	</div>
+	<div id="teachers" class="tiles-secondary-container">
+		{% if teachers|length == 0 %}
+		<div class="nodata"> There is no data available for this page at this time.</div>
+		{% else %}
+		<div class="content">
+		{% for teacher in teachers %}
+			{% if teacher.type == 'teacher' %}
+			<div class="element teacher-bg">
+			{% else %}
+			<div class="element student-bg">
+			{% endif %}
+				<div class="userimg">
+					<img src="/static/Images/header-default.jpg"/>
+				</div>
+				<div class="username">{{ teacher.displayname }}</div>
+		</div>
+		{% endfor %}
+		</div>
+		{% if teachersnextlink %}
+		<div class="pagination">
+		{% else %}
+		<div class="pagination hideitem">
+		{% endif %}
+			<input id="nextlink" type="hidden" value="{{ teachersnextlink }}" />
+			<input id="curpage" type="hidden" value="1"/>
+			<span class="current prev">Previous</span>
+			<span class="next">Next</span>
+		</div>
+		{% endif %}
+	</div>
+</div>
+<input id="school-objectid" type="hidden" value="{{ schoolid }}" />
+</div>
+{% endblock %}
+{% block demohelper %}
+<div class="demo-helper-control collapsed">
+	<div class="header">DEMO HELPER</div>
+    <div class="header-right-shadow-mask"></div>
+    <div class="body">
+        <p class="desc">Code sample links for this page:</p>
+		<ul>
+			<li>
+				<p class="title">Controller</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs</a></p>
+			</li>
+			<li>
+				<p class="title">View</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/Users.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/Users.cshtml</a></p>
+			</li>
+			<li>
+				<p class="title">SchoolsService</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs</a></p>
+			</li>
+			<li>
+				<p class="title">SchoolUsersViewModel</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SchoolUsersViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SchoolUsersViewModel.cs</a></p>
+			</li>
+		</ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/users.js"></script>
+{% endblock %}

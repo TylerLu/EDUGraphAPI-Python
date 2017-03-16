@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block csslink %}
+	<link href="/static/css/register.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<h2>Register</h2>
+<form action="" method="post" class="form-horizontal" role="form">{% csrf_token %}
+	<h4>Create a new account.</h4>
+	<hr />
+	<div class="form-group">
+		<div class="validation-summary-valid text-danger" data-valmsg-summary="true">
+				<ul>
+					<li style="display:none"></li>
+				</ul>
+		</div>
+	<div class="form-group">
+		<label class="col-md-2 control-label" for="Email">Email</label>
+		<div class="col-md-10">
+			<input class="form-control" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-required="The Email field is required." id="Email" name="Email" type="text" value="" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-md-2 control-label" for="Password">Password</label>
+		<div class="col-md-10">
+			<input class="form-control" data-val="true" data-val-length="The Password must be at least 6 characters long." data-val-length-max="100" data-val-length-min="6" data-val-required="The Password field is required." id="Password" name="Password" type="password" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-md-2 control-label" for="ConfirmPassword">Confirm password</label>
+		<div class="col-md-10">
+			<input class="form-control" data-val="true" data-val-equalto="The password and confirmation password do not match." data-val-equalto-other="*.Password" id="ConfirmPassword" name="ConfirmPassword" type="password" />
+		</div>
+	</div>    
+	<div class="form-group">
+		<label class="col-md-2 control-label" for="FavoriteColor">Favorite color</label>
+		<div class="col-md-10">
+			<select name="FavoriteColor" id="FavoriteColor" class="form-control">
+				<option value="#2F19FF">Blue</option>
+				<option value="#127605">Green</option>
+				<option value="#535353">Grey</option>
+			</select>
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-md-offset-2 col-md-10">
+			<input type="submit" class="btn btn-default" value="Register" />
+		</div>
+	</div>
+</form>
+{% endblock %}
+{% block demohelper %}
+<div class="demo-helper-control collapsed">
+	<div class="header">DEMO HELPER</div>
+    	<div class="header-right-shadow-mask"></div>
+    		<div class="body">
+        		<p class="desc">Code sample links for this page:</p>
+            	<ul>
+					<li>
+						<p class="title">Controller</p>
+						<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs</a></p>
+					</li>
+					<li>
+						<p class="title">View</p>
+						<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Register.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Register.cshtml</a></p>
+					</li>
+					<li>
+						<p class="title">EducationRegisterViewModel</p>
+						<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/EducationRegisterViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/EducationRegisterViewModel.cs</a></p>
+					</li>
+            	</ul>
+    		</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/jquery.validate.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script src="/static/js/jquery.validate-vsdoc.js"></script>
+<script src="/static/js/jquery.validate.unobtrusive.js"></script>
+{% endblock %}

@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Class Details{% endblock %}
+
+{% block headjs %}
+{% endblock %}
+
+{% block content %}
+<div class="row schools class-details">
+	<div class="tophero">
+    	<div class="container">
+            <div class="col-md-6 secondnav">
+                <a href="/schools"> All Schools</a>
+				> {{ schoolname }}
+				> {{ section.coursename }}
+            </div>
+        </div>
+        <div class="container">
+            <div class="a-heading ">Class Details</div>
+			<div class="b-title"> {{ section.coursenumber }} | {{ section.displayname}}</div>
+        </div>
+        <div class="container coursedetail">
+            <div class="col-md-6">
+				<span>Course Name:</span> {{ section.coursename }}
+                <br />
+				<span>Description:</span> {{ section.coursedesc }}
+                <br />
+				<span>Period:</span> {{ section.period }}
+                <br />
+				<span>Term Name:</span> {{ section.termname }}
+                <br />
+                <span>Start/Finish Date:</span>
+				<span id="termdate">{{ section.termstartdate }}</span>
+                <span id="termdate-separator"> - </span>
+				<span id="termdate">{{ section.termenddate }}</span>
+            </div>
+            <div class="col-md-6">
+				{% for teach in section.teachers %}
+				<span>Teacher:</span>{{ teach }}
+				{% if not forloop.last %}<br />{% endif %} 
+				{% endfor %}
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+    <div class="students">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#students"><span>Students</span></a></li>
+            <li><a data-toggle="tab" href="#documents" id="classdoclink"><span>Class Documents</span></a></li>
+            <li><a data-toggle="tab" href="#conversations"><span>Conversations</span></a></li>
+            <li><a data-toggle="tab" href="#seatingchart"><span>SEATING CHART</span></a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="students" class="tab-pane fade in active">
+				{% if section.students|length == 0%}
+				<div class="nodata"> There is no data available for this page at this time.</div>
+				{% else %}
+				<table class="table  table-green table-student tablesorter" id="studentsTable">
+					<thead>
+						<tr class="table-green-header">
+							<th class="tdleft">student name</th>
+							<th>grade</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for stu in section.students %}
+						<tr class="tr-content">
+							<td><img src="/static/Images/header-default.jpg" />{{ stu.displayname }}</td>
+							<td>{{ stu.educationgrade }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				{% endif %}
+            </div>
+            <div id="documents" class="tab-pane fade">
+				{% if driveitems|length == 0 %}
+				<div class="nodata"> There is no data available for this page at this time.</div>
+				{% else %}
+				<table id="studoc" class="table  table-green table-student tablesorter">
+					<thead>
+						<tr class="table-green-header">
+							<th class="border-holder"></th>
+							<th class="space-holder left"></th>
+							<th class="tdleft">document name</th>
+							<th class="tdleft">modified</th>
+							<th class="tdleft">modified by</th>
+							<th class="space-holder right"></th>
+						</tr>
+						<tr class="blanktr">
+							<th colspan="5"></th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for doc in driveitems %}
+						<tr class="tr-content">
+							<td class="border-holder"></td>
+							<td class="space-holder left"></td>
+							<td>
+								<a target="_blank" href="{{ doc.url }}">{{ doc.name }}</a>
+							</td>
+							<td>{{ doc.lastmodifieddatetime }}</td>
+							<td>{{ doc.lastusername }}</td>
+							<td class="space-holder right"></td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				{% endif %}
+                <span class="see-more"><a href="" target="_blank">See All</a></span>
+                <br style="clear:both" />
+            </div>
+            <div id="conversations" class="tab-pane fade">
+				{% if conversations|length == 0 %}
+				<div class="nodata"> There is no data available for this page at this time.</div>
+				{% else %}
+				<table id="stuconv" class="table  table-green table-student">
+					<tbody>
+						{% for con in conversations %}
+						<tr class="tr-content">
+							<td class="border-holder"></td>
+							<td class="space-holder left"></td>
+							<td>
+								<a target="_blank" href="">{{ con.topic }}</a>
+							</td>
+							<td class="space-holder right"></td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				{% endif %}
+				<span class="see-more"><a target="_blank" href="">See All</a></span>
+                <br style="clear:both" />
+            </div>
+            <div id="seatingchart" class="tab-pane fade ">
+                <div class="left" id="dvleft">
+					{% if isstudent %}
+					<div class="tip"> To assign seats for each student, drag and drop student profile icons below onto the seating map to the right.</div>
+					{% else %}
+					<div class="assignseat tip"><div class="greenicon" style=""></div>Your assigned seat </div>
+					{% endif %}
+                    <ul id="lstproducts">
+						{% for stu in section.students%}
+							<li id="{{ stu.O365userid }}">
+								<img src="/static/Images/header-default.jpg"/>
+								<span class="disname">{{ stu.displayname }}</span>
+								<span class="seated">seated ?</span>
+							</li>
+						{% endfor %}
+                    </ul>
+                    <div id="hidtiles" class="hideitem">
+						{% for stu in section.students %}
+                            <div class="deskcontainer white" style="" position="" userid="">
+                                <div class="deskclose"><img src="/static/Images/close.png"></div>
+                                <div class="deskicon">
+                                    <img src="/static/Images/header-default.jpg" />
+                                </div>
+								<div class="stuname">{{ stu.displayname }}</div>
+                            </div>
+						{% endfor %}
+                    </div>
+                </div>
+                <div class="right" id="dvright">
+                    <div class="teacherdesk" style="">Teacher's desk</div>
+                    <div>
+                        <div id="graybg">
+							{% for i in seatrange%}
+							<div class="desktile" position="{{ i }}"></div>
+							{% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div id="dvedit" class="dvedit">
+					{% if isstudent %}
+					<img id="imgedit" src="/static/Images/edit.png" />
+					<img id="imgsave" src="/static/Images/save.png" />
+					<img id="imgcancel" src="/static/Images/cancel.png" />
+					{% endif %}
+                </div>
+                <br style="clear:both" />
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" name="hidSectionid" id="hidSectionid" value="64e0c4a4-8fc9-4d2a-9d95-63316ac82a31" />
+{% endblock %}
+
+{% block demohelper %}
+<div class="demo-helper-control collapsed">
+    <div class="header">DEMO HELPER</div>
+    <div class="header-right-shadow-mask"></div>
+    <div class="body">
+        <p class="desc">Code sample links for this page:</p>
+		<ul>
+			<li>
+				<p class="title">Controller</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs</a></p>
+			</li>
+			<li>
+				<p class="title">View</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/ClassDetails.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/ClassDetails.cshtml</a></p>
+			</li>
+			<li>
+				<p class="title">ApplicationService</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs</a></p>
+			</li>
+			<li>
+				<p class="title">SchoolsService</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs</a></p>
+			</li>
+			<li>
+				<p class="title">SectionDetailsViewModel</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SectionDetailsViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SectionDetailsViewModel.cs</a></p>
+			</li>
+			<li>
+				<p class="title">SeatingViewModel</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SeatingViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SeatingViewModel.cs</a></p>
+			</li>
+		</ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block basejs%}
+<script src="/static/js/jquery-3.1.1.js"></script>
+<script src="/static/js/modernizr-2.6.2.js"></script>
+<script src="/static/js/jquery.tablesorter.min.js"></script>
+<script src="/static/js/moment.min.js"></script>
+<script src="/static/js/classdetail.js"></script>
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/respond.js"></script>
+<script src="/static/js/site.js"></script>
+{% endblock %}

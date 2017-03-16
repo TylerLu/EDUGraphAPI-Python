@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} - EDUGraphAPI</title>
+	<link href="/static/favicon.ico" rel="icon" type="image/x-icon" />
+
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/site.css">
+	{% block csslink %}{% endblock %}
+	{% block headjs %}{% endblock %}
+</head>
+<body>
+{% include 'nav.html' %}
+
+<div class="containerbg">
+<div class="container body-content">
+{% block content %}
+{% endblock %}
+</div>
+</div>
+
+{% block demohelper%}
+{% endblock %}
+
+{% block basejs%}
+<script src="/static/js/jquery-3.1.1.js"></script>
+<script src="/static/js/modernizr-2.6.2.js"></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/respond.js"></script>
+<script src="/static/js/site.js"></script>
+{% endblock %}
+
+{% block localjs %}
+{% endblock %}
+
+</body>
+</html>

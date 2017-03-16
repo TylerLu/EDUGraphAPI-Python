@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}About Me{% endblock %}
+
+{% block content %}
+<div class="container ">
+	<h2>                
+    	About Me
+	</h2>
+    <div class="margin-top-12 margin-btm-12 aboutme">
+		<b>Username:</b><br /> {{ username }}
+    </div>
+    <div class="margin-top-12 margin-btm-12">
+		<b>Logged in as:</b><br /> {{ userrole }}
+    </div>
+	{% if showcolor %}
+    <div class="margin-btm-12">
+        <b>Favorite Color:</b>
+		<form action="/Manage/UpdateFavoriteColor" method="post">
+			<select name="favoritecolor">
+            	<option value="#2F19FF" >Blue</option>
+            	<option value="#127605" >Green</option>
+            	<option value="#535353" selected>Grey</option>
+    		</select>
+            <input type="submit"  value="Save"/>
+		</form>
+    </div>
+	{% endif %}
+    <div class="margin-btm-12 ">
+        <b>Classes:</b> 
+        <br />
+        <div >
+			{% for item in groups %}
+				{{ item }} <br />
+			{% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

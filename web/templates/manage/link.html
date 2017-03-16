@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Link Office 365 & Local Account{% endblock %}
+
+{% block content %}
+<h2>Link Office 365 & Local Account</h2>
+{% if not arelinked %}
+    <p>This page will enable you to link your Office 365 & Local Account together to successfully use the demo application.</p>
+	{% if islocal %}
+        <div class="form-horizontal" id="linkAccountPrompt">
+            <hr />
+			<form action="" method="post">{% csrf_token %}
+                <p>
+                    <input type="submit" value="Link to existing O365 account" class="btn btn-primary" /> &nbsp; &nbsp;
+                </p>
+			</form>
+        </div>
+	{% else %}
+        <hr />
+        <div class="form-horizontal">
+			{% if localexisted %}
+			<p>{{ localmessage }}</p>
+			{% endif %}
+            <p>
+			{% if localexisted %}
+			<a class="btn btn-primary disabled" href="">Continue with new Local Account</a>
+			{% else %}
+			<a class="btn btn-primary" href="">Continue with new Local Account</a>
+			{% endif %}
+          	&nbsp; &nbsp;
+			<a class="btn btn-primary" href="">Link with existing Local Account</a>
+         	&nbsp; &nbsp;
+            </p>
+        </div>
+	{% endif %}
+{% else %}
+    <div>
+        <p>Your local account and Office 365 account are now linked.</p>
+        <p>
+            <ul>
+				<li>Local account: {{ user.email }}</li>
+				<li>Office 365 account: {{ user.o365email }}</li>
+            </ul>
+        </p>
+		<p><a class="btn btn-default" href="">Return to home</a></p>
+    </div>
+{% endif %}
+{% endblock %}
+

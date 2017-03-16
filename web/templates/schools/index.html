@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% load  set_var %}
+
+{% block title %}ALL SCHOOLS{% endblock %}
+
+{% block content %}
+<div class="row schools">
+<div class="tophero">
+	<div class="col-md-6">
+		<div class="a-heading schoolname">
+			ALL SCHOOLS
+		</div>
+	</div>
+	<div class="col-md-6 schooltiles">
+		{% if userid %}
+		<div class="infocontainer">
+			<div class="infoheader">
+				{% if isstudent %}
+				Student
+				{% else %}
+				Teacher
+				{% endif %}
+				Id
+			</div>
+			<div class="infobody">
+				{{ userid }}
+			</div>
+		</div>
+		{% endif %}
+	</div>
+	<div class="container myschool">
+		<div class="schoolenrolled">
+			Current school(s) enrolled
+		</div>
+		<div class="greenicon"></div>
+	</div>
+	<div style="clear:both;"></div>
+</div>
+{{ a }}
+{% if schools|length == 0 %}
+<div class="nodata"> There is no data available for this page at this time.</div>
+{% else %}
+<table class="table  table-green table-schools">
+	<tr class="table-green-header">
+		<th class="tdleft">
+			School Name
+		</th>
+		<th>
+			Principal
+		</th>
+		<th>
+			Grade Levels
+		</th>
+		<th>
+			Address
+		</th>
+		<th></th>
+	</tr>
+	{% for school in schools %}
+		{% if userschoolid == school.id %}
+			<tr class="tr-content td-green">
+			{% set bingicon = "/static/Images/icon-map_30x28px-WHT.png" %}
+		{% else %}
+			<tr class="tr-content">
+			{% set bingicon = "/static/Images/icon-map_30x28px-BLU.png" %}
+		{% endif %}
+		<td >{{ school.name }}</td>
+		<td >{{ school.principalname }}</td>
+		<td >{{ school.lowestgrade }} - {{ school.highestgrade }}</td>
+		<td>
+			<div class="schooladdress">
+				{{ school.address }}
+				{% if school.city %}
+				<br />
+				{{ school.city }},
+				{% endif %}
+				{{ school.state }} {{ school.zip }}
+			</div>
+			<div class="schoolmap">
+				{% if school.latitude and school.longitude %}
+					<a class="bingMapLink" lat="{{ school.latitude }}" lon="{{ school.Longitude }}" href="javascript:void(0)"><img src="{{ bingicon }}" /></a>
+				{% endif %}
+			</div>
+		</td>
+		<td>
+			<a href="/Classes" class="btnlink">Classes</a>
+			<a href="/Users" class="btnlink">Teachers/students</a>
+		</td>
+	</tr>
+	{% endfor %}
+</table>
+{% endif %}
+</div>
+{% endblock %}
+{% block demohelper %}
+<div class="demo-helper-control collapsed">
+	<div class="header">DEMO HELPER</div>
+	<div class="header-right-shadow-mask"></div>
+	<div class="body">
+		<p class="desc">Code sample links for this page:</p>
+		<ul>
+			<li>
+				<p class="title">Controller</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs</a></p>
+			</li>
+			<li>
+				<p class="title">View</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/Index.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/Index.cshtml</a></p>
+			</li>
+			<li>
+				<p class="title">ApplicationService</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs</a></p>
+			</li>
+			<li>
+				<p class="title">SchoolsService</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs</a></p>
+			</li>
+			<li>
+				<p class="title">SchoolsViewModel</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SchoolsViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SchoolsViewModel.cs</a></p>
+			</li>
+		</ul>
+    </div>
+</div>
+<div id='myMap' ></div>
+<input type="hidden" name="BingMapKey" id="BingMapKey" value="3123" />
+{% endblock %}
+
+{% block localjs %}
+<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol' async defer></script>
+<script src="/static/js/schools.js"></script>
+{% endblock %}
