@@ -96,6 +96,10 @@ echo Pip install six.
 %PYTHON_EXE% -m pip install six
 IF !ERRORLEVEL! NEQ 0 goto error
 
+echo Pip install setuptools.
+%PYTHON_EXE% -m pip install setuptools
+IF !ERRORLEVEL! NEQ 0 goto error
+
 IF EXIST "%DEPLOYMENT_TARGET%\requirements.txt" (
   echo Pip install requirements.
   %PYTHON_EXE% -m pip install -r requirements.txt
