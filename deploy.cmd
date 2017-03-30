@@ -118,13 +118,13 @@ IF EXIST "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" (
 )
 
 :: 6. Django collectstatic
-IF EXIST "%DEPLOYMENT_TARGET%\manage.py" (
-  echo Collecting Django static files.
-  IF NOT EXIST "%DEPLOYMENT_TARGET%\static" (
-    MKDIR "%DEPLOYMENT_TARGET%\static"
-  )
-  %PYTHON_EXE% manage.py collectstatic --noinput --clear
-)
+::IF EXIST "%DEPLOYMENT_TARGET%\manage.py" (
+::  echo Collecting Django static files.
+::  IF NOT EXIST "%DEPLOYMENT_TARGET%\static" (
+::    MKDIR "%DEPLOYMENT_TARGET%\static"
+::  )
+::  %PYTHON_EXE% manage.py collectstatic --noinput --clear
+::)
 
 popd
 
