@@ -19,7 +19,6 @@ from web import views as web_views
 
 urlpatterns = [
     url(r'^$', web_views.index, name='index'),
-    url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^Account/Login', web_views.login, name='login'),
     url(r'^Account/Register', web_views.register, name='register'),
     url(r'^Schools', web_views.schools, name='schools'),
@@ -28,4 +27,6 @@ urlpatterns = [
     url(r'^ClassDetails', web_views.classdetails, name='classdetails'),
     url(r'^AboutMe', web_views.aboutme, name='aboutme'),
     url(r'^link', web_views.link, name='link'),
+    url(r'^MS/Login', web_views.o365_login, name='o365login'),
+    url(r'^oauth/login', web_views.oauth_login, name='oauth_login'),
 ]

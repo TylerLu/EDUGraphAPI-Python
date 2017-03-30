@@ -35,9 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    'oauth2_provider',
-
+    
     'web',
 ]
 
@@ -116,10 +114,17 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images)R
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+
+CLIENT_ID = 'dfc81b95-1a9c-4522-9f33-259de9acf68b'
+CLIENT_SECRET = 'yBjqwJkHMNOmh1LdgvO+xQsJ2KjlCTxjOeeidWV0rHM='
+SCOPES = 'Directory.Read.All'
+AUTHORIZE_TOKEN_URI = 'https://login.microsoftonline.com/canvizEDU.onmicrosoft.com'
+AAD_RESOURCE = 'https://graph.windows.net'
+MS_RESOURCE = 'https://graph.microsoft.com'

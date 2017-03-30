@@ -1,10 +1,50 @@
 from django import forms
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
+from django.http import HttpResponse, HttpResponseRedirect
 
-# Create your views here.
+from django.conf import settings
+
+from .utils import constant
+from .utils.ms_api_request import MSGraphRequest
+from .utils.aad_api_request import AADGraphRequest
+from .utils.account_controller import LocalUser, O365User
 
 def index(request):
     return render(request, 'account/login.html')
+
+def login(request):
+    email = ''
+    password = ''
+    if request.method == 'POST':
+        email = request.POST.get('Email')
+        password = request.POST.get('Password')
+    if email and password:
+        local_user = LocalUser(email, password)
+        return HttpResponse('local user')
+    else:
+        return HttpResponseRedirect(constant.o365_signin_url)
+
+def o365_login(request):
+    code = request.GET.get('code', '')
+    aad_request = AADGraphRequest()
+    ms_request = MSGraphRequest(constant.client_id, constant.client_secret, constant.authorize_token_uri, constant.graph_base_uri)
+    aad_resource_result = ms_request.authorize(code, constant.redirect_uri, constant.aad_resource)
+    token = aad_resource_result['accessToken']
+    # get admin ids from aad graph api because of ms graph lost directoryRoles members api
+    admin_ids = aad_request.get_admin_ids(token)
+    # get ms graph client by freshToken
+    refresh_token = aad_resource_result['refreshToken']
+    ms_resource_result = ms_request.authorize_refresh(refresh_token, constant.ms_resource)
+    token = ms_resource_result['accessToken']
+    ms_client = ms_request.get_client(token)
+    # process user info for display
+    o365_user = O365User()
+    user_info = o365_user.parse_user_info(ms_client, admin_ids)
+    request.session['o365_user_info'] = user_info
+    if user_info['role'] == 'Admin':
+        return HttpResponseRedirect('/link')
+    else:
+        return HttpResponseRedirect('/Schools')
 
 def register(request):
     return render(request, 'account/register.html')
@@ -17,17 +57,6 @@ class LoginForm(forms.Form):
     pwd = forms.CharField(required=True, 
                           error_messages={'required': 'The Email field is required'})
 
-def login(request):
-    if request.method == "POST":
-        loginPost = LoginForm(request.POST)
-        ret = loginPost.is_valid()
-        if ret:
-            pass
-        else:
-            return render(request, 'account/login.html',{'error': loginPost.errors, 'form': loginPost})
-    else:
-        objGet = LoginForm()
-        return render(request, 'account/login.html',{'obj1': objGet})
 
 def schools(request):
     userid = '13003'
@@ -148,20 +177,13 @@ def aboutme(request):
     return render(request, 'manage/aboutme.html', parameter_dict)
 
 def link(request):
-    username = 'test001'
-    isauthenticated = True
-    arelinked = True
-    islocal = False
-    localexisted = True
-    localmessage = "There is a local account: test@test.com matching your O365 account."
-    user = {'email':'123@456.com', 'o365email': 'office@office.com'}
-    parameter_dict = {'username':username,
-                      'isauthenticated': isauthenticated,
-                      'arelinked': arelinked,
-                      'islocal': islocal,
-                      'localexisted': localexisted,
-                      'localmessage': localmessage,
-                      'user': user}
-    return render(request, 'manage/link.html', parameter_dict)
+    user_info = request.session['o365_user_info']
+    return render(request, 'manage/link.html', user_info)
 
-    
+
+def get_code(request):
+    print(request.GET)
+    return HttpResponse('ok')
+
+def oauth_login(request):
+    return HttpResponse(request.GET['code'])
