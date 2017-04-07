@@ -70,7 +70,7 @@ $(document).ready(function () {
                     $.each(value, function (i, user) {
                         var userHtml = '<div class="element ' + (user.ObjectType == "Teacher" ? "teacher-bg" : "student-bg") + '">' +
                                            '<div class="userimg">' +
-                                               '<img src="/images/header-default.jpg" realheader="' + '/Photo/UserPhoto/' + user.O365UserId + '" />' +
+                                               '<img src="/static/Images/header-default.jpg" realheader="' + '/Photo/UserPhoto/' + user.O365UserId + '" />' +
                                            '</div>' +
                                            '<div class="username">' + user.DisplayName + '</div>' +
                                        '</div>';

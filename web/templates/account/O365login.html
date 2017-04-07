@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign in{% endblock %}
+
+{% block csslink %}
+    <link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
+{% block content %}
+<div class="loginbody logino365">
+	<h3>Sign in</h3>
+    <div class="headertext">
+		{{ username }}
+    </div>
+    <div class="bodytext">
+		{{ email }}
+    </div>
+    <div class="bodytext">
+       Office 365 account
+    </div>
+    <div class="formstyle">
+		<form action="/Account/ExternalLogin">{% csrf_token %}
+            <div id="socialLoginList">
+                <p>
+					<button type="submit" class="btn btn-default btn-ms-login" id="" name="provider" value="" title=""></button>
+                </p>
+            </div>
+    	</form>
+    </div>
+    <div class="link">
+        <a href="/Account/ReLogin">Use a different account</a>
+    </div>
+</div>
+{% endblock %}
+{% block demohelper %}
+<div class="demo-helper-control collapsed">
+    <div class="header">
+        DEMO HELPER
+    </div>
+    <div class="header-right-shadow-mask"></div>
+	<div class="body">
+		<p class="desc">Code sample links for this page:</p>
+		<ul>
+			<li>
+				<p class="title">Controller</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs</a></p>
+			</li>
+			<li>
+				<p class="title">View</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml</a></p>
+			</li>
+			<li>
+				<p class="title">LoginViewModel</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs</a></p>
+			</li>
+		</ul>
+	</div>
+</div>
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/jquery.validate.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script src="/static/js/jquery.validate-vsdoc.js"></script>
+<script src="/static/js/jquery.validate.unobtrusive.js"></script>
+{% endblock %}

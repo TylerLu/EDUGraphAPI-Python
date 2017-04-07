@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Linked Accounts{% endblock %}
+
+{% block csslink %}
+{% endblock %}
+
+{% block content %}
+<h2>Linked Accounts</h2>
+<table class="table table-striped table-bordered">
+    <tr>
+        <th>Local Account</th>
+        <th>Office 365 Account</th>
+        <th></th>
+    </tr>
+	{% for link in links %}
+        <tr>
+			<td>{{ link.email }}</td>
+			<td>{{ link.o365Email }}</td>
+            <td>
+				<a href="/UnlinkAccounts/{{ link.id }}">Unlink</a>
+            </td>
+        </tr>
+	{% endfor %}
+	{% if links|length == 0 %}
+        <tr>
+            <td class="empty-result" colspan="3">No linked accounts</td>
+        </tr>
+	{% endif %}
+</table>
+<p><a href="/" class="btn btn-default">Return</a></p>
+{% endblock %}
+{% block demohelper %}
+<div class="demo-helper-control collapsed">
+    <div class="header">
+        DEMO HELPER
+    </div>
+    <div class="header-right-shadow-mask"></div>
+	<div class="body">
+		<p class="desc">Code sample links for this page:</p>
+		<ul>
+			<li>
+				<p class="title">Controller</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs</a></p>
+			</li>
+			<li>
+				<p class="title">View</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml</a></p>
+			</li>
+			<li>
+				<p class="title">LoginViewModel</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs</a></p>
+			</li>
+		</ul>
+	</div>
+</div>
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/jquery.validate.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script src="/static/js/jquery.validate-vsdoc.js"></script>
+<script src="/static/js/jquery.validate.unobtrusive.js"></script>
+{% endblock %}

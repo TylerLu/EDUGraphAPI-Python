@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin{% endblock %}
+
+{% block csslink %}
+{% endblock %}
+
+{% block content %}
+<h2>Admin</h2>
+{% if not user.isadminconsented %}
+    <div>
+        <h3>Admin Consent</h3>
+        <hr />
+		<form action="/Consent" method="POST">{% csrf_token %}
+            <p>To use this application in this tenancy you must first provide Admin Consent. </p>
+            <p>Please click the button below to proceed.</p>
+            <p class="form-group">
+                <input type="submit" value="Consent" class="btn btn-primary" />
+            </p>
+		</form>
+    </div>
+{% else %}
+    <div>
+        <p>Admin Consent has been applied.</p><hr />
+		<form action="/Consent" method="POST">{% csrf_token %}
+            <p>In some cases, you need to re-apply Admin Consent. For example, after the permissions of the AAD application change.</p>
+            <p>Please click the button below to proceed.</p>
+            <p class="form-group">
+                <input type="submit" value="Admin Consent" class="btn btn-default" />
+            </p>
+		</form>
+		<form action="/Unconsent" method="POST">{% csrf_token %}
+            <p>Please click the button below to cancel the admin consent.</p>
+            <p class="form-group">
+                <input type="submit" value="Admin Unconsent" class="btn btn-default" />
+            </p>
+            <p>Note: It will take a few minutes to effect.</p>
+		</form>
+    </div>
+    <hr />
+    <div>
+        <p>If you want to view your linked account or unlink accounts, please click the button below.</p>
+		<p><a href="/Admin/LinkedAccounts" class="btn btn-default">Manage Linked Accounts</a></p>
+    </div>
+    <hr />
+    <div>
+        <p>Click the button below to enable access to all your tenant users.</p>
+		<form action="" method="POST">{% csrf_token %}
+            <p class="form-group">
+                <input type="submit" value="Enable User Access" class="btn btn-default" />
+            </p>
+		</form>
+        <p>Note: The App will take a while to effect.</p>
+    </div>
+    <hr />
+	<p><a href="/" class="btn btn-default">Return to home</a></p>
+{% endif %}
+{% endblock %}
+{% block demohelper %}
+<div class="demo-helper-control collapsed">
+    <div class="header">
+        DEMO HELPER
+    </div>
+    <div class="header-right-shadow-mask"></div>
+	<div class="body">
+		<p class="desc">Code sample links for this page:</p>
+		<ul>
+			<li>
+				<p class="title">Controller</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs</a></p>
+			</li>
+			<li>
+				<p class="title">View</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml</a></p>
+			</li>
+			<li>
+				<p class="title">LoginViewModel</p>
+				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs</a></p>
+			</li>
+		</ul>
+	</div>
+</div>
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/jquery.validate.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script src="/static/js/jquery.validate-vsdoc.js"></script>
+<script src="/static/js/jquery.validate.unobtrusive.js"></script>
+{% endblock %}

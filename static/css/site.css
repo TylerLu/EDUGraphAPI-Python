@@ -508,3 +508,31 @@ max-width: 140px;
 #studoc .header:nth-child(5){background-position-x:105px;}
 
 .blanktr th{border:none !important;height:20px;visibility:hidden}
+
+.search-container {
+    float: left;
+}
+.search-container .txtsearch {
+    float: left;
+    width: 200px;
+    height: 25px;
+    padding: 0 10px;
+    border: 1px solid #a9a9a9;
+    font-size: 12px;
+    font-weight: normal;
+    border-right: 0;
+}
+
+.search-container .btnsubmit {
+    background-color: transparent;
+    position: static;
+    border: 1px solid #a9a9a9;
+    border-left: none;
+    margin-left: -4px;
+    height: 25px;
+    width: 32px;
+    background-image: url(/static/Images/search.png);
+    background-size: 18px;
+    background-repeat: no-repeat;
+    background-position: center;
+}

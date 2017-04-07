@@ -10,25 +10,25 @@
 		</div>
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
-				<li><a href="">Home</a></li>
-				{% if isInAschool %}
-				<li><a href="">Classes</a></li>
-				<li><a href="">Teachers & Students</a></li>
+				<li><a href="/">Home</a></li>
+				{% if user.isinaschool %}
+				<li><a href="/Schools/{{ user.school_object_id }}/Classes">Classes</a></li>
+				<li><a href="/Schools/{{ user.school_object_id }}/Users">Teachers & Students</a></li>
 				{% endif %}
-				{% if isauthenticated and isadmin %}
-				<li><a href="">Admin</a></li>
+				{% if user.isauthenticated and user.isadmin %}
+				<li><a href="/Admin">Admin</a></li>
 				{% endif %}
 			</ul>
-		{% if isauthenticated %}
+		{% if user.isauthenticated %}
 		<form action="https://login.microsoftonline.com/common/oauth2/logout?redirect_uri=http://127.0.0.1:8000&post_logout_redirect_uri=http://127.0.0.1:8000" class="navbar-right" id="logoutForm" method="post">{% csrf_token %}
         	<div class="userinfo">
-				<a href="javascript:void(0);" id="userinfolink">Logged in as: {{ role }}. Hello {{ display_name }}</a>
+				<a href="javascript:void(0);" id="userinfolink">Logged in as: {{ user.role }}. Hello {{ user.display_name }}<img src="{{ user.photo }}" /></a>
             	<span class="caret" id="caret"></span>
         	</div>
 			<div class="popupcontainer" id="userinfoContainer">
             	<div class="popuserinfo">
                 	<div class="subitem">
-                    	<a href="/AboutMe">About Me</a>
+                    	<a href="/Manage/AboutMe">About Me</a>
                 	</div>
                 	<div class="subitem">
                     	<a href="/link">Link</a>

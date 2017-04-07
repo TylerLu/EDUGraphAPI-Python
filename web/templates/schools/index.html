@@ -5,6 +5,7 @@
 {% block title %}ALL SCHOOLS{% endblock %}
 
 {% block content %}
+{% if user.arelinked %}
 <div class="row schools">
 <div class="tophero">
 	<div class="col-md-6">
@@ -13,10 +14,10 @@
 		</div>
 	</div>
 	<div class="col-md-6 schooltiles">
-		{% if userid %}
+		{% if user.school_uid %}
 		<div class="infocontainer">
 			<div class="infoheader">
-				{% if isstudent %}
+				{% if user.isstudent %}
 				Student
 				{% else %}
 				Teacher
@@ -24,7 +25,7 @@
 				Id
 			</div>
 			<div class="infobody">
-				{{ userid }}
+				{{ user.school_uid }}
 			</div>
 		</div>
 		{% endif %}
@@ -37,7 +38,6 @@
 	</div>
 	<div style="clear:both;"></div>
 </div>
-{{ a }}
 {% if schools|length == 0 %}
 <div class="nodata"> There is no data available for this page at this time.</div>
 {% else %}
@@ -58,7 +58,7 @@
 		<th></th>
 	</tr>
 	{% for school in schools %}
-		{% if userschoolid == school.id %}
+		{% if user.school_id == school.id %}
 			<tr class="tr-content td-green">
 			{% set bingicon = "/static/Images/icon-map_30x28px-WHT.png" %}
 		{% else %}
@@ -79,19 +79,34 @@
 			</div>
 			<div class="schoolmap">
 				{% if school.latitude and school.longitude %}
-					<a class="bingMapLink" lat="{{ school.latitude }}" lon="{{ school.Longitude }}" href="javascript:void(0)"><img src="{{ bingicon }}" /></a>
+					<a class="bingMapLink" lat="{{ school.latitude }}" lon="{{ school.longitude }}" href="javascript:void(0)"><img src="{{ bingicon }}" /></a>
 				{% endif %}
 			</div>
 		</td>
 		<td>
-			<a href="/Classes" class="btnlink">Classes</a>
-			<a href="/Users" class="btnlink">Teachers/students</a>
+			<a href="Schools/{{ school.object_id }}/Classes" class="btnlink">Classes</a>
+			<a href="Schools/{{ school.object_id }}/Users" class="btnlink">Teachers/students</a>
 		</td>
 	</tr>
 	{% endfor %}
 </table>
 {% endif %}
 </div>
+<div id='myMap'></div>
+<input type="hidden" name="BingMapKey" id="BingMapKey" value="Anu3xoioQvqyG6b3eZ30IyR8TwyeQYpeag6OBdQvrsfUn0FwsVwFH9OnkJZvX-8a" />
+<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol' async defer></script>
+{% else %}
+<br/>
+	{% if not user.islocal %}
+		<p>
+		You will need to link your O365 and local accounts in order to use the functionality of this demo application. Please click on the browser 'Back' button to go back and link your existing local account or create a local account.
+		</p>
+	{% else %}
+		<p>
+		You will need to link your O365 and local account together in order to use the functionality of this demo application. Please click on the browser 'Back' button to go back and link your existing O365 account.        
+		</p>
+	{% endif %}
+{% endif %}
 {% endblock %}
 {% block demohelper %}
 <div class="demo-helper-control collapsed">
@@ -123,11 +138,19 @@
 		</ul>
     </div>
 </div>
-<div id='myMap' ></div>
-<input type="hidden" name="BingMapKey" id="BingMapKey" value="3123" />
+{% endblock %}
+
+{% block basejs%}
+<script src="/static/js/jquery-3.1.1.js"></script>
+<script src="/static/js/modernizr-2.6.2.js"></script>
+<script src="/static/js/jquery.tablesorter.min.js"></script>
+<script src="/static/js/moment.min.js"></script>
+<script src="/static/js/classdetail.js"></script>
 {% endblock %}
 
 {% block localjs %}
-<script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol' async defer></script>
+<script src="/static/js/bootstrap.js"></script>
+<script src="/static/js/respond.js"></script>
 <script src="/static/js/schools.js"></script>
+<script src="/static/js/site.js"></script>
 {% endblock %}
