@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
 
-{% load set_var %}
-
 {% block title %}Class Details{% endblock %}
 
 {% block headjs %}
@@ -13,32 +11,32 @@
     	<div class="container">
             <div class="col-md-6 secondnav">
                 <a href="/schools"> All Schools</a>
-				><a href="/Schools/{{ user.school_object_id }}/Classes">{{ school.school_name }}</a>
-				> {{ section.course_name }}
+				> {{ schoolname }}
+				> {{ section.coursename }}
             </div>
         </div>
         <div class="container">
             <div class="a-heading ">Class Details</div>
-			<div class="b-title"> {{ section.course_number }} | {{ section.course_displayname}}</div>
+			<div class="b-title"> {{ section.coursenumber }} | {{ section.displayname}}</div>
         </div>
         <div class="container coursedetail">
             <div class="col-md-6">
-				<span>Course Name:</span> {{ section.course_name }}
+				<span>Course Name:</span> {{ section.coursename }}
                 <br />
-				<span>Description:</span> {{ section.course_desc }}
+				<span>Description:</span> {{ section.coursedesc }}
                 <br />
-				<span>Period:</span> {{ section.course_period }}
+				<span>Period:</span> {{ section.period }}
                 <br />
-				<span>Term Name:</span> {{ section.course_termname }}
+				<span>Term Name:</span> {{ section.termname }}
                 <br />
                 <span>Start/Finish Date:</span>
-				<span id="termdate">{{ section.course_termstartdate }}</span>
+				<span id="termdate">{{ section.termstartdate }}</span>
                 <span id="termdate-separator"> - </span>
-				<span id="termdate">{{ section.course_termenddate }}</span>
+				<span id="termdate">{{ section.termenddate }}</span>
             </div>
             <div class="col-md-6">
-				{% for teach in teachers %}
-				<span>Teacher:</span>{{ teach.name }}
+				{% for teach in section.teachers %}
+				<span>Teacher:</span>{{ teach }}
 				{% if not forloop.last %}<br />{% endif %} 
 				{% endfor %}
             </div>
@@ -54,7 +52,7 @@
         </ul>
         <div class="tab-content">
             <div id="students" class="tab-pane fade in active">
-				{% if students|length == 0%}
+				{% if section.students|length == 0%}
 				<div class="nodata"> There is no data available for this page at this time.</div>
 				{% else %}
 				<table class="table  table-green table-student tablesorter" id="studentsTable">
@@ -65,10 +63,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for student in students %}
+						{% for stu in section.students %}
 						<tr class="tr-content">
-							<td><img src="/static/Images/header-default.jpg" realheader="{{ student.photo|safe }}"/>{{ student.name }}</td>
-							<td>{{ student.grade }}</td>
+							<td><img src="/static/Images/header-default.jpg" />{{ stu.displayname }}</td>
+							<td>{{ stu.educationgrade }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -76,7 +74,7 @@
 				{% endif %}
             </div>
             <div id="documents" class="tab-pane fade">
-				{% if documents|length == 0 %}
+				{% if driveitems|length == 0 %}
 				<div class="nodata"> There is no data available for this page at this time.</div>
 				{% else %}
 				<table id="studoc" class="table  table-green table-student tablesorter">
@@ -94,22 +92,22 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for document in documents %}
+						{% for doc in driveitems %}
 						<tr class="tr-content">
 							<td class="border-holder"></td>
 							<td class="space-holder left"></td>
 							<td>
-								<a target="_blank" href="{{ document.web_url }}">{{ document.name }}</a>
+								<a target="_blank" href="{{ doc.url }}">{{ doc.name }}</a>
 							</td>
-							<td>{{ document.last_modified_date_time }}</td>
-							<td>{{ document.last_modified_user_name }}</td>
+							<td>{{ doc.lastmodifieddatetime }}</td>
+							<td>{{ doc.lastusername }}</td>
 							<td class="space-holder right"></td>
 						</tr>
 						{% endfor %}
 					</tbody>
 				</table>
 				{% endif %}
-				<span class="see-more"><a href="{{ documents_root }}" target="_blank">See All</a></span>
+                <span class="see-more"><a href="" target="_blank">See All</a></span>
                 <br style="clear:both" />
             </div>
             <div id="conversations" class="tab-pane fade">
@@ -118,12 +116,12 @@
 				{% else %}
 				<table id="stuconv" class="table  table-green table-student">
 					<tbody>
-						{% for conversation in conversations %}
+						{% for con in conversations %}
 						<tr class="tr-content">
 							<td class="border-holder"></td>
 							<td class="space-holder left"></td>
 							<td>
-								<a target="_blank" href="{{ conversation.url }}">{{ conversation.topic }}</a>
+								<a target="_blank" href="">{{ con.topic }}</a>
 							</td>
 							<td class="space-holder right"></td>
 						</tr>
@@ -131,58 +129,39 @@
 					</tbody>
 				</table>
 				{% endif %}
-				<span class="see-more"><a target="_blank" href="{{ conversations_root }}">See All</a></span>
+				<span class="see-more"><a target="_blank" href="">See All</a></span>
                 <br style="clear:both" />
             </div>
             <div id="seatingchart" class="tab-pane fade ">
                 <div class="left" id="dvleft">
-					{% if not user.isstudent %}
+					{% if isstudent %}
 					<div class="tip"> To assign seats for each student, drag and drop student profile icons below onto the seating map to the right.</div>
 					{% else %}
-					<div class="assignseat tip"><div class="greenicon" style="background-color:{{ user.color }}"></div>Your assigned seat </div>
+					<div class="assignseat tip"><div class="greenicon" style=""></div>Your assigned seat </div>
 					{% endif %}
                     <ul id="lstproducts">
-						{% for student in students %}
-							<li id="{{ student.uid }}">
-								<img src="/static/Images/header-default.jpg" realheader={{ student.photo }}/>
-								<span class="disname">{{ student.name }}</span>
-								{% if student.position == 0 %}
-								<span class="seated hideitem">
-								{% else %}
-								<span class="seated">
-								{% endif %}
-								seated &#10003
-								</span>
+						{% for stu in section.students%}
+							<li id="{{ stu.O365userid }}">
+								<img src="/static/Images/header-default.jpg"/>
+								<span class="disname">{{ stu.displayname }}</span>
+								<span class="seated">seated ?</span>
 							</li>
 						{% endfor %}
                     </ul>
                     <div id="hidtiles" class="hideitem">
-						{% for student in students %}
-							{% if student.position != 0 %}
-								{% set containerclass = "white" %}
-							{% else %}
-								{% set containerclass = "saved" %}
-							{% endif %}
-							{% if student.color %}
-								{% set containerclass += " green" %}
-								{% set style = "background-color:student.color" %}
-							{% endif %}
-							<div class="deskcontainer {{ containerclass }}" style="{{ style }}" position="{{ student.position }}" userid="{{ student.uid }}">
+						{% for stu in section.students %}
+                            <div class="deskcontainer white" style="" position="" userid="">
                                 <div class="deskclose"><img src="/static/Images/close.png"></div>
                                 <div class="deskicon">
-									<img src="/static/Images/header-default.jpg" realheader="{{ student.photo }}" />
+                                    <img src="/static/Images/header-default.jpg" />
                                 </div>
-								<div class="stuname">{{ student.name }}</div>
+								<div class="stuname">{{ stu.displayname }}</div>
                             </div>
 						{% endfor %}
                     </div>
                 </div>
                 <div class="right" id="dvright">
-					{% if not user.isstudent %}
-						<div class="teacherdesk" style="background-color:{{ user.color }}">Teacher's desk</div>
-					{% else %}
-						<div class="teacherdesk" style="">Teacher's desk</div>
-					{% endif %}
+                    <div class="teacherdesk" style="">Teacher's desk</div>
                     <div>
                         <div id="graybg">
 							{% for i in seatrange%}
@@ -192,10 +171,10 @@
                     </div>
                 </div>
                 <div id="dvedit" class="dvedit">
-					{% if not user.isstudent %}
-						<img id="imgedit" src="/static/Images/edit.png" />
-						<img id="imgsave" src="/static/Images/save.png" />
-						<img id="imgcancel" src="/static/Images/cancel.png" />
+					{% if isstudent %}
+					<img id="imgedit" src="/static/Images/edit.png" />
+					<img id="imgsave" src="/static/Images/save.png" />
+					<img id="imgcancel" src="/static/Images/cancel.png" />
 					{% endif %}
                 </div>
                 <br style="clear:both" />
@@ -203,7 +182,7 @@
         </div>
     </div>
 </div>
-<input type="hidden" name="hidSectionid" id="hidSectionid" value="{{ user.class_object_id }}" />
+<input type="hidden" name="hidSectionid" id="hidSectionid" value="64e0c4a4-8fc9-4d2a-9d95-63316ac82a31" />
 {% endblock %}
 
 {% block demohelper %}

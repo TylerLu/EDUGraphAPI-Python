@@ -14,23 +14,14 @@
 				<form class="form-horizontal" action="/Account/Login" method="post" role="form">{% csrf_token %}
             	<h4 class="margin-btm-20">Use your local account to log in</h4>
             		<div class="form-group">
-						{% if errors %}
-						<div class="validation-summary-errors text-danger">
-							<ul>
-								{% for error in errors %}
-								<li>{{ error }}</li>
-								{% endfor %}
-							</ul>
-						</div>
-						{% endif %}
                 		<div class="col-md-12">
-							{{ user_form.Email }}
+							<input class="form-control logincontrol" data-val="true" data-val-email="The Email field is not a valid e-mail address." data-val-required="The Email field is required." id="Email" name="Email" placeholder="Email" type="text" value="" />
                     		<span class="field-validation-valid text-danger" data-valmsg-for="Email" data-valmsg-replace="true"></span>
                 		</div>
             		</div>
             		<div class="form-group">
                 		<div class="col-md-12">
-							{{ user_form.Password }}
+							<input class="form-control logincontrol" data-val="true" data-val-required="The Password field is required." id="Password" name="Password" placeholder="Password" type="password" />
 							<span class="field-validation-valid text-danger" data-valmsg-for="Password" data-valmsg-replace="true"></span>
                 		</div>
             		</div>
@@ -82,22 +73,23 @@
         DEMO HELPER
     </div>
     <div class="header-right-shadow-mask"></div>
-	<div class="body">
-		<p class="desc">Code sample links for this page:</p>
-		<ul>
-			<li>
-				<p class="title">Controller</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs</a></p>
-			</li>
-			<li>
-				<p class="title">View</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml</a></p>
-			</li>
-			<li>
-				<p class="title">LoginViewModel</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs</a></p>
-			</li>
-		</ul>
+    	<div class="body">
+        	<p class="desc">Code sample links for this page:</p>
+			<ul>
+				<li>
+					<p class="title">Controller</p>
+					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/AccountController.cs</a></p>
+				</li>
+				<li>
+					<p class="title">View</p>
+					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Account/Login.cshtml</a></p>
+              	</li>
+              	<li>
+					<p class="title">LoginViewModel</p>
+					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/AccountViewModels.cs</a></p>
+				</li>
+       		</ul>
+    	</div>
 	</div>
 </div>
 {% endblock %}

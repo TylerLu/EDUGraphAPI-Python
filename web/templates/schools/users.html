@@ -7,7 +7,7 @@
 <div class="tophero">
 	<div class="col-md-8">
 		<div class="secondnav">
-			<a href="/schools">All Schools</a> > {{ school.school_name }}
+			<a href="/schools">All Schools</a> > {{ schoolname }}
 		</div>
 		<div class="a-heading">
 			Teachers & Students
@@ -15,18 +15,18 @@
 	</div>
 	<div class="toptiles">
 		<div class="section-school-name">
-			{{ school.school_name }}
+			{{ schoolname }}
 		</div>
 		<div class="infocontainer">
 			<div class="infoheader">PRINCIPAL</div>
-			<div class="infobody" title="{{ school.school_principalname }}">
-				{{ school.school_principalname }}
+			<div class="infobody" title="{{ principalname }}">
+				{{ principalname }}
 			</div>
 		</div>
 		<div class="infocontainer">
 			<div class="infoheader">Grade level</div>
-			<div class="infobody" title="{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}">
-				{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}
+			<div class="infobody" title="{{ lowestgrade }} - {{ highestgrade }}">
+				{{ lowestgrade }} - {{ highestgrade }}
 			</div>
 		</div>
 	</div>
@@ -36,10 +36,6 @@
 			<div class="teacicon"></div><div>Teacher</div>
 		</div>
 		<div class="col-md-6 filterlink-container">
-			<div class="search-container ">
-				<input type="text" placeholder="Search" class="txtsearch" />
-				<button type="submit" id="btnsearch" title="Search" data-bi-dnt="" tabindex="40" class="btnsubmit"></button>
-			</div>
 			<span>FILTER:</span> <a id="filterteacher" class="filterlink" data-type="teachers">Teachers</a> | <a id="filterstudnet" class="filterlink" data-type="students">Students</a> | <a id="filterall" class="filterlink selected" data-type="users">All</a>
 		</div>
 	</div>
@@ -52,15 +48,15 @@
 		{% else %}
 		<div class="content">
 		{% for user in users %}
-			{% if user.object_type == 'Teacher' %}
+			{% if user.type == 'teacher' %}
 			<div class="element teacher-bg">
 			{% else %}
 			<div class="element student-bg">
 			{% endif %}
-			<div class="userimg">
-				<img src="{{ user.photo }}"/>
-			</div>
-			<div class="username">{{ user.name }}</div>
+				<div class="userimg">
+					<img src="/static/Images/header-default.jpg"/>
+				</div>
+				<div class="username">{{ user.displayname }}</div>
 			</div>
 		{% endfor %}
 		</div>
@@ -82,11 +78,15 @@
 		{% else %}
 		<div class="content">
 		{% for student in students %}
+			{% if student.type == 'teacher' %}
+			<div class="element teacher-bg">
+			{% else %}
 			<div class="element student-bg">
-			<div class="userimg">
-				<img src="{{ student.photo }}"/>
-			</div>
-			<div class="username">{{ student.name }}</div>
+			{% endif %}
+				<div class="userimg">
+					<img src="/static/Images/header-default.jpg"/>
+				</div>
+				<div class="username">{{ student.displayname }}</div>
 		</div>
 		{% endfor %}
 		</div>
@@ -108,11 +108,15 @@
 		{% else %}
 		<div class="content">
 		{% for teacher in teachers %}
+			{% if teacher.type == 'teacher' %}
 			<div class="element teacher-bg">
-			<div class="userimg">
-				<img src="{{ teacher.photo }}"/>
-			</div>
-			<div class="username">{{ teacher.name }}</div>
+			{% else %}
+			<div class="element student-bg">
+			{% endif %}
+				<div class="userimg">
+					<img src="/static/Images/header-default.jpg"/>
+				</div>
+				<div class="username">{{ teacher.displayname }}</div>
 		</div>
 		{% endfor %}
 		</div>
@@ -129,7 +133,7 @@
 		{% endif %}
 	</div>
 </div>
-<input id="school-objectid" type="hidden" value="{{ user.school_object_id }}" />
+<input id="school-objectid" type="hidden" value="{{ schoolid }}" />
 </div>
 {% endblock %}
 {% block demohelper %}

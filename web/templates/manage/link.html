@@ -23,12 +23,12 @@
 			{% endif %}
             <p>
 			{% if localexisted %}
-			<a class="btn btn-primary disabled" href="javascript:void(0)">Continue with new Local Account</a>
+			<a class="btn btn-primary disabled" href="">Continue with new Local Account</a>
 			{% else %}
-			<a class="btn btn-primary" href="link/createlocal">Continue with new Local Account</a>
+			<a class="btn btn-primary" href="">Continue with new Local Account</a>
 			{% endif %}
           	&nbsp; &nbsp;
-			<a class="btn btn-primary" href="link/loginlocal">Link with existing Local Account</a>
+			<a class="btn btn-primary" href="">Link with existing Local Account</a>
          	&nbsp; &nbsp;
             </p>
         </div>
@@ -38,8 +38,8 @@
         <p>Your local account and Office 365 account are now linked.</p>
         <p>
             <ul>
-				<li>Local account: {{ email }}</li>
-				<li>Office 365 account: {{ o365email }}</li>
+				<li>Local account: {{ user.email }}</li>
+				<li>Office 365 account: {{ user.o365email }}</li>
             </ul>
         </p>
 		<p><a class="btn btn-default" href="">Return to home</a></p>
