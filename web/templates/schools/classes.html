@@ -7,7 +7,7 @@
 	<div class="tophero">
 		<div class="col-md-8">
 			<div class="secondnav">
-				<a href="/Schools"> All Schools</a> > {{ schoolname }}
+				<a href="/Schools"> All Schools</a> > {{ school.school_name }}
 			</div>
 			<div class="a-heading">
 				Classes
@@ -15,29 +15,29 @@
 		</div>
 		<div class="toptiles">
 			<div class="section-school-name">
-				{{ schoolname }}
+				{{ school.school_name }}
 			</div>
 			<div class="infocontainer">
 				<div class="infoheader">
 					PRINCIPAL
 				</div>
-				<div class="infobody" title="{{ principalname }}">
-					{{ principalname }}
+				<div class="infobody" title="{{ school.school_principalname }}">
+					{{ school.school_principalname }}
 				</div>
 			</div>
 			<div class="infocontainer">
 				<div class="infoheader">
 					Grade level
 				</div>
-				<div class="infobody" title="{{ lowestgrade }} - {{ highestgrade }}">
-					{{ lowestgrade }} - {{ highestgrade }}
+				<div class="infobody" title="{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}">
+					{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}
 				</div>
 			</div>
 		</div>
 		<div>
 			<div class="col-md-4 usericon">
 				<div class="icon"></div>
-				{% if isstudent %}
+				{% if user.isstudent %}
 				<div>Not Enrolled</div>
 				{% else %}
 				<div>Not Teaching</div>
@@ -62,26 +62,35 @@
 				<div class="content clearfix">
 					{% for section in sections %}
 					<div class="tile-container">
+						{% if section.ismy %}
+						<a class="mysectionlink" href="Classes/{{ section.object_id }}">
+							<div class="tile">
+								<h5>{{ section.name }}</h5>
+								<h2>{{ section.combined_course_number }}</h2>
+							</div>
+						</a>
+						{% else %}
 						<div class="tile">
-							<h5>{{ section.displayname }}</h5>
-							<h2>{{ section.combinedcoursenumber }}</h2>
+							<h5>{{ section.name }}</h5>
+							<h2>{{ section.combined_course_number }}</h2>
 						</div>
+						{% endif %}
 						<div class="detail">
 							<h5>Course Id:</h5>
-							<h6>{{ section.courseId }}</h6>
+							<h6>{{ section.course_id }}</h6>
 							<h5>Description:</h5>
-							<h6>{{ section.coursedescription }}</h6>
+							<h6>{{ section.course_desc }}</h6>
 							<h5>Teachers:</h5>
 							{% for teacher in section.teachers %}
-								<h6>{{ teacher.displayname }}</h6>
+								<h6>{{ teacher.name }}</h6>
 							{% endfor %}
 							<h5>Term Name:</h5>
-							<h6>{{ section.termname }}</h6>
+							<h6>{{ section.term_name }}</h6>
 							<h5>Start/Finish Date:</h5>
 							<h6>
-								<span id="termdate">{{ section.termstartdate }}</span>
+								<span id="termdate">{{ section.term_start_date }}</span>
 								<span> - </span>
-								<span id="termdate">{{ section.termenddate }}</span>
+								<span id="termdate">{{ section.term_end_date }}</span>
 							</h6>
 							<h5>Period:</h5>
 							<h6>{{ section.period }}</h6>
@@ -96,7 +105,7 @@
 				<div class="seemore hideitem" id="see-more">
 				{% endif %}
 					<input id="nextlink" type="hidden" value="{{ sectionsnextlink }}" />
-					<input id="schoolid" type="hidden" value="{{ objectid }}" />
+					<input id="schoolid" type="hidden" value="{{ user.school_object_id }}" />
 					<span>See More</span>
 				</div>
 			</div>
@@ -115,28 +124,28 @@
 			<div class="content clearfix">
 			{% for mysection in mysections %}
 				<div class="tile-container">
-					<a class="mysectionlink" href="/ClassDetails">
+					<a class="mysectionlink" href="Classes/{{mysection.object_id }}">
 						<div class="tile">
-							<h5>{{ mysection.displayname }}</h5>
-							<h2>{{ mysection.combinedcoursenumber }}</h2>
+							<h5>{{ mysection.name }}</h5>
+							<h2>{{ mysection.combined_course_number }}</h2>
 						</div>
 					</a>
 					<div class="detail">
 						<h5>Course Id:</h5>
-						<h6>{{ mysection.courseId }}</h6>
+						<h6>{{ mysection.course_id }}</h6>
 						<h5>Description:</h5>
-						<h6>{{ mysection.coursedescription }}</h6>
+						<h6>{{ mysection.course_desc }}</h6>
 						<h5>Teachers:</h5>
 						{% for teacher in mysection.teachers %}
-						<h6>{{ teacher.displayname }}</h6>
+						<h6>{{ teacher.name }}</h6>
 						{% endfor %}
 						<h5>Term Name:</h5>
-						<h6>{{ mysection.termname }}</h6>
+						<h6>{{ mysection.term_name }}</h6>
 						<h5>Start/Finish Date:</h5>
 						<h6>
-							<span id="termdate">{{ mysection.termstartdate }}</span>
+							<span id="termdate">{{ mysection.term_start_date }}</span>
 							<span> - </span>
-							<span id="termdate">{{ mysection.termenddate }}</span>
+							<span id="termdate">{{ mysection.term_end_date }}</span>
 						</h6>
 						<h5>Period:</h5>
 						<h6>{{ mysection.period }}</h6>

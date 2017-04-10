@@ -8,21 +8,28 @@
     	About Me
 	</h2>
     <div class="margin-top-12 margin-btm-12 aboutme">
-		<b>Username:</b><br /> {{ username }}
+		<b>Username:</b><br /> {{ user.display_name }}<img src="{{ user.photo }}" />
     </div>
     <div class="margin-top-12 margin-btm-12">
-		<b>Logged in as:</b><br /> {{ userrole }}
+		<b>Logged in as:</b><br /> {{ user.role }}
     </div>
-	{% if showcolor %}
+	{% if user.showcolor %}
     <div class="margin-btm-12">
         <b>Favorite Color:</b>
-		<form action="/Manage/UpdateFavoriteColor" method="post">
+		<form action="/Manage/UpdateFavoriteColor" method="post">{% csrf_token %}
 			<select name="favoritecolor">
-            	<option value="#2F19FF" >Blue</option>
-            	<option value="#127605" >Green</option>
-            	<option value="#535353" selected>Grey</option>
+				{% for color in colors %}
+				{% if color.value == user.color %}
+				<option value={{ color.value }} selected>
+				{% else %}
+				<option value={{ color.value }}>
+				{% endif %}
+				{{ color.name }}
+				</option>
+				{% endfor %}
     		</select>
             <input type="submit"  value="Save"/>
+			{{ savemessage|safe }}
 		</form>
     </div>
 	{% endif %}
