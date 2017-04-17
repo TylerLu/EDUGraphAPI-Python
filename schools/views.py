@@ -14,6 +14,7 @@ O365_USER = O365UserManager()
 @ms_login_required
 def schools(request):
     user_info = request.session['ms_user']
+    print(user_info)
     # get token for aad api
     aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
     if not aad.access_token:

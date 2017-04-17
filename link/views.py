@@ -6,16 +6,20 @@ from django.contrib.auth import authenticate
 from .forms import CreateLocalInfo
 
 from decorator import ms_login_required
-from account.controller import LocalUserManager, O365UserManager
+from account.controller import LocalUserManager
 
 LOCAL_USER = LocalUserManager()
-O365_USER = O365UserManager()
 
 @ms_login_required
 def link(request):
     user_info = request.session['ms_user']
     # set parameter for template
-    return render(request, 'link/index.html', user_info)
+    parameter = {}
+    parameter['user'] = user_info
+    if user_info['arelinked']:
+        return HttpResponseRedirect('/Schools')
+    else:
+        return render(request, 'link/index.html', parameter)
 
 @ms_login_required
 def createlocal(request):
@@ -54,7 +58,8 @@ def loginlocal(request):
     LOCAL_USER.update_token(user_info['uid'], (aad.access_token, aad.refresh_token, 'aad'))
     LOCAL_USER.update_token(user_info['uid'], (aad.access_token, aad.refresh_token, 'ms'))
     LOCAL_USER.update_role(user_info['uid'], user_info['role'])
-    request.session['ms_user']['arelinked'] = True 
-    request.session['ms_user']['email'] = user_info['mail']
-    request.session['ms_user']['o365Email'] = user_info['mail']
+    user_info['arelinked'] = True
+    user_info['email'] = user_info['mail']
+    user_info['o365Email'] = user_info['mail']
+    request.session['ms_user'] = user_info
     return HttpResponseRedirect('/Schools')

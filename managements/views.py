@@ -32,7 +32,7 @@ def aboutme(request):
     parameter['groups'] = groups
     request.session['colors'] = colors
     request.session['groups'] = groups
-    return render(request, 'manage/aboutme.html', parameter)
+    return render(request, 'managements/aboutme.html', parameter)
 
 def updatecolor(request):
     # get user info from session
@@ -45,4 +45,4 @@ def updatecolor(request):
     parameter['colors'] = request.session['colors']
     parameter['groups'] = request.session['groups']
     parameter['savemessage'] = "<span class='saveresult'>Favorite color has been updated!</span>"
-    return render(request, 'manage/aboutme.html', parameter)
+    return render(request, 'managements/aboutme.html', parameter)

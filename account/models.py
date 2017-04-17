@@ -20,6 +20,7 @@ class TokenCache(models.Model):
     o365UserId = models.CharField(null=True, max_length=255)
     refreshToken = models.TextField(null=True)
     accessToken = models.TextField(null=True)
+    expiresOn = models.CharField(null=True, max_length=255)
     resource = models.CharField(null=True, max_length=255)
     class Meta:
         db_table = 'token_cache'

@@ -6,6 +6,7 @@ import json
 import msgraph
 import requests
 import constant
+from .auth_provider import AuthProvider
 from msgraph.options import QueryOption
 from msgraph.model.assigned_license import AssignedLicense 
 
@@ -16,7 +17,7 @@ class MSGraphRequest(object):
         self.client_secret = constant.client_secret
         self.context = adal.AuthenticationContext(constant.authorize_token_uri)
         self.http_provider = msgraph.HttpProvider()
-        self.auth_provider = msgraph.AuthProvider()
+        self.auth_provider = AuthProvider()
         self.graph_base_uri = constant.graph_base_uri
     
     def authorize(self, code, redirect_uri, resource):

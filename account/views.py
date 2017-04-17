@@ -43,10 +43,10 @@ def my_login(request):
         if user is not None:
             if hasattr(user, 'localuser') and user.localuser.o365Email:
                 login(request, user)
-                aad = authenticate(token=request.aad_token, resource='aad')
-                ms = authenticate(token=request.ms_token, resource='ms')
-                if aad.access_token and ms.access_token:
-                    return HttpResponseRedirect('/link')
+                #aad = authenticate(token=request.aad_token, resource='aad')
+                #ms = authenticate(token=request.ms_token, resource='ms')
+                #if aad.access_token and ms.access_token:
+                return HttpResponseRedirect('/link')
             else:
                 errors.append('Invalid login attempt.')
                 return render(request, 'account/login.html', {'user_form':user_form, 'errors':errors})

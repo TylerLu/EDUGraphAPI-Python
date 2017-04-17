@@ -92,6 +92,7 @@ class LocalUserManager(object):
             local = LocalUser(user=user)
             local.o365UserId = o365_user_id
             local.o365Email = o365_user_mail
+            local.favoriteColor = color
             local.save()
         except Exception as e:
             print(e)
@@ -109,8 +110,12 @@ class LocalUserManager(object):
         user = User.objects.get_or_create(username=o365_user_mail)[0]
         user.first_name = first_name
         user.last_name = last_name
+        user.email = o365_user_mail
         user.save()
-        local = user.localuser
+        try:
+            local = user.localuser
+        except:
+            local = LocalUser(user=user)
         local.o365UserId = o365_user_id
         local.o365Email = o365_user_mail
         local.save()
