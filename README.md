@@ -32,7 +32,7 @@ The sample demonstrates:
 
   - [Office 365 Schools REST API reference](https://msdn.microsoft.com/office/office365/api/school-rest-operations)
 
-EDUGraphAPI is based on NodeJS (the server side) and Angular 2 (the client side).
+This sample is implemented with the Python language and Django web framework.
 
 ## Prerequisites
 
@@ -128,11 +128,11 @@ The following software arerequired:
 
 - [Python](https://www.python.org/downloads/) 3.5.2 or above
 - [Django](https://www.djangoproject.com/download/) 1.11 or above
-- [SQLite](https://www.sqlite.org/)](https://git-scm.com/download/win)
+- [SQLite](https://www.sqlite.org/)
 
 Debug the app:
 
-1. Configure the following **Environment Variables**:
+1. Configure the following **environment variables**:
 
    - **clientId**: use the Client Id of the app registration you created earlier.
    - **clientSecret**: use the Key value of the app registration you created earlier.
@@ -295,7 +295,7 @@ These APIs are defined in the **/routes** folder.
 
 **Data Access**
 
-[Sequelize](http://docs.sequelizejs.com/en/v3/) is used in this sample to access data from a SQL Database. 
+Active Record  is used in this sample to access data from a SQL Database. 
 
 The **DbContext** exposes the models and methods that are used to access data.
 
