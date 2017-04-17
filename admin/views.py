@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 
 from decorator import ms_login_required
 
+import constant
 from account.controller import LocalUserManager
 
 LOCAL_USER = LocalUserManager()
@@ -36,7 +37,10 @@ def unlinkaccounts(request, link_id):
     return render(request, 'admin/linkedaccounts.html', parameter)
 
 def consent(request):
-    return HttpResponseRedirect(constant.admin_consent_url)
+    redirect_scheme = request.scheme
+    redirect_host = request.get_host()
+    redirect_url = constant.admin_consent_url % (redirect_scheme, redirect_host)
+    return HttpResponseRedirect(redirect_url)
 
 def unconsent(request):
     # get user info from session

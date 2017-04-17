@@ -6,7 +6,7 @@ client_id = 'dfc81b95-1a9c-4522-9f33-259de9acf68b'
 
 client_secret = 'yBjqwJkHMNOmh1LdgvO+xQsJ2KjlCTxjOeeidWV0rHM='
 
-redirect_uri = 'http://127.0.0.1:8000/MS/Login'
+redirect_uri = '%s://%s/MS/Login'
 
 login_base_uri = 'https://login.microsoftonline.com/common/oauth2/authorize?'
 

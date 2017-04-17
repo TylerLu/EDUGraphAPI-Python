@@ -29,6 +29,10 @@ def relogin(request):
     return render(request, 'account/login.html', {'user_form':user_form})
 
 def my_login(request):
+    redirect_scheme = request.scheme
+    redirect_host = request.get_host()
+    if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
+        return HttpResponseRedirect('/Account/O365login')
     # post /Account/Login
     if request.method == 'POST':
         email = ''
@@ -51,7 +55,12 @@ def my_login(request):
                 errors.append('Invalid login attempt.')
                 return render(request, 'account/login.html', {'user_form':user_form, 'errors':errors})
         # 0365 login
-        return HttpResponseRedirect(constant.o365_signin_url)
+        else:
+            if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
+                return HttpResponseRedirect('/Account/O365login')
+            else:
+                redirect_url = constant.o365_signin_url % (redirect_scheme, redirect_host)
+                return HttpResponseRedirect(redirect_url)
     # get /Account/Login
     else:
         user_form = UserInfo()
@@ -69,9 +78,12 @@ def merge_o365_user(aad, ms):
     return user_info
 
 def ms_login(request):
+    redirect_scheme = request.scheme
+    redirect_host = request.get_host()
+    redirect_uri = constant.redirect_uri % (redirect_scheme, redirect_host)
     code = request.GET.get('code', '')
-    aad = authenticate(code=code, resource='aad')
-    ms = authenticate(code=code, resource='ms')
+    aad = authenticate(code=code, resource='aad', redirect_uri=redirect_uri)
+    ms = authenticate(code=code, resource='ms', redirect_uri=redirect_uri)
     user_info = merge_o365_user(aad, ms)
     # check user link status
     LOCAL_USER.check_link_status(user_info)
@@ -95,7 +107,7 @@ def ms_login(request):
         return HttpResponseRedirect('/link')
 
 def photo(request, user_object_id):
-    ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], token_resource='ms', resource='ms')
+    ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], resource='ms')
     # get user photo from ms graph api
     user_photo = settings.MS_REQUEST.get_user_photo(ms.access_token, user_object_id)
     user_photo = ''
@@ -114,7 +126,15 @@ def o365_signin(request):
     return render(request, 'account/O365login.html', parameter)
 
 def external_login(request):
-    return HttpResponseRedirect(constant.o365_signin_url)
+    redirect_scheme = request.scheme
+    redirect_host = request.get_host()
+    ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], resource='ms')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
+    if ms.access_token and aad.access_token:
+        return HttpResponseRedirect('/Schools')
+    else:
+        redirect_url = constant.o365_signin_url % (redirect_scheme, redirect_host)
+        return HttpResponseRedirect(redirect_url)
 
 def register(request):
     user_reg_form = UserRegInfo()

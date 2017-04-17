@@ -14,9 +14,8 @@ O365_USER = O365UserManager()
 @ms_login_required
 def schools(request):
     user_info = request.session['ms_user']
-    print(user_info)
     # get token for aad api
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
     if not aad.access_token:
         if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
             return HttpResponseRedirect('/Account/O365login')
@@ -38,7 +37,7 @@ def classes(request, school_object_id):
     user_info = request.session['ms_user']
     user_info['isinaschool'] = True
     user_info['school_object_id'] = school_object_id
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
 
     school_processer = SchoolProcesser()
     # get a school info from aad graph api
@@ -66,7 +65,7 @@ def classes(request, school_object_id):
 
 def classnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
 
     school_processer = SchoolProcesser()
     # get a school info from aad graph api
@@ -74,7 +73,7 @@ def classnext(request, school_object_id):
     school_info = school_processer.normalize_one_school_info(one_school)
     # get sections info from aad graph api
     my_sections = settings.AAD_REQUEST.get_section_by_member(aad.access_token)
-    next_sections, sectionsnextlink = settings.AAD_REQUEST.get_sections_by_schoolid(aad_token, school_info['school_id'], nextlink=nextlink)
+    next_sections, sectionsnextlink = settings.AAD_REQUEST.get_sections_by_schoolid(aad.access_token, school_info['school_id'], nextlink=nextlink)
     mysections, nextsections = school_processer.prune_next_sections(my_sections, next_sections)
     ajax_result = {}
     ajax_result['Sections'] = {}
@@ -90,7 +89,7 @@ def classdetails(request, school_object_id, class_object_id):
     user_info['school_object_id'] = school_object_id
     user_info['class_object_id'] = class_object_id
     user_info['color'] = LOCAL_USER.get_color(user_info)
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
 
     school_processer = SchoolProcesser()
     # get a school info from aad graph api
@@ -111,7 +110,7 @@ def classdetails(request, school_object_id, class_object_id):
     LOCAL_USER.get_colors(out_students)
     # set seatrange
     seatrange = range(36)
-    ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], token_resource='ms', resource='ms')
+    ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], resource='ms')
     # get documents from ms graph api
     all_documents = settings.MS_REQUEST.get_documents_for_section(ms.access_token, class_object_id)
     documents_root = settings.MS_REQUEST.get_documents_root(ms.access_token, class_object_id)
@@ -145,7 +144,7 @@ def users(request, school_object_id):
     user_info = request.session['ms_user']
     user_info['isinaschool'] = True
     user_info['school_object_id'] = school_object_id
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
     
     school_processer = SchoolProcesser()
     # get a school info from aad graph api
@@ -175,7 +174,7 @@ def users(request, school_object_id):
 def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
 
     school_processer = SchoolProcesser()
     # get all users for school from aad graph api
@@ -190,7 +189,7 @@ def usernext(request, school_object_id):
 def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
     
     school_processer = SchoolProcesser()
     # get all users for school from aad graph api
@@ -205,7 +204,7 @@ def studentnext(request, school_object_id):
 def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
 
     school_processer = SchoolProcesser()
     # get all users for school from aad graph api

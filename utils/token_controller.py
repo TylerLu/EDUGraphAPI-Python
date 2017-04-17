@@ -10,12 +10,12 @@ class TokenManager(object):
     def __init__(self):
         self._ms_request = MSGraphRequest()
     
-    def get_token_by_code(self, code, resource):
+    def get_token_by_code(self, code, resource, redirect_uri):
         token_result = {}
         if resource == 'aad':
-            token_result = self._ms_request.authorize(code, constant.redirect_uri, constant.aad_resource)
+            token_result = self._ms_request.authorize(code, redirect_uri, constant.aad_resource)
         elif resource == 'ms':
-            token_result = self._ms_request.authorize(code, constant.redirect_uri, constant.ms_resource)
+            token_result = self._ms_request.authorize(code, redirect_uri, constant.ms_resource)
         else:
             pass
         token = token_result.get('accessToken', '')

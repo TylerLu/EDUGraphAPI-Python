@@ -16,10 +16,7 @@ def link(request):
     # set parameter for template
     parameter = {}
     parameter['user'] = user_info
-    if user_info['arelinked']:
-        return HttpResponseRedirect('/Schools')
-    else:
-        return render(request, 'link/index.html', parameter)
+    return render(request, 'link/index.html', parameter)
 
 @ms_login_required
 def createlocal(request):
@@ -51,8 +48,8 @@ def createlocal(request):
         return render(request, 'link/createlocal.html', parameter)
 
 def loginlocal(request):
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], token_resource='aad', resource='aad')
-    ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], token_resource='ms', resource='ms')
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
+    ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], resource='ms')
     user_info = request.session['ms_user']
     LOCAL_USER.link(user_info)
     LOCAL_USER.update_token(user_info['uid'], (aad.access_token, aad.refresh_token, 'aad'))
