@@ -1,0 +1,104 @@
+[
+	{
+		"path": "/Account/Login",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "account/controller.py"
+			},
+			{
+				"title": "View",
+        		"url": "account/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "account/templates/account/index.html"
+      		}
+		]
+	},
+	{
+		"path": "/Account/ReLogin",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "account/controller.py"
+			},
+			{
+				"title": "View",
+				"url": "account/views.py"
+			},
+			{
+				"title": "LoginViewModel",
+				"url": "account/templates/account/index.html"
+			}
+		]
+	},
+	{
+		"path": "/Account/O365login",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "account/controller.py"
+			},
+			{
+				"title": "View",
+        		"url": "account/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "account/templates/account/O365login.html"
+      		}
+		]
+	},
+	{
+		"path": "/Account/Register",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "account/controller.py"
+			},
+			{
+				"title": "View",
+        		"url": "account/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "account/templates/account/register.html"
+      		}
+		]
+	},
+	{
+		"path": "/link",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "account/controller.py"
+			},
+			{
+				"title": "View",
+        		"url": "link/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "link/templates/link/index.html"
+      		}
+		]
+	},
+	{
+		"path": "/link/createlocal",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "account/controller.py"
+			},
+			{
+				"title": "View",
+        		"url": "link/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "link/templates/link/createlocal.html"
+      		}
+		]
+	}
+]

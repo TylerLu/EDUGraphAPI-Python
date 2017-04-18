@@ -5,10 +5,9 @@ from django.contrib.auth import authenticate
 
 from decorator import ms_login_required
 
-from account.controller import LocalUserManager, O365UserManager
+from account.controller import LocalUserManager
 
 LOCAL_USER = LocalUserManager()
-O365_USER = O365UserManager()
 
 @ms_login_required
 def aboutme(request):

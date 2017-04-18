@@ -1,3 +1,4 @@
+import json
 from django.conf import settings
 from django.shortcuts import render
 from django.contrib.auth import authenticate
@@ -5,11 +6,10 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 
 import constant
 from decorator import ms_login_required
-from account.controller import LocalUserManager, O365UserManager
+from account.controller import LocalUserManager
 from .controller import SchoolProcesser
 
 LOCAL_USER = LocalUserManager()
-O365_USER = O365UserManager()
 
 @ms_login_required
 def schools(request):

@@ -3,6 +3,7 @@ account controller for local user and o365 user
 """
 
 import json
+import datetime
 import constant
 from constant import Roles
 from constant import O365ProductLicenses
@@ -54,18 +55,50 @@ class LocalUserManager(object):
             if user_obj.o365UserId and user_obj.o365Email and user_obj.user.email:
                 user_info['arelinked'] = True
                 user_info['email'] = user_obj.user.email
-                user_info['o365email'] = user_obj.o365Email
+                user_info['o365Email'] = user_obj.o365Email
         elif local_mail:
             user_info['localexisted'] = True
             user_info['localmessage'] = 'There is a local account: %s matching your O365 account.' % o365_user_mail
         else:
             pass
     
+    def get_user(self, username):
+        user_info = {}
+        try:
+            user = User.objects.get(username=username)
+            user_info['isauthenticated'] = False
+            user_info['uid'] = user.localuser.o365UserId
+            user_info['mail'] = user.localuser.o365Email
+            user_info['first_name'] = user.first_name
+            user_info['last_name'] = user.last_name
+            role = UserRoles.objects.get(o365UserId=user.localuser.o365UserId)
+            user_info['role'] = role.name
+            if user_info['role'] != 'Admin':
+                user_info['isadmin'] = False
+            if user_info['role'] != 'Student':
+                user_info['isstudent'] = False
+        except:
+            pass
+        return user_info
+    
+    def get_token(self, uid, resource):
+        token_tuple = ()
+        try:
+            cache = TokenCache.objects.get(o365UserId=uid, resource=resource)
+            format_expireson = datetime.datetime.strptime(cache.expiresOn, "%Y-%m-%d %H:%M:%S.%f")
+            current_time = datetime.datetime.now()
+            if current_time < format_expireson:
+                token_tuple = (cache.accessToken, cache.refreshToken, cache.expiresOn)
+        except:
+            pass
+        return token_tuple
+
     def update_token(self, uid, token_tuple):
-        accessToken, refreshToken, resource = token_tuple
+        accessToken, refreshToken, expiresOn, resource = token_tuple
         token = TokenCache.objects.get_or_create(o365UserId=uid, resource=resource)[0]
         token.accessToken = accessToken
         token.refreshToken = refreshToken
+        token.expiresOn = expiresOn
         token.save()
     
     def update_role(self, uid, role_name):

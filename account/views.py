@@ -3,6 +3,7 @@ from django.shortcuts import render, reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.conf import settings
+from django.urls import reverse
 
 import constant
 from decorator import ms_login_required
@@ -25,8 +26,18 @@ def index(request):
     return HttpResponseRedirect('/Account/Login')
 
 def relogin(request):
+    request.session['ms_user'] = {}
+    request.session['aad_token'] = ''
+    request.session['aad_refresh'] = ''
+    request.session['aad_expires'] = ''
+    request.session['ms_token'] = ''
+    request.session['ms_refresh'] = ''
+    request.session['ms_expires'] = ''
+    request.session[constant.username_cookie] = ''
+    request.session[constant.email_cookie] = ''
     user_form = UserInfo()
-    return render(request, 'account/login.html', {'user_form':user_form})
+    links = settings.DEMO_HELPER.get_links(request.get_full_path())
+    return render(request, 'account/login.html', {'user_form':user_form, 'links':links})
 
 def my_login(request):
     redirect_scheme = request.scheme
@@ -46,10 +57,16 @@ def my_login(request):
             user = authenticate(username=email, password=password)
         if user is not None:
             if hasattr(user, 'localuser') and user.localuser.o365Email:
-                login(request, user)
-                #aad = authenticate(token=request.aad_token, resource='aad')
-                #ms = authenticate(token=request.ms_token, resource='ms')
-                #if aad.access_token and ms.access_token:
+                user_info = LOCAL_USER.get_user(user.username)
+                request.session['ms_user'] = user_info
+                aad_token = LOCAL_USER.get_token(user_info['uid'], 'aad')
+                request.session['aad_token'] = aad_token[0]
+                request.session['aad_refresh'] = aad_token[1]
+                request.session['aad_expires'] = aad_token[2]
+                ms_token = LOCAL_USER.get_token(user_info['uid'], 'ms')
+                request.session['ms_token'] = ms_token[0]
+                request.session['ms_refresh'] = ms_token[1]
+                request.session['ms_expires'] = ms_token[2]
                 return HttpResponseRedirect('/link')
             else:
                 errors.append('Invalid login attempt.')
@@ -63,8 +80,9 @@ def my_login(request):
                 return HttpResponseRedirect(redirect_url)
     # get /Account/Login
     else:
+        links = settings.DEMO_HELPER.get_links(request.get_full_path())
         user_form = UserInfo()
-        return render(request, 'account/login.html', {'user_form':user_form})
+        return render(request, 'account/login.html', {'user_form':user_form, 'links':links})
 
 def merge_o365_user(aad, ms):
     # get admin ids from aad graph api because of ms graph lost directoryRoles members api
@@ -110,7 +128,6 @@ def photo(request, user_object_id):
     ms = authenticate(access_token=request.session['ms_token'], refresh_token=request.session['ms_refresh'], expires=request.session['ms_expires'], resource='ms')
     # get user photo from ms graph api
     user_photo = settings.MS_REQUEST.get_user_photo(ms.access_token, user_object_id)
-    user_photo = ''
     if not user_photo:
         local_photo_path = settings.STATICFILES_DIRS[0] + '/Images/DefaultUserPhoto.jpg'
         local_photo_file = open(local_photo_path, 'rb')
@@ -118,11 +135,13 @@ def photo(request, user_object_id):
     return HttpResponse(user_photo, content_type='image/jpeg')
 
 def o365_signin(request):
+    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     username = request.session[constant.username_cookie]
     email = request.session[constant.email_cookie]
     parameter = {}
     parameter['username'] = username
     parameter['email'] = email
+    parameter['links'] = links
     return render(request, 'account/O365login.html', parameter)
 
 def external_login(request):
@@ -148,5 +167,6 @@ def register(request):
             ret = LOCAL_USER.register(data)
             if ret:
                 return HttpResponseRedirect('/')
-    return render(request, 'account/register.html', {'user_reg_form':user_reg_form})
+    links = settings.DEMO_HELPER.get_links(request.get_full_path())
+    return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'links':links})
 
