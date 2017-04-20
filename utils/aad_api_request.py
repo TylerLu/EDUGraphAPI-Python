@@ -145,13 +145,16 @@ class AADGraphRequest(object):
             pass
         return sections_list, next_link
 
-    def get_section_by_member(self, token):
+    def get_section_by_member(self, token, schoolid):
         mysection_list = []
         url = 'me/memberOf'
         version = '?api-version=1.5'
         mysections_content = self.send(url, token, version)
-        mysections_list = mysections_content['value']
-        return mysections_list
+        allsections_list = mysections_content['value']
+        for item in allsections_list:
+            if item['extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId'] == schoolid:
+                mysection_list.append(item)
+        return mysection_list
 
     def get_one_section(self, token, object_id):
         section_result = {}

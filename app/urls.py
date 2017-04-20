@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^Account/Register', account_views.register, name='register'),
 
     url(r'^MS/Login', account_views.ms_login, name='ms_login'),
+    url(r'^LoginO365', account_views.login_o365, name='login_o365'),
     
 
     url(r'^Photo/UserPhoto/(?P<user_object_id>\w+-\w+-\w+-\w+-\w+)', account_views.photo, name='photo'),

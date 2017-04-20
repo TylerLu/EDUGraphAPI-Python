@@ -21,7 +21,7 @@ def aboutme(request):
     colors.append({'value':'#127605', 'name':'Green'})
     colors.append({'value':'#535353', 'name':'Grey'})
     aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
-    my_sections = settings.AAD_REQUEST.get_section_by_member(aad.access_token)
+    my_sections = settings.AAD_REQUEST.get_section_by_member(aad.access_token, user_info['school_id'])
     groups = []
     for section in my_sections:
         groups.append(section['displayName'])

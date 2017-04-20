@@ -151,7 +151,7 @@
 								{% else %}
 								<span class="seated">
 								{% endif %}
-								seated &#10003
+								seated &#10003;
 								</span>
 							</li>
 						{% endfor %}
@@ -161,11 +161,11 @@
 							{% if student.position != 0 %}
 								{% set containerclass = "white" %}
 							{% else %}
-								{% set containerclass = "saved" %}
+								{% set containerclass = "unsaved" %}
 							{% endif %}
 							{% if student.color %}
 								{% set containerclass += " green" %}
-								{% set style = "background-color:student.color" %}
+								{% set style = "background-color:{{ student.color }}" %}
 							{% endif %}
 							<div class="deskcontainer {{ containerclass }}" style="{{ style }}" position="{{ student.position }}" userid="{{ student.uid }}">
                                 <div class="deskclose"><img src="/static/Images/close.png"></div>
@@ -204,42 +204,6 @@
     </div>
 </div>
 <input type="hidden" name="hidSectionid" id="hidSectionid" value="{{ user.class_object_id }}" />
-{% endblock %}
-
-{% block demohelper %}
-<div class="demo-helper-control collapsed">
-    <div class="header">DEMO HELPER</div>
-    <div class="header-right-shadow-mask"></div>
-    <div class="body">
-        <p class="desc">Code sample links for this page:</p>
-		<ul>
-			<li>
-				<p class="title">Controller</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs</a></p>
-			</li>
-			<li>
-				<p class="title">View</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/ClassDetails.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/ClassDetails.cshtml</a></p>
-			</li>
-			<li>
-				<p class="title">ApplicationService</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs</a></p>
-			</li>
-			<li>
-				<p class="title">SchoolsService</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs</a></p>
-			</li>
-			<li>
-				<p class="title">SectionDetailsViewModel</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SectionDetailsViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SectionDetailsViewModel.cs</a></p>
-			</li>
-			<li>
-				<p class="title">SeatingViewModel</p>
-				<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SeatingViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SeatingViewModel.cs</a></p>
-			</li>
-		</ul>
-    </div>
-</div>
 {% endblock %}
 
 {% block basejs%}

@@ -9,7 +9,7 @@ School data is kept in sync in O365 Education tenants by [Microsoft School Data 
 - [Sample Goals](#sample-goals)
 - [Prerequisites](#prerequisites)
 - [Register the application in Azure Active Directory](#register-the-application-in-azure-active-directory)
-- [Build and debug locally](#build-and-debug-locally)
+- [Run the sample locally](#run-the-sample-locally)
 - [Deploy the sample to Azure](#deploy-the-sample-to-azure)
 - [Understand the code](#understand-the-code)
 - [Questions and comments](#questions-and-comments)
@@ -71,7 +71,7 @@ Create a key to enable Bing Maps API features in the app:
 
 ## Register the application in Azure Active Directory
 
-1. Sign into the new azure portal: [https://portal.azure.com/](https://portal.azure.com/).
+1. Sign into the new Azure portal: [https://portal.azure.com/](https://portal.azure.com/).
 
 2. Choose your Azure AD tenant by selecting your account in the top right corner of the page:
 
@@ -122,22 +122,22 @@ Create a key to enable Bing Maps API features in the app:
 
    Close the Settings window.
 
-## Build and debug locally
+## Run the sample locally
 
-The following software arerequired:
+The following softwares are required:
 
 - [Python](https://www.python.org/downloads/) 3.5.2 or above
 - [Django](https://www.djangoproject.com/download/) 1.11 or above
 - [SQLite](https://www.sqlite.org/)
 
-Debug the app:
+Run the app:
 
 1. Configure the following **environment variables**:
 
    - **clientId**: use the Client Id of the app registration you created earlier.
    - **clientSecret**: use the Key value of the app registration you created earlier.
    - **BingMapKey**: use the key of Bing Map you got earlier. This setting is optional.
-   - **SourceCodeRepositoryURL**: use the repository URL of your fork.
+   - **SourceCodeRepositoryURL**: use the URL of this repository.
 
 2. Open terminal and navigate to the source code folder. Execute the command below:
 
@@ -232,7 +232,7 @@ Debug the app:
 
    Copy the URL aside and change the schema to **https**. This is the replay URL and will be used in next step.
 
-3. Navigate to the app registration in the new azure portal, then open the setting windows.
+3. Navigate to the app registration in the new Azure portal, then open the setting windows.
 
    Add the reply URL:
 
@@ -467,7 +467,7 @@ The first 2 flows (Local Login/O365 Login) enable users to login in with either 
 
 This flow shows how an administrator logs into the system and performs administrative operations.
 
-After logging into the app with an office 365 account,the administrator will be asked to link to a local account. This step is not required and can be skipped. 
+After logging into the app with an Office 365 account,the administrator will be asked to link to a local account. This step is not required and can be skipped. 
 
 As mentioned earlier, the web app is a multi-tenant app which uses some application permissions, so tenant administrator must consent the app first.  
 

@@ -17,6 +17,7 @@ def admin(request):
     parameter['user'] = user_info
     return render(request, 'admin/index.html', parameter)
 
+@ms_login_required
 def linkaccounts(request):
     # get user info from session
     user_info = request.session['ms_user']
@@ -26,6 +27,7 @@ def linkaccounts(request):
     parameter['links'] = links
     return render(request, 'admin/linkedaccounts.html', parameter)
 
+@ms_login_required
 def unlinkaccounts(request, link_id):
     # get user info from session
     user_info = request.session['ms_user']
@@ -36,12 +38,14 @@ def unlinkaccounts(request, link_id):
     parameter['links'] = links
     return render(request, 'admin/linkedaccounts.html', parameter)
 
+@ms_login_required
 def consent(request):
     redirect_scheme = request.scheme
     redirect_host = request.get_host()
     redirect_url = constant.admin_consent_url % (redirect_scheme, redirect_host)
     return HttpResponseRedirect(redirect_url)
 
+@ms_login_required
 def unconsent(request):
     # get user info from session
     user_info = request.session['ms_user']

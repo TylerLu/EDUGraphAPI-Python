@@ -33,13 +33,17 @@ class LocalUserManager(object):
         email = data['Email']
         password = data['Password']
         favoriteColor = data['FavoriteColor']
-        user = User.objects.get_or_create(username=email)[0]
-        user.set_password(password)
-        user.email = email
-        user.save()
-        local = LocalUser(user=user, favoriteColor=favoriteColor)
-        local.save()
-        return True
+        ret = True
+        try:
+            user = User.objects.create(username=email)
+            user.set_password(password)
+            user.email = email
+            user.save()
+            local = LocalUser(user=user, favoriteColor=favoriteColor)
+            local.save()
+        except:
+            ret = False
+        return ret
 
     def check_link_status(self, user_info):
         user_info['arelinked'] = False
@@ -66,11 +70,13 @@ class LocalUserManager(object):
         user_info = {}
         try:
             user = User.objects.get(username=username)
-            user_info['isauthenticated'] = False
+            user_info['isauthenticated'] = True
+            user_info['islocal'] = True
             user_info['uid'] = user.localuser.o365UserId
             user_info['mail'] = user.localuser.o365Email
             user_info['first_name'] = user.first_name
             user_info['last_name'] = user.last_name
+            user_info['display_name'] = user.localuser.o365Email 
             role = UserRoles.objects.get(o365UserId=user.localuser.o365UserId)
             user_info['role'] = role.name
             if user_info['role'] != 'Admin':
@@ -132,23 +138,18 @@ class LocalUserManager(object):
             result = False
         return result
     
-    def link(self, user_info):
+    def link(self, user_info, data):
+        local_mail = data['Email']
+        password = data['Password']
         first_name = user_info['first_name']
         last_name = user_info['last_name']
         o365_user_mail = user_info['mail']
         o365_user_id = user_info['uid']
-        user_info['arelinked'] = True
-        user_info['email'] = o365_user_mail
-        user_info['o365email'] = o365_user_mail
-        user = User.objects.get_or_create(username=o365_user_mail)[0]
+        user = User.objects.get(username=local_mail)
         user.first_name = first_name
         user.last_name = last_name
-        user.email = o365_user_mail
         user.save()
-        try:
-            local = user.localuser
-        except:
-            local = LocalUser(user=user)
+        local = LocalUser(user=user)
         local.o365UserId = o365_user_id
         local.o365Email = o365_user_mail
         local.save()
@@ -194,9 +195,13 @@ class LocalUserManager(object):
             class_id = seat['ClassId']
             seat_obj = ClassroomSeatingArrangements.objects.filter(userId=user_id, classId=class_id)
             if seat_obj:
-                seat_obj.update(position=position)
+                if int(position) != 0:
+                    seat_obj.update(position=position)
+                else:
+                    seat_obj.delete()
             else:
-                ClassroomSeatingArrangements.objects.create(userId=user_id, classId=class_id, position=position)
+                if int(position) != 0:
+                    ClassroomSeatingArrangements.objects.create(userId=user_id, classId=class_id, position=position)
     
     def get_links(self):
         links = []

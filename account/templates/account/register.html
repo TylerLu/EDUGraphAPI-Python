@@ -11,11 +11,15 @@
 <form action="" method="post" class="form-horizontal" role="form">{% csrf_token %}
 	<h4>Create a new account.</h4>
 	<hr />
+	{% if errors %}
 	<div class="validation-summary-valid text-danger" data-valmsg-summary="true">
 		<ul>
-			<li style="display:none"></li>
+			{% for error in errors %}
+			<li>{{ error }}</li>
+			{% endfor %}
 		</ul>
 	</div>
+	{% endif %}
 	<div class="form-group">
 		<label class="col-md-2 control-label" for="Email">Email</label>
 		<div class="col-md-10">

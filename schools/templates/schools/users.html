@@ -7,7 +7,7 @@
 <div class="tophero">
 	<div class="col-md-8">
 		<div class="secondnav">
-			<a href="/schools">All Schools</a> > {{ school.school_name }}
+			<a href="/Schools">All Schools</a> > {{ school.school_name }}
 		</div>
 		<div class="a-heading">
 			Teachers & Students
@@ -24,7 +24,7 @@
 			</div>
 		</div>
 		<div class="infocontainer">
-			<div class="infoheader">Grade level</div>
+			<div class="infoheader">Grade levels</div>
 			<div class="infobody" title="{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}">
 				{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}
 			</div>
@@ -36,10 +36,6 @@
 			<div class="teacicon"></div><div>Teacher</div>
 		</div>
 		<div class="col-md-6 filterlink-container">
-			<div class="search-container ">
-				<input type="text" placeholder="Search" class="txtsearch" />
-				<button type="submit" id="btnsearch" title="Search" data-bi-dnt="" tabindex="40" class="btnsubmit"></button>
-			</div>
 			<span>FILTER:</span> <a id="filterteacher" class="filterlink" data-type="teachers">Teachers</a> | <a id="filterstudnet" class="filterlink" data-type="students">Students</a> | <a id="filterall" class="filterlink selected" data-type="users">All</a>
 		</div>
 	</div>

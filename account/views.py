@@ -44,6 +44,7 @@ def my_login(request):
     redirect_host = request.get_host()
     if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
         return HttpResponseRedirect('/Account/O365login')
+    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     # post /Account/Login
     if request.method == 'POST':
         email = ''
@@ -70,7 +71,7 @@ def my_login(request):
                 return HttpResponseRedirect('/link')
             else:
                 errors.append('Invalid login attempt.')
-                return render(request, 'account/login.html', {'user_form':user_form, 'errors':errors})
+                return render(request, 'account/login.html', {'user_form':user_form, 'errors':errors, 'links':links})
         # 0365 login
         else:
             if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
@@ -80,7 +81,6 @@ def my_login(request):
                 return HttpResponseRedirect(redirect_url)
     # get /Account/Login
     else:
-        links = settings.DEMO_HELPER.get_links(request.get_full_path())
         user_form = UserInfo()
         return render(request, 'account/login.html', {'user_form':user_form, 'links':links})
 
@@ -138,6 +138,9 @@ def o365_signin(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     username = request.session[constant.username_cookie]
     email = request.session[constant.email_cookie]
+    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
+    if aad.access_token:
+        return HttpResponseRedirect('/Schools')
     parameter = {}
     parameter['username'] = username
     parameter['email'] = email
@@ -160,13 +163,33 @@ def register(request):
     email = ''
     password = ''
     favoritecolor = ''
+    links = settings.DEMO_HELPER.get_links(request.get_full_path())
+    # post /Account/Register
     if request.method == 'POST':
+        errors = []
         user_reg_form = UserRegInfo(request.POST)
         if user_reg_form.is_valid():
             data = user_reg_form.clean()
             ret = LOCAL_USER.register(data)
             if ret:
-                return HttpResponseRedirect('/')
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'links':links})
+                user_info = {}
+                user_info['isauthenticated'] = True
+                user_info['islocal'] = True
+                user_info['display_name'] = data['Email']
+                request.session['ms_user'] = user_info
+                request.session['aad_token'] = 'empty'
+                request.session['ms_token'] = 'empty'
+                return HttpResponseRedirect('/link')
+            else:
+                errors.append('Name %s is already taken.' % data['Email'])
+                errors.append("Email '%s' is already taken." % data['Email'])
+                return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'errors':errors, 'links':links})
+    # get /Account/Register
+    else:
+        return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'links':links})
 
+def login_o365(request):
+    redirect_scheme = request.scheme
+    redirect_host = request.get_host()
+    redirect_url = constant.o365_login_url % (redirect_scheme, redirect_host)
+    return HttpResponseRedirect(redirect_url)
