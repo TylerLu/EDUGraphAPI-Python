@@ -111,8 +111,8 @@
             "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), variables('pythonSiteExtensionName'))]"
           ],
           "properties": {
-            "ida:ClientId": "[parameters('clientId')]",
-            "ida:ClientSecret": "[parameters('clientSecret')]",
+            "ClientId": "[parameters('clientId')]",
+            "ClientSecret": "[parameters('clientSecret')]",
             "BingMapKey": "[parameters('bingMapKey')]",
             "SourceCodeRepositoryUrl": "[parameters('SourceCodeRepositoryUrl')]",
             "command": "deploy.cmd"
