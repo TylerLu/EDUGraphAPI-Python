@@ -7,7 +7,7 @@
 	<div class="tophero">
 		<div class="col-md-8">
 			<div class="secondnav">
-				<a href="/Schools"> All Schools</a> > {{ school.school_name }}
+				<a href="/Schools"> All Schools</a> > {{ school.name }}
 			</div>
 			<div class="a-heading">
 				Classes
@@ -15,22 +15,22 @@
 		</div>
 		<div class="toptiles">
 			<div class="section-school-name">
-				{{ school.school_name }}
+				{{ school.name }}
 			</div>
 			<div class="infocontainer">
 				<div class="infoheader">
 					PRINCIPAL
 				</div>
-				<div class="infobody" title="{{ school.school_principalname }}">
-					{{ school.school_principalname }}
+				<div class="infobody" title="{{ school.principalname }}">
+					{{ school.principalname }}
 				</div>
 			</div>
 			<div class="infocontainer">
 				<div class="infoheader">
 					Grade level
 				</div>
-				<div class="infobody" title="{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}">
-					{{ school.school_lowestgrade }} - {{ school.school_highestgrade }}
+				<div class="infobody" title="{{ school.lowestgrade }} - {{ school.highestgrade }}">
+					{{ school.lowestgrade }} - {{ school.highestgrade }}
 				</div>
 			</div>
 		</div>
@@ -45,7 +45,6 @@
 				<div class="icon my-class"></div><div>My Class</div>
 			</div>
 			<div class="col-md-3 filterlink-container">
-				<div class="search-container "></div>
 				<span>FILTER:</span>
 				<a id="filtermyclasses" class="filterlink selected" data-type="myclasses">My Classes</a> | 
 				<a id="filterclasses" class="filterlink " data-type="allclasses">All Classes</a>
@@ -154,39 +153,6 @@
 			{% endfor %}
 			</div>
 		{% endif %}
-		</div>
-	</div>
-</div>
-{% endblock %}
-
-{% block demohelper %}
-<div class="demo-helper-control collapsed">
-	<div class="header">DEMO HELPER</div>
-    	<div class="header-right-shadow-mask"></div>
-		<div class="body">
-			<p class="desc">Code sample links for this page:</p>
-			<ul>
-				<li>
-					<p class="title">Controller</p>
-					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Controllers/SchoolsController.cs</a></p>
-				</li>
-				<li>
-					<p class="title">View</p>
-					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/Classes.cshtml" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Views/Schools/Classes.cshtml</a></p>
-				</li>
-				<li>
-					<p class="title">ApplicationService</p>
-					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/ApplicationService.cs</a></p>
-				</li>
-				<li>
-					<p class="title">SchoolsService</p>
-					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Services/SchoolsService.cs</a></p>
-				</li>
-				<li>
-					<p class="title">SectionsViewModel</p>
-					<p><a href="https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SectionsViewModel.cs" target="_blank">https://github.com/TylerLu/EDUGraphAPI/blob/master/src/EDUGraphAPI.Web/Models/SectionsViewModel.cs</a></p>
-				</li>
-			</ul>
 		</div>
 	</div>
 </div>

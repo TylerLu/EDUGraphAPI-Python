@@ -52,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middlewares.TokenErrorMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'
@@ -87,8 +88,6 @@ DATABASES = {
 
 # Auth Backend
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 
-                           'backends.TokenByCodeBackend',
-                           'backends.TokenRefreshBackend',
                            )
 
 # Password validation

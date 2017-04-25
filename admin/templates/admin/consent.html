@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Consent{% endblock %}
+
+{% block csslink %}
+{% endblock %}
+
+{% block content %}
+<h2>Admin Consent</h2>
+{% if consented %}
+	<form action="/Consent" method="POST">
+        <p>To use this application in this tenancy you must first provide Admin Consent. </p>
+        <p>Please click the button below to proceed.</p>
+        <p class="form-group">
+            <input type="submit" value="Consent" class="btn btn-primary" />
+        </p>
+	</form>
+{% else %}
+    <p>Admin Consent has been applied.</p>
+{% endif %}
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/jquery.validate.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script src="/static/js/jquery.validate-vsdoc.js"></script>
+<script src="/static/js/jquery.validate.unobtrusive.js"></script>
+{% endblock %}

@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^Account/O365login', account_views.o365_signin, name='o365signin'),
     url(r'^Account/ExternalLogin', account_views.external_login, name='exlogin'),
     url(r'^Account/Register', account_views.register, name='register'),
+    url(r'^Account/LogOff', account_views.logoff, name='logoff'),
 
     url(r'^MS/Login', account_views.ms_login, name='ms_login'),
     url(r'^LoginO365', account_views.login_o365, name='login_o365'),
@@ -57,4 +58,5 @@ urlpatterns = [
     url(r'^UnlinkAccounts/(?P<link_id>\d+)', admin_views.unlinkaccounts, name='unlinkaccounts'),
     url(r'^Consent', admin_views.consent, name='consent'),
     url(r'^Unconsent', admin_views.unconsent, name='unconsent'),
+    url(r'^Admin/Consent', admin_views.consent_alone, name='consent_alone'),
 ]

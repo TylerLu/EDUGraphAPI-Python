@@ -20,7 +20,7 @@
 				{% endif %}
 			</ul>
 		{% if user.isauthenticated %}
-		<form action="https://login.microsoftonline.com/common/oauth2/logout?redirect_uri=http://127.0.0.1:8000&post_logout_redirect_uri=http://127.0.0.1:8000" class="navbar-right" id="logoutForm" method="post">{% csrf_token %}
+		<form action="/Account/LogOff" class="navbar-right" id="logoutForm" method="post">{% csrf_token %}
         	<div class="userinfo">
 				<a href="javascript:void(0);" id="userinfolink">Logged in as: {{ user.role }}. Hello {{ user.display_name }}
 					{% if user.photo %}<img src="{{ user.photo }}" />{% endif %}</a>
@@ -40,6 +40,11 @@
             	</div>
 			</div>
     	</form>
+		{% else %}
+    	<ul class="nav navbar-nav navbar-right">
+			<li><a href="/Account/Register" id="registerLink">Register</a></li>
+			<li><a href="/Account/Login" id="loginLink">Log in</a></li>
+    	</ul>
 		{% endif %}
 		</div>
 	</div>

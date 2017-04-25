@@ -4,7 +4,7 @@
 		"links": [
 			{
 				"title": "Controller",
-				"url": "account/controller.py"
+				"url": "services/user_service.py"
 			},
 			{
 				"title": "View",
@@ -21,7 +21,7 @@
 		"links": [
 			{
 				"title": "Controller",
-				"url": "account/controller.py"
+				"url": "services/user_service.py"
 			},
 			{
 				"title": "View",
@@ -38,7 +38,7 @@
 		"links": [
 			{
 				"title": "Controller",
-				"url": "account/controller.py"
+				"url": "services/education_service.py"
 			},
 			{
 				"title": "View",
@@ -55,7 +55,7 @@
 		"links": [
 			{
 				"title": "Controller",
-				"url": "account/controller.py"
+				"url": "services/user_service.py"
 			},
 			{
 				"title": "View",
@@ -72,7 +72,7 @@
 		"links": [
 			{
 				"title": "Controller",
-				"url": "account/controller.py"
+				"url": "services/user_service.py"
 			},
 			{
 				"title": "View",
@@ -89,7 +89,7 @@
 		"links": [
 			{
 				"title": "Controller",
-				"url": "account/controller.py"
+				"url": "services/user_service.py"
 			},
 			{
 				"title": "View",
@@ -98,6 +98,104 @@
       		{
         		"title": "LoginViewModel",
         		"url": "link/templates/link/createlocal.html"
+      		}
+		]
+	},
+	{
+		"path": "/link/loginlocal",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "services/user_service.py"
+			},
+			{
+				"title": "View",
+        		"url": "link/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "link/templates/link/createlocal.html"
+      		}
+		]
+	},
+	{
+		"path": "/Admin",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "services/user_service.py"
+			},
+			{
+				"title": "View",
+        		"url": "admin/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "admin/templates/admin/index.html"
+      		}
+		]
+	},
+	{
+		"path": "/Admin/LinkedAccounts",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "services/user_service.py"
+			},
+			{
+				"title": "View",
+        		"url": "admin/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "admin/templates/admin/linkedaccounts.html"
+      		}
+		]
+	},
+	{
+		"path": "/Admin/Consent",
+		"links": [
+			{
+				"title": "View",
+        		"url": "admin/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "admin/templates/admin/consent.html"
+      		}
+		]
+	},
+	{
+		"path": "/Schools",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "services/education_service.py"
+			},
+			{
+				"title": "View",
+        		"url": "schools/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "schools/templates/schools/index.html"
+      		}
+		]
+	},
+	{
+		"path": "/Manage/AboutMe",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "services/user_service.py"
+			},
+			{
+				"title": "View",
+        		"url": "managements/views.py"
+			},
+      		{
+        		"title": "LoginViewModel",
+        		"url": "managements/templates/managements/aboutme.html"
       		}
 		]
 	}

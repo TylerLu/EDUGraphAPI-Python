@@ -13,7 +13,7 @@
     	<div class="container">
             <div class="col-md-6 secondnav">
                 <a href="/schools"> All Schools</a>
-				><a href="/Schools/{{ user.school_object_id }}/Classes">{{ school.school_name }}</a>
+				><a href="/Schools/{{ user.school_object_id }}/Classes">{{ school.name }}</a>
 				> {{ section.course_name }}
             </div>
         </div>
@@ -159,21 +159,24 @@
                     <div id="hidtiles" class="hideitem">
 						{% for student in students %}
 							{% if student.position != 0 %}
-								{% set containerclass = "white" %}
+								{% if student.color %}
+								<div class="deskcontainer white green" style="background-color:{{ student.color }}" position="{{ student.position }}" userid="{{ student.uid }}">
+								{% else %}
+								<div class="deskcontainer white" style="" position="{{ student.position }}" userid="{{ student.uid }}">
+								{% endif %}
 							{% else %}
-								{% set containerclass = "unsaved" %}
+								{% if student.color %}
+								<div class="deskcontainer unsaved green" style="background-color:{{ student.color }}" position="{{ student.position }}" userid="{{ student.uid }}">
+								{% else %}
+								<div class="deskcontainer unsaved" style="" position="{{ student.position }}" userid="{{ student.uid }}">
+								{% endif %}
 							{% endif %}
-							{% if student.color %}
-								{% set containerclass += " green" %}
-								{% set style = "background-color:{{ student.color }}" %}
-							{% endif %}
-							<div class="deskcontainer {{ containerclass }}" style="{{ style }}" position="{{ student.position }}" userid="{{ student.uid }}">
-                                <div class="deskclose"><img src="/static/Images/close.png"></div>
-                                <div class="deskicon">
-									<img src="/static/Images/header-default.jpg" realheader="{{ student.photo }}" />
-                                </div>
-								<div class="stuname">{{ student.name }}</div>
-                            </div>
+									<div class="deskclose"><img src="/static/Images/close.png"></div>
+									<div class="deskicon">
+										<img src="/static/Images/header-default.jpg" realheader="{{ student.photo }}" />
+									</div>
+									<div class="stuname">{{ student.name }}</div>
+								</div>
 						{% endfor %}
                     </div>
                 </div>

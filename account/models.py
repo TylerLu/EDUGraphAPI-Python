@@ -1,3 +1,7 @@
+'''
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+'''
 from django.db import models
 
 from django.contrib.auth.models import User
@@ -32,3 +36,4 @@ class ClassroomSeatingArrangements(models.Model):
     classId = models.CharField(null=True, max_length=255)
     class Meta:
         db_table = 'classroom_seating_arranements'
+

@@ -1,45 +1,48 @@
-from django.conf import settings
+'''
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+'''
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth import authenticate
+from django.conf import settings
 
+from constant import FavoriteColors
 from decorator import ms_login_required
+from services.token_service import TokenService
+from services.user_service import LocalUserService
+from services.education_service import SchoolService
 
-from account.controller import LocalUserManager
-
-LOCAL_USER = LocalUserManager()
+LOCAL_USER = LocalUserService()
+TOKEN_SERVICE = TokenService()
+SCHOOL_SERVICE = SchoolService()
 
 @ms_login_required
 def aboutme(request):
-    # get user info from session
+    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.session['ms_user']
     user_info['showcolor'] = True
     user_info['color'] = LOCAL_USER.get_color(user_info)
-    # color list
-    colors = []
-    colors.append({'value':'#2F19FF', 'name':'Blue'})
-    colors.append({'value':'#127605', 'name':'Green'})
-    colors.append({'value':'#535353', 'name':'Grey'})
-    aad = authenticate(access_token=request.session['aad_token'], refresh_token=request.session['aad_refresh'], expires=request.session['aad_expires'], resource='aad')
-    my_sections = settings.AAD_REQUEST.get_section_by_member(aad.access_token, user_info['school_id'])
-    groups = []
-    for section in my_sections:
-        groups.append(section['displayName'])
+
+    groups = SCHOOL_SERVICE.get_user_groups(user_info['school_id'])
+
     parameter = {}
+    parameter['links'] = links
     parameter['user'] = user_info
-    parameter['colors'] = colors
+    parameter['colors'] = FavoriteColors
     parameter['groups'] = groups
-    request.session['colors'] = colors
+    request.session['colors'] = FavoriteColors
     request.session['groups'] = groups
     return render(request, 'managements/aboutme.html', parameter)
 
 def updatecolor(request):
+    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     # get user info from session
     user_info = request.session['ms_user']
     color = request.POST.get('favoritecolor')
     LOCAL_USER.update_color(color, user_info)
     user_info['color'] = LOCAL_USER.get_color(user_info)
     parameter = {}
+    parameter['links'] = links
     parameter['user'] = user_info
     parameter['colors'] = request.session['colors']
     parameter['groups'] = request.session['groups']
