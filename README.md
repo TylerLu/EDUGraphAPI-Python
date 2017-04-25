@@ -32,7 +32,9 @@ The sample demonstrates:
 
   - [Office 365 Schools REST API reference](https://msdn.microsoft.com/office/office365/api/school-rest-operations)
 
-This sample is implemented with the Python language and Django web framework.
+This sample is implemented with the Python language and [Django](https://www.djangoproject.com/) web framework.
+
+> [Django](https://www.djangoproject.com/) is a high-level Python Web framework that encourages rapid development and clean, pragmatic design. Built by experienced developers, it takes care of much of the hassle of Web development, so you can focus on writing your app without needing to reinvent the wheel. It’s free and open source.
 
 ## Prerequisites
 
@@ -250,56 +252,29 @@ Run the app:
 
 ![](Images/solution-component-diagram.png)
 
-The top layer of the solution contains the two parts of the EDUGraphAPI.Web project:
 
-* The server side Node.js app.
-* The client side Angular 2 app.
 
-The bottom layers contain the three data sources.
-
-* The EDUGraphAPI database.
-* Education data exposed by REST APIs.
-* Azure AD data exposed by Graph APIs.
-
-### **EDUGraphAPI.Web - Server**
+### **EDUGraphAPI**
 
 The server side app is based on Node.js and implemented with Typescript.
 
-**Authentication Mechanisms**
+**Authentication**
 
-Passport and its 2 plugins are used to enable local and O365 authentications:
+Django comes with a user authentication system. It handles user accounts, groups, permissions and cookie-based user sessions. For more details, see [Django authentication system](https://docs.djangoproject.com/en/1.10/topics/auth/).
 
-* **[passport-azure-ad](https://github.com/AzureAD/passport-azure-ad)**: a collection of [Passport](http://passportjs.org/) Strategies to help you integrate with Azure Active Directory. It includes OpenID Connect, WS-Federation, and SAML-P authentication and authorization. These providers let you integrate your Node app with Microsoft Azure AD so you can use its many features, including web single sign-on (WebSSO), Endpoint Protection with OAuth, and JWT token issuance and validation.
-* **[passport-local](https://github.com/jaredhanson/passport-local)**: this module lets you authenticate using a username and password in your Node.js applications. By plugging into Passport, local authentication can be easily and unobtrusively integrated into any application or framework that supports [Connect](http://www.senchalabs.org/connect/)-style middleware, including [Express](http://expressjs.com/).
+Local users authentication is based on the built-in API:
 
-The 2 kinds of authentication are implemented in the **/auth/appAuth.ts** file.
+* [authenticate](https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.authenticate)
+* [login](https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.login)
+* [logout](https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.logout)
 
-**Web APIs**
-
-The server app exposes several Web APIs:
-
-| Path                                     | Method   | Description                              |
-| ---------------------------------------- | -------- | ---------------------------------------- |
-| /api/me                                  | GET      | Return the current user and the user's organization and roles |
-| /api/me/favoriteColor                    | POST     | Update current user's favorite color     |
-| /api/me/accesstoken                      | GET      | Get current user's access token          |
-| /api/tenant                              | POST     | Update information (isAdminConsented) of current user's tenant |
-| /api/tenant/unlinkAllUsers               | POST     | Unlink all users in current user's tenant |
-| /api/users/linked                        | GET      | Get all linked users                     |
-| /api/users/:userId/unlink                | POST     | Unlink the specified user                |
-| /api/admin/consent                       | GET      | Redirect the user to login page to perform admin consent |
-| /api/admin/consented                     | POST     | Will be invoked after admin consented    |
-| /api/schools/seatingArrangements/:classId | GET/POST | Get or set the seating arrangement of the specified class |
-
-These APIs are defined in the **/routes** folder.
+O365 users authentication is implemented with Open ID Connect package: 
 
 **Data Access**
 
-Active Record  is used in this sample to access data from a SQL Database. 
+In this sample, [Django's built-in ORM](https://docs.djangoproject.com/en/1.11/topics/db/) is used to access data from the backend SQLite database.
 
-The **DbContext** exposes the models and methods that are used to access data.
-
-The tables used in this demo:
+Below are are tables:
 
 | Table                        | Description                              |
 | ---------------------------- | ---------------------------------------- |
@@ -310,6 +285,30 @@ The tables used in this demo:
 | ClassroomSeatingArrangements | Contains the classroom seating arrangements. |
 
 You will find the **DbContext** class and related model interfaces in the **/data/dbContext.ts** file.
+
+**Views**
+
+The server app exposes several Web APIs:
+
+| Path                 | Description                              |
+| -------------------- | ---------------------------------------- |
+| /account/views.py    | Contains views for users to register, login and logout. |
+| /admin/views.py      | Contains administrative views like consent tenant, manage linked accounts. |
+| /link/views.py       | Contains views used for link user accounts. |
+| /management/views.py | Contains views of the about me page.     |
+| /schools/view        | Contains education views, like schools, classes, and class details. |
+
+These APIs are defined in the **/routes** folder.
+
+**Decorators**
+
+Several decorators were used for authorization:
+
+| Decorator |      |
+| --------- | ---- |
+|           |      |
+|           |      |
+|           |      |
 
 **Services**
 
@@ -336,54 +335,6 @@ Users from any Azure Active Directory tenant can access this app. Some permissio
 ![](Images/app-requires-admin-to-consent.png)
 
 For more information, see [Build a multi-tenant SaaS web application using Azure AD & OpenID Connect](https://azure.microsoft.com/en-us/resources/samples/active-directory-dotnet-webapp-multitenant-openidconnect/).
-
-### **EDUGraphAPI.Web - Client**
-
-The client side app which resides in the /app folder is based on Angular 2 and is also implemented with Typescript 2.
-
-> Note:  Getting and using declaration files in TypeScript 2.0 is much easier than in TypeScript 1. To get declarations for a library like lodash for example, all you need is npm:
->
-> ```
-> npm install --save @types/lodash
-> ```
-
-**Components**
-
-These components are used in the client app.
-
-| Folder      | Component             |
-| ----------- | --------------------- |
-| /           | App                   |
-| /aboutme    | AboutMe               |
-| /admin      | Admin                 |
-|             | LinkedAccounts        |
-|             | Consent               |
-| /demoHeoper | DemoHelper            |
-| /header     | Header                |
-| /link       | Link                  |
-|             | LinkCreateLocal       |
-|             | LinkLoginLocal        |
-|             | LinkLoginO365Requried |
-| /login      | Login                 |
-| /O365login  | O365login             |
-| /register   | Register              |
-| /schools    | Schools               |
-|             | Classes               |
-|             | MyClasses             |
-|             | ClassDetails          |
-
-**Services**
-
-| Folder      | Name              |
-| ----------- | ----------------- |
-| /aboutme    | AboutMeService    |
-| /admin      | AdminService      |
-| /demoHelper | DemoHelperService |
-| /link       | LinkService       |
-| /services   | MeService         |
-|             | UserService       |
-|             | UserPhotoService  |
-|             | DataService       |
 
 ### Office 365 Education API
 
