@@ -4,21 +4,21 @@
   "parameters": {
     "siteName": {
       "type": "string",
-      "defaultValue": "EDUGraphAPI",
+      "defaultValue": "EDUGraphAPIPython",
       "metadata": {
         "description": "The name of the web client app that you wish to create."
       }
     },
     "hostingPlanName": {
       "type": "string",
-      "defaultValue": "EDUGraphAPI",
+      "defaultValue": "EDUGraphAPIPython",
       "metadata": {
         "description": "The hosting service plan name that you wish to create."
       }
     },
     "sourceCodeRepositoryURL": {
       "type": "string",
-      "defaultValue": "https://github.com/<YOUR REPOSITORY>/EDUGraphAPI",
+      "defaultValue": "https://github.com/<YOUR REPOSITORY>/O365-EDU-Python-Samples",
       "metadata": {
         "description": "Source code repository URL"
       }
