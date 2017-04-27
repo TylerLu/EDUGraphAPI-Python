@@ -9,12 +9,12 @@ from django.conf import settings
 from constant import FavoriteColors
 from decorator import ms_login_required
 from services.token_service import TokenService
-from services.user_service import LocalUserService
-from services.education_service import SchoolService
+from services.local_user_service import LocalUserService
+from services.education_service import EducationService
 
 LOCAL_USER = LocalUserService()
 TOKEN_SERVICE = TokenService()
-SCHOOL_SERVICE = SchoolService()
+EDUCATION_SERVICE = EducationService()
 
 @ms_login_required
 def aboutme(request):
@@ -23,7 +23,8 @@ def aboutme(request):
     user_info['showcolor'] = True
     user_info['color'] = LOCAL_USER.get_color(user_info)
 
-    groups = SCHOOL_SERVICE.get_user_groups(user_info['school_id'])
+    token = TOKEN_SERVICE.get_access_token('aad')
+    groups = EDUCATION_SERVICE.get_my_groups(token, user_info['school_id'])
 
     parameter = {}
     parameter['links'] = links

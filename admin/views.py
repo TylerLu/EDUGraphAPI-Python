@@ -9,7 +9,7 @@ from django.conf import settings
 from decorator import ms_login_required
 
 import constant
-from services.user_service import LocalUserService
+from services.local_user_service import LocalUserService
 
 LOCAL_USER = LocalUserService()
 

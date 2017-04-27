@@ -28,8 +28,7 @@ class TokenService(object):
         self._refresh_token = ''
         self._expires_on = ''
         self._resource = ''
-        self._map = {'aad': constant.aad_resource,
-                     'ms': constant.ms_resource}
+        self._map = constant.token_source
         self._context = adal.AuthenticationContext(constant.authorize_token_uri)
 
     @property

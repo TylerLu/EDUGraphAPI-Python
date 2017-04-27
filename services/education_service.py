@@ -2,341 +2,182 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
  *   * See LICENSE in the project root for license information.  
 '''
-from constant import Roles
-from constant import O365ProductLicenses
+import re
+from services.rest_api_service import RestApiService
+from schools.models import School, Section, EduUser
 
-from services.ms_api_service import MSGraphRequest
-from services.aad_api_service import AADGraphRequest
-
-from schools.models import School, ClassModel, User, Document, Conversation
-
-class SchoolService(object):
+class EducationService(object):
 
     def __init__(self):
-        self._aad_request = AADGraphRequest()
-        self._ms_request = MSGraphRequest()
+        self.api_base_uri = 'https://graph.windows.net/canvizEDU.onmicrosoft.com/'
+        self.version = '?api-version=1.6'
+        self.rest_api_service = RestApiService()
+        self._token_re = re.compile('\$skiptoken=.*')
     
-    def _normalize_schools_info(self, schools_list, my_school_id=''):
+    def get_schools(self, token, school_uid):
         '''
-        normalize schools info by api result
+        Get all schools that exist in the Azure Active Directory tenant.
         '''
+        schools_list = []
+        version = '?api-version=beta'
+        url = self.api_base_uri + 'administrativeUnits' + version
+        school_list = self.rest_api_service.get_object_list(url, token, model=School)
+        out_schools = self._normalize_schools(school_list, school_uid)
+        return out_schools
+    
+    def get_school(self, token, object_id):
+        '''
+        Get a school by using the object_id.
+        '''
+        school_result = {}
+        version = '?api-version=beta'
+        url = self.api_base_uri + 'administrativeUnits/%s' % object_id + version
+        school_result = self.rest_api_service.get_object(url, token, model=School)
+        return school_result
+    
+    def get_section_members(self, token, section_object_id, object_type=''):
+        '''
+        Get a section members by using the object_id.
+        '''
+        member_list = []
+        version = '?api-version=1.5'
+        url = self.api_base_uri + 'groups/%s/members' % section_object_id + version
+        members = self.rest_api_service.get_object_list(url, token, model=EduUser)
+        if object_type:
+            member_list = [i for i in members if i['object_type'] == object_type]
+        else:
+            member_list = members
+        return member_list
+
+    def _get_my_sections(self, token, load_members=False):
+        '''
+        Get my sections
+        '''
+        mysection_list = []
+        version = '?api-version=1.5'
+        url = self.api_base_uri + 'me/memberOf' + version
+        section_list = self.rest_api_service.get_object_list(url, token, model=Section)
+
+        for section in section_list:
+            if load_members:
+                member_list = self.get_section_members(token, section['object_id'])
+                section['teachers'] =  [i for i in member_list if i['object_type'] == 'Teacher']
+            mysection_list.append(section)
+        return mysection_list
+
+    def get_my_sections(self, token, school_id):
+        '''
+        Get my sections within a school
+        '''
+        section_list = self._get_my_sections(token, True)
+        mysection_list = []
+        mysection_emails = []
+
+        for section in section_list:
+            if section['school_id'] == school_id:
+                mysection_list.append(section)
+                mysection_emails.append(section['email'])
+        mysection_list.sort(key=lambda d:d['combined_course_number'])
+        return mysection_list, mysection_emails
+    
+    def get_all_sections(self, token, school_id, mysection_emails=[], top=12, nextlink=''):
+        '''
+        Get sections within a school
+        '''
+        skiptoken = ''
+        if nextlink and nextlink.find('skiptoken') != -1:
+            link_skiptoken = self._token_re.findall(nextlink)[0]
+            skiptoken = '&%s' % link_skiptoken
+        sections_list = []
+        next_link = ''
+        url = self.api_base_uri + "groups?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
+        section_list, next_link = self.rest_api_service.get_object_list(url, token, model=Section, next_key='odata.nextLink')
+        out_sections = self._normalize_all_sections(section_list, mysection_emails)
+        return out_sections, next_link
+
+    def get_section(self, token, object_id):
+        '''
+        Get a section by using the object_id.
+        '''
+        section_result = {}
+        version = '?api-version=1.5'
+        url = self.api_base_uri + 'groups/%s' % object_id + version
+        section_result = self.rest_api_service.get_object(url, token, model=Section)
+        return section_result
+    
+    def get_members(self, token, object_id, top=12, nextlink=''):
+        '''
+        Get members within a school
+        '''
+        skiptoken = ''
+        if nextlink and nextlink.find('skiptoken') != -1:
+            link_skiptoken = self._token_re.findall(nextlink)[0]
+            skiptoken = '&%s' % link_skiptoken
+        members_list = []
+        next_link = ''
+        url = self.api_base_uri + 'administrativeUnits/%s/members?api-version=beta&$top=%s%s' % (object_id, top, skiptoken)
+        members_list, next_link = self.rest_api_service.get_object_list(url, token, model=EduUser, next_key='odata.nextLink')
+        return members_list, next_link
+
+    def get_students(self, token, school_id, top=12, nextlink=''):
+        '''
+        Get students within a school
+        '''
+        skiptoken = ''
+        if nextlink and nextlink.find('skiptoken') != -1:
+            link_skiptoken = self._token_re.findall(nextlink)[0]
+            skiptoken = '&%s' % link_skiptoken
+        students_list = []
+        next_link = ''
+        url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Student'&$top=%s%s" % (school_id, top, skiptoken)
+        students_list, next_link = self.rest_api_service.get_object_list(url, token, model=EduUser, next_key='odata.nextLink')
+        return students_list, next_link
+    
+    def get_teachers(self, token, school_id, top=12, nextlink=''):
+        '''
+        Get teachers within a school
+        '''
+        skiptoken = ''
+        if nextlink and nextlink.find('skiptoken') != -1:
+            link_skiptoken = self._token_re.findall(nextlink)[0]
+            skiptoken = '&%s' % link_skiptoken
+        teachers_list = []
+        next_link = ''
+        url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Teacher'&$top=%s%s" % (school_id, top, skiptoken)
+        teachers_list, next_link = self.rest_api_service.get_object_list(url, token, model=EduUser, next_key='odata.nextLink')
+        return teachers_list, next_link
+    
+    def _normalize_schools(self, school_list, school_uid=''):
         out_schools = []
         temp_schools = []
-        for data in schools_list:
-            school_obj = School(data)
-            school_dict = school_obj.convert()
-            if my_school_id and school_dict['id'] == my_school_id:
-                out_schools.append(school_dict)
+        for school in school_list:
+            if school_uid and school['id'] == school_uid:
+                out_schools.append(school)
             else:
-                temp_schools.append(school_dict)
+                temp_schools.append(school)
         temp_schools.sort(key=lambda d:d['name'])
         out_schools.extend(temp_schools)
         return out_schools
     
-    def _normalize_class_school_info(self, data):
-        '''
-        normalize one school info by api result
-        '''
-        school_obj = School(data)
-        out_info = school_obj.convert()
-        return out_info
-    
-    def _normalize_class_detail_info(self, data):
-        '''
-        normalize one class info by api result
-        '''
-        class_obj = ClassModel(data)
-        out_info = class_obj.convert()
-        return out_info
-
-    def _normalize_classes_info(self, classes_list, my_emails=[]):
-        '''
-        normalize classes info by api result
-        '''
-        out_classes = []
-        for data in classes_list:
-            class_obj = ClassModel(data)
-            class_dict = class_obj.convert()
-            if class_dict['email']  in my_emails:
-                class_dict['ismy'] = True
+    def _normalize_all_sections(self, section_list, mysection_emails):
+        out_sections = []
+        for section in section_list:
+            if section['email']  in mysection_emails:
+                section['ismy'] = True
             else:
-                class_dict['ismy'] = False
-            out_classes.append(class_dict)
-        return out_classes
-    
-    def _normalize_my_classes_info(self, classes_list):
+                section['ismy'] = False
+            out_sections.append(section)
+        return out_sections
+
+    def get_my_groups(self, token, school_id):
         '''
-        normalize my classes info by api result
+        Get my groups
         '''
-        out_classes = []
-        user_class_emails = []
-        for data in classes_list:
-            class_obj = ClassModel(data)
-            class_dict = class_obj.convert()
-            out_classes.append(class_dict)
-            user_class_emails.append(class_dict['email'])
-        out_classes.sort(key=lambda d:d['combined_course_number'])
-        return out_classes, user_class_emails
-    
-    def _normalize_teachers_info(self, teachers_list):
-        '''
-        normalize teachers info by api result
-        '''
-        out_teachers = []
-        for data in teachers_list:
-            teacher_obj = User(data)
-            teacher_dict = teacher_obj.convert()
-            out_teachers.append(teacher_dict)
-        return out_teachers
-    
-    def _normalize_students_info(self, students_list):
-        '''
-        normalize students info by api result
-        '''
-        out_students = []
-        for data in students_list:
-            student_obj = User(data)
-            student_dict = student_obj.convert()
-            out_students.append(student_dict)
-        return out_students
-    
-    def _normalize_documents_info(self, documents_list):
-        '''
-        normalize documents info by api result
-        '''
-        out_documents = []
-        for data in documents_list:
-            document_obj = Document(data)
-            document_dict = document_obj.convert()
-            out_documents.append(document_dict)
-        return out_documents
-    
-    def _normalize_conversations_info(self, conversations_list, section_email):
-        '''
-        normalize conversations info by api result
-        '''
-        out_conversations = []
-        for data in conversations_list:
-            conver_obj = Conversation(data, section_email)
-            conversation_dict = conver_obj.convert()
-            out_conversations.append(conversation_dict)
-        return out_conversations
-    
-    def _normalize_users_info(self, users_list):
-        '''
-        normalize users info by api result
-        '''
-        out_users = []
-        for data in users_list:
-            user_obj = User(data)
-            user_dict = user_obj.convert()
-            out_users.append(user_dict)
-        return out_users
-
-    def _prune_next_classes(self, my_classes, all_classes):
-        mysections = []
-        if my_classes:
-            for section in my_classes:
-                record = {}
-                record['Email'] = section['email']
-                mysections.append(record)
-
-        allsections = []
-        if all_classes:
-            for data in all_classes:
-                class_obj = ClassModel(data)
-                record = class_obj.convert()
-                allsections.append(record)
-        return mysections, allsections
-    
-    def _prune_users_info(self, users_list):
-        out_users = []
-        for data in users_list:
-            user_obj = User(data)
-            record = user_obj.convert()
-            out_users.append(record)
-        return out_users
-    
-    def get_user_schools(self, school_user_id):
-        all_schools = self._aad_request.get_all_schools()
-        user_schools = self._normalize_schools_info(all_schools, school_user_id)
-        return user_schools
-
-    def get_class_school(self, school_object_id):
-        school = self._aad_request.get_one_school(school_object_id)
-        school_info = self._normalize_class_school_info(school)
-        return school_info
-    
-    def get_user_classes(self, school_user_id):
-        classes = self._aad_request.get_section_by_member(school_user_id)
-        out_classes, user_class_emails = self._normalize_my_classes_info(classes)
-        return out_classes, user_class_emails
-
-    def get_school_classes(self, school_user_id, my_emails=[]):
-        all_classes, sectionsnextlink = self._aad_request.get_sections_by_schoolid(school_user_id)
-        out_classes = self._normalize_classes_info(all_classes, my_emails)
-        return out_classes, sectionsnextlink
-
-    def get_current_class(self, class_object_id):
-        one_section = self._aad_request.get_one_section(class_object_id)
-        section_info = self._normalize_class_detail_info(one_section)
-        return section_info
-
-    def get_next_classes(self, school_user_id, nextlink, my_classes):
-        all_classes, sectionsnextlink = self._aad_request.get_sections_by_schoolid(school_user_id, nextlink=nextlink)
-        mysections, nextsections = self._prune_next_classes(my_classes, all_classes)
-        return mysections, nextsections
-    
-    def get_class_teachers(self, class_object_id):
-        all_teachers = self._aad_request.get_teachers_for_section(class_object_id)
-        out_teachers = self._normalize_teachers_info(all_teachers)
-        return out_teachers
-
-    def get_class_students(self, class_object_id):
-        all_students = self._aad_request.get_students_for_section(class_object_id)
-        out_students = self._normalize_students_info(all_students)
-        return out_students
-    
-    def get_documents(self, class_object_id):
-        all_documents = self._ms_request.get_documents_for_section(class_object_id)
-        out_documents = self._normalize_documents_info(all_documents)
-        return out_documents
-    
-    def get_documents_root(self, class_object_id):
-        documents_root = self._ms_request.get_documents_root(class_object_id)
-        return documents_root
-        
-    def get_conversations(self, class_object_id, section_mail):
-        all_conversations = self._ms_request.get_conversatoins_for_section(class_object_id)
-        out_conversations = self._normalize_conversations_info(all_conversations, section_mail)
-        return out_conversations
-    
-    def get_conversations_root(self, section_email):
-        seeall_url = 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0' % section_email
-        return seeall_url
-    
-    def get_current_users(self, school_object_id):
-        all_users, usersnextlink = self._aad_request.get_users_for_school(school_object_id)
-        out_users = self._normalize_users_info(all_users)
-        return out_users, usersnextlink
-
-    def get_current_teachers(self, school_user_id):
-        all_teachers, teachersnextlink = self._aad_request.get_teachers_by_schoolid(school_user_id)
-        out_teachers = self._normalize_teachers_info(all_teachers)
-        return out_teachers, teachersnextlink
-
-    def get_current_students(self, school_user_id):
-        all_students, studentsnextlink = self._aad_request.get_students_by_schoolid(school_user_id)
-        out_students = self._normalize_students_info(all_students)
-        return out_students, studentsnextlink
-
-    def get_next_users(self, school_object_id, nextlink):
-        all_users, usersnextlink = self._aad_request.get_users_for_school(school_object_id, nextlink=nextlink)
-        out_users = self._prune_users_info(all_users)
-        return out_users, usersnextlink
-    
-    def get_next_teachers(self, school_user_id, nextlink):
-        all_teachers, teachersnextlink = self._aad_request.get_teachers_by_schoolid(school_user_id, nextlink=nextlink)
-        out_teachers = self._prune_users_info(all_teachers)
-        return out_teachers, teachersnextlink
-    
-    def get_next_students(self, school_user_id, nextlink):
-        all_students, studentsnextlink = self._aad_request.get_students_by_schoolid(school_user_id, nextlink=nextlink)
-        out_students = self._prune_users_info(all_students)
-        return out_students, studentsnextlink
-    
-    def get_user_groups(self, school_user_id):
-        my_sections = self._aad_request.get_section_by_member(school_user_id)
-        groups = []
-        for section in my_sections:
-            groups.append(section['displayName'])
-        return groups
-
-class O365UserService(object):
-
-    def __init__(self):
-        self._aad_request = AADGraphRequest()
-        self._ms_request = MSGraphRequest()
-
-    def _check_admin(self, role):
-        if role == 'Admin':
-            return True
-        return False
-    
-    def _check_role(self, uid, admin_ids, sku_ids):
-        roles = []
-        role = ''
-        if uid in admin_ids:
-            roles.append('Admin')
-        else:
-            for sid in sku_ids:
-                if sid == O365ProductLicenses.Faculty or sid == O365ProductLicenses.FacultyPro:
-                    roles.append(Roles.Faculty)
-                if sid == O365ProductLicenses.Student or sid == O365ProductLicenses.StudentPro:
-                    roles.append(Roles.Student)
-        if roles:
-            if 'Admin' in roles:
-                role = 'Admin'
-            elif 'Faculty' in roles:
-                role = 'Teacher'
-            elif 'Student' in roles:
-                role = 'Student'
-        return role
-    
-    def _check_student(self, role):
-        if role == 'Student':
-            return True
-        return False
-
-    def _assign_full_name(self, user_dict):
-        given_name = user_dict['givenName'].strip()
-        sur_name = user_dict['surname'].strip()
-        if given_name and sur_name:
-            full_name = given_name + ' ' + sur_name
-        else:
-            full_name = user_dict['displayName']
-        return full_name
-    
-    def _assign_photo(self, uid):
-        photo = '/Photo/UserPhoto/%s' % uid
-        return photo
-    
-    def _assign_mail(self, user_dict):
-        mail = ''
-        if not user_dict['mail']:
-            mail = user_dict['userPrincipalName']
-        else:
-            mail = user_dict['mail']
-        return mail
-
-    def _normalize_base_user_info(self, client, extra_info, admin_ids=None):
-        '''
-        normalize sign in user info from MS Graph client
-        '''
-        user_obj = client.me.get()
-        user_dict = user_obj.to_dict()
-        user_info = {}
-        user_info['isauthenticated'] = True
-        user_info['uid'] = user_dict['id']
-        user_info['mail'] = self._assign_mail(user_dict)
-        user_info['photo'] = '/Photo/UserPhoto/%s' % user_dict['id']
-        user_info['display_name'] = self._assign_full_name(user_dict)
-        user_info['first_name'] = user_dict['givenName']
-        user_info['last_name'] = user_dict['surname']
-        user_info['role'] = self._check_role(user_dict['id'], admin_ids, extra_info.get('sku_ids'))
-        user_info['isadmin'] = self._check_admin(user_info['role'])
-        user_info['isstudent'] = self._check_student(user_info['role'])
-        user_info['school_uid'] = extra_info.get('school_uid')
-        user_info['school_id'] = extra_info.get('school_id')
-        return user_info
-
-    def get_current_user(self):
-        admin_ids = self._aad_request.get_admin_ids()
-        extra_info = self._aad_request.get_user_extra_info()
-        ms_client = self._ms_request.get_client()
-        user = self._normalize_base_user_info(ms_client, extra_info, admin_ids)
-        return user
-
-    def get_photo(self, user_object_id):
-        photo = self._ms_request.get_user_photo(user_object_id)
-        return photo
+        groups_list = []
+        version = '?api-version=1.5'
+        url = self.api_base_uri + 'me/memberOf' + version
+        group_list = self.rest_api_service.get_object_list(url, token, model=Section)
+        for section in group_list:
+            if section['school_id'] == school_id:
+                groups_list.append(section['display_name'])
+        return groups_list

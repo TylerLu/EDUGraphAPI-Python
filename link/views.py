@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 
 from services.token_service import TokenService
-from services.user_service import LocalUserService
+from services.local_user_service import LocalUserService
 
 from decorator import ms_login_required
 

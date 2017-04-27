@@ -11,8 +11,8 @@ from django.conf import settings
 
 import constant
 from services.token_service import TokenService
-from services.user_service import LocalUserService
-from services.education_service import O365UserService
+from services.local_user_service import LocalUserService
+from services.o365_user_service import O365UserService
 
 from .forms import UserInfo, UserRegInfo
 
@@ -80,7 +80,9 @@ def ms_login(request):
         TOKEN_SERVICE.code = code
         TOKEN_SERVICE.redirect_uri = redirect_uri
 
-    user_info = O365_USER.get_current_user()
+    token = TOKEN_SERVICE.get_access_token('aad')
+    ms_token = TOKEN_SERVICE.get_access_token('ms')
+    user_info = O365_USER.get_current_user(token, ms_token)
 
     LOCAL_USER.check_link_status(user_info)
 
@@ -97,7 +99,8 @@ def ms_login(request):
         return HttpResponseRedirect('/link')
 
 def photo(request, user_object_id):
-    user_photo = O365_USER.get_photo(user_object_id)
+    token = TOKEN_SERVICE.get_access_token('ms')
+    user_photo = O365_USER.get_photo(token, user_object_id)
     if not user_photo:
         local_photo_path = settings.STATICFILES_DIRS[0] + '/Images/DefaultUserPhoto.jpg'
         local_photo_file = open(local_photo_path, 'rb')
@@ -109,8 +112,8 @@ def o365_signin(request):
     username = request.session[constant.username_cookie]
     email = request.session[constant.email_cookie]
 
-    access_token = TOKEN_SERVICE.get_access_token('aad')
-    if access_token:
+    token = TOKEN_SERVICE.get_access_token('aad')
+    if token:
         return HttpResponseRedirect('/Schools')
 
     parameter = {}
@@ -122,9 +125,9 @@ def o365_signin(request):
 def external_login(request):
     redirect_scheme = request.scheme
     redirect_host = request.get_host()
-    aad_token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token('aad')
     ms_token = TOKEN_SERVICE.get_access_token('ms')
-    if ms_token and aad_token:
+    if token and ms_token:
         return HttpResponseRedirect('/Schools')
     else:
         redirect_url = constant.o365_signin_url % (redirect_scheme, redirect_host)
@@ -149,8 +152,6 @@ def register(request):
                 user_info['islocal'] = True
                 user_info['display_name'] = data['Email']
                 request.session['ms_user'] = user_info
-                request.session['aad_token'] = 'empty'
-                request.session['ms_token'] = 'empty'
                 return HttpResponseRedirect('/link')
             else:
                 errors.append('Name %s is already taken.' % data['Email'])

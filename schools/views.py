@@ -11,25 +11,27 @@ import json
 import constant
 from decorator import ms_login_required
 from services.token_service import TokenService
-from services.user_service import LocalUserService
-from services.education_service import SchoolService
+from services.local_user_service import LocalUserService
+from services.ms_graph_service import MSGraphService
+from services.education_service import EducationService
 
 LOCAL_USER = LocalUserService()
 TOKEN_SERVICE = TokenService()
-SCHOOL_SERVICE = SchoolService()
+MSGRAPH_SERVICE = MSGraphService()
+EDUCATION_SERVICE = EducationService()
 
 @ms_login_required
 def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.session['ms_user']
-    # get token for aad api
-    access_token = TOKEN_SERVICE.get_access_token('aad')
-    if not access_token:
+
+    token = TOKEN_SERVICE.get_access_token('aad')
+    if not token:
         if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
             return HttpResponseRedirect('/Account/O365login')
         else:
             return HttpResponseRedirect('/')
-    out_schools = SCHOOL_SERVICE.get_user_schools(user_info['school_id'])
+    out_schools = EDUCATION_SERVICE.get_schools(token, user_info['school_id'])
     # set parameter for template
     parameter = {}
     parameter['links'] = links
@@ -45,42 +47,37 @@ def classes(request, school_object_id):
     user_info['isinaschool'] = True
     user_info['school_object_id'] = school_object_id
 
-    school_info = SCHOOL_SERVICE.get_class_school(school_object_id)
-
-    my_out_classes, my_emails = SCHOOL_SERVICE.get_user_classes(school_info['id'])
-    all_out_classes, classesnextlink = SCHOOL_SERVICE.get_school_classes(school_info['id'], my_emails)
-
-    # get teachers from aad graph api for every section
-    for section  in my_out_classes:
-        out_teachers = SCHOOL_SERVICE.get_class_teachers(section['object_id'])
-        section['teachers'] = out_teachers
+    token = TOKEN_SERVICE.get_access_token('aad')
+    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
+    
+    my_sections, mysection_emails = EDUCATION_SERVICE.get_my_sections(token, school_info['id'])
+    all_sections, sectionsnextlink = EDUCATION_SERVICE.get_all_sections(token, school_info['id'], mysection_emails)
 
     # set parameter for template
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user_info
     parameter['school'] = school_info
-    parameter['sectionsnextlink'] = classesnextlink
-    parameter['sections'] = all_out_classes
-    parameter['mysections'] = my_out_classes
+    parameter['sectionsnextlink'] = sectionsnextlink
+    parameter['sections'] = all_sections
+    parameter['mysections'] = my_sections
     return render(request, 'schools/classes.html', parameter)
 
 @ms_login_required
 def classnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
 
-    school_info = SCHOOL_SERVICE.get_class_school(school_object_id)
+    token = TOKEN_SERVICE.get_access_token('aad')
+    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
 
-    my_out_classes, my_emails = SCHOOL_SERVICE.get_user_classes(school_info['id'])
-    all_out_classes, classesnextlink = SCHOOL_SERVICE.get_school_classes(school_info['id'], my_emails)
-
-    mysections, nextsections = SCHOOL_SERVICE.get_next_classes(school_info['id'], classesnextlink, my_out_classes)
+    my_sections, mysection_emails = EDUCATION_SERVICE.get_my_sections(token, school_info['id'])
+    all_sections, sectionsnextlink = EDUCATION_SERVICE.get_all_sections(token, school_info['id'], mysection_emails, nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Sections'] = {}
-    ajax_result['Sections']['Value'] = nextsections
-    ajax_result['Sections']['NextLink'] = classesnextlink
-    ajax_result['MySections'] = mysections
+    ajax_result['Sections']['Value'] = all_sections
+    ajax_result['Sections']['NextLink'] = sectionsnextlink
+    ajax_result['MySections'] = my_sections
     return JsonResponse(ajax_result, safe=False)
 
 @ms_login_required
@@ -93,13 +90,12 @@ def classdetails(request, school_object_id, class_object_id):
     user_info['class_object_id'] = class_object_id
     user_info['color'] = LOCAL_USER.get_color(user_info)
 
-    school_info = SCHOOL_SERVICE.get_class_school(school_object_id)
+    token = TOKEN_SERVICE.get_access_token('aad')
+    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
+    section_info = EDUCATION_SERVICE.get_section(token, class_object_id)
 
-    section_info = SCHOOL_SERVICE.get_current_class(class_object_id)
-
-    out_teachers = SCHOOL_SERVICE.get_class_teachers(class_object_id)
-
-    out_students = SCHOOL_SERVICE.get_class_students(class_object_id)
+    out_teachers = EDUCATION_SERVICE.get_section_members(token, class_object_id, 'Teacher')
+    out_students = EDUCATION_SERVICE.get_section_members(token, class_object_id, 'Student')
 
     # get students position from database
     LOCAL_USER.get_positions(out_students, class_object_id)
@@ -108,11 +104,12 @@ def classdetails(request, school_object_id, class_object_id):
     # set seatrange
     seatrange = range(1, 37)
 
-    out_documents = SCHOOL_SERVICE.get_documents(class_object_id)
-    documents_root = SCHOOL_SERVICE.get_documents_root(class_object_id)
+    ms_token = TOKEN_SERVICE.get_access_token('ms')
+    out_documents = MSGRAPH_SERVICE.get_documents(ms_token, class_object_id)
+    documents_root = MSGRAPH_SERVICE.get_documents_root(ms_token, class_object_id)
 
-    out_conversations = SCHOOL_SERVICE.get_conversations(class_object_id, section_info['email'])
-    conversations_root = SCHOOL_SERVICE.get_conversations_root(section_info['email'])
+    out_conversations = MSGRAPH_SERVICE.get_conversations(ms_token, class_object_id, section_info['email'])
+    conversations_root = MSGRAPH_SERVICE.get_conversations_root(section_info['email'])
 
     # set parameter for template
     parameter = {}
@@ -144,13 +141,15 @@ def users(request, school_object_id):
     user_info['isinaschool'] = True
     user_info['school_object_id'] = school_object_id
     
-    school_info = SCHOOL_SERVICE.get_class_school(school_object_id)
+    token = TOKEN_SERVICE.get_access_token('aad')
+    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
     
-    out_users, usersnextlink = SCHOOL_SERVICE.get_current_users(school_object_id)
+    out_users, usersnextlink = EDUCATION_SERVICE.get_members(token, school_object_id)
 
-    out_teachers, teachersnextlink = SCHOOL_SERVICE.get_current_teachers(school_info['id'])
+    out_teachers, teachersnextlink = EDUCATION_SERVICE.get_teachers(token, school_info['id'])
 
-    out_students, studentsnextlink = SCHOOL_SERVICE.get_current_students(school_info['id'])
+    out_students, studentsnextlink = EDUCATION_SERVICE.get_students(token, school_info['id'])
+
     # set parameter for template
     parameter = {}
     parameter['links'] = links
@@ -168,8 +167,9 @@ def users(request, school_object_id):
 def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
-
-    out_users, usersnextlink = SCHOOL_SERVICE.get_next_users(school_object_id, nextlink)
+    
+    token = TOKEN_SERVICE.get_access_token('aad')
+    out_users, usersnextlink = EDUCATION_SERVICE.get_members(token, school_object_id, nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Users'] = {}
@@ -182,7 +182,8 @@ def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
     
-    out_students, studentsnextlink = SCHOOL_SERVICE.get_next_students(user_info['school_id'], nextlink)
+    token = TOKEN_SERVICE.get_access_token('aad')
+    out_students, studentsnextlink = EDUCATION_SERVICE.get_students(token, user_info['school_id'], nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Students'] = {}
@@ -195,7 +196,8 @@ def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
 
-    out_teachers, teachersnextlink = SCHOOL_SERVICE.get_next_teachers(user_info['school_id'], nextlink)
+    token = TOKEN_SERVICE.get_access_token('aad')
+    out_teachers, teachersnextlink = EDUCATION_SERVICE.get_students(token, user_info['school_id'], nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Teachers'] = {}

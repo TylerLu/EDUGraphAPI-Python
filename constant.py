@@ -22,12 +22,6 @@ log_out_url = 'https://login.microsoftonline.com/common/oauth2/logout?redirect_u
 
 authorize_token_uri = 'https://login.microsoftonline.com/canvizEDU.onmicrosoft.com'
 
-aad_resource = 'https://graph.windows.net'
-
-ms_resource = 'https://graph.microsoft.com'
-
-graph_base_uri = 'https://graph.microsoft.com/v1.0/'
-
 company_admin_role_name = "Company Administrator"
 
 bing_map_key = os.environ['BingMapKey']
@@ -35,6 +29,10 @@ bing_map_key = os.environ['BingMapKey']
 username_cookie = "O365CookieUsername"
 
 email_cookie = "O365CookieEmail"
+
+token_source = {'aad': 'https://graph.windows.net',
+                'ms': 'https://graph.microsoft.com'
+                }
 
 class Roles():
     Admin = "Admin"
@@ -55,4 +53,3 @@ class O365ProductLicenses():
 
 
 FavoriteColors = [{'value':'#2F19FF', 'name':'Blue'}, {'value':'#127605', 'name':'Green'}, {'value':'#535353', 'name':'Grey'}]
-
