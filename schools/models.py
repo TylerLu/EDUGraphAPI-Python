@@ -6,7 +6,7 @@ import re
 import datetime
 from services.bingmap_service import BingMapService
 
-class PropertyItem(object):
+class GraphObjectBase(object):
 
     def __init__(self, prop_dict={}):
         self._prop_dict = prop_dict
@@ -17,7 +17,7 @@ class PropertyItem(object):
          else:
             return None
 
-class School(PropertyItem):
+class School(GraphObjectBase):
     def __init__(self, prop_dict={}):
         self._bing_map_server = BingMapService()
         super(School, self).__init__(prop_dict)
@@ -100,7 +100,7 @@ class School(PropertyItem):
         else:
             return None, None
 
-class Section(PropertyItem):
+class Section(GraphObjectBase):
     def __init__(self, prop_dict={}):
         super(Section, self).__init__(prop_dict)
 
@@ -256,7 +256,7 @@ class Section(PropertyItem):
     def Members(self):
         return []
 
-class EduUser(PropertyItem):
+class EduUser(GraphObjectBase):
     def __init__(self, prop_dict={}):
         super(EduUser, self).__init__(prop_dict)
 
@@ -299,9 +299,10 @@ class EduUser(PropertyItem):
     @property
     def photo(self):
         photo = '/Photo/UserPhoto/%s' % self.uid
+        print(photo)
         return photo
 
-class Document(PropertyItem):
+class Document(GraphObjectBase):
     def __init__(self, prop_dict={}):
         super(Document, self).__init__(prop_dict)
 
@@ -325,7 +326,7 @@ class Document(PropertyItem):
             last_modified_user_name = last_modified_by['user']['displayName']
         return last_modified_user_name
 
-class Conversation(PropertyItem):
+class Conversation(GraphObjectBase):
     def __init__(self, prop_dict={}):
         super(Conversation, self).__init__(prop_dict)
 

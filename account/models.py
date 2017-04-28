@@ -11,6 +11,7 @@ class LocalUser(models.Model):
     o365UserId = models.CharField(null=True, max_length=255)
     o365Email = models.CharField(null=True, max_length=255)
     favoriteColor = models.CharField(null=True, max_length=255)
+    organization = models.ForeignKey('Organizations', null=True)
     class Meta:
         db_table = 'users'
 
@@ -37,3 +38,11 @@ class ClassroomSeatingArrangements(models.Model):
     class Meta:
         db_table = 'classroom_seating_arranements'
 
+class Organizations(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(null=True, max_length=255)
+    tenantId = models.CharField(null=True, max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
+    isAdminConsented = models.BooleanField(default=True)
+    class Meta:
+        db_table = 'organizations'

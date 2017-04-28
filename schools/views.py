@@ -25,7 +25,7 @@ def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.session['ms_user']
 
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     if not token:
         if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
             return HttpResponseRedirect('/Account/O365login')
@@ -47,7 +47,7 @@ def classes(request, school_object_id):
     user_info['isinaschool'] = True
     user_info['school_object_id'] = school_object_id
 
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
     
     my_sections, mysection_emails = EDUCATION_SERVICE.get_my_sections(token, school_info['id'])
@@ -67,7 +67,7 @@ def classes(request, school_object_id):
 def classnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
 
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
 
     my_sections, mysection_emails = EDUCATION_SERVICE.get_my_sections(token, school_info['id'])
@@ -90,7 +90,7 @@ def classdetails(request, school_object_id, class_object_id):
     user_info['class_object_id'] = class_object_id
     user_info['color'] = LOCAL_USER.get_color(user_info)
 
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
     section_info = EDUCATION_SERVICE.get_section(token, class_object_id)
 
@@ -104,7 +104,7 @@ def classdetails(request, school_object_id, class_object_id):
     # set seatrange
     seatrange = range(1, 37)
 
-    ms_token = TOKEN_SERVICE.get_access_token('ms')
+    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
     out_documents = MSGRAPH_SERVICE.get_documents(ms_token, class_object_id)
     documents_root = MSGRAPH_SERVICE.get_documents_root(ms_token, class_object_id)
 
@@ -141,7 +141,7 @@ def users(request, school_object_id):
     user_info['isinaschool'] = True
     user_info['school_object_id'] = school_object_id
     
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
     
     out_users, usersnextlink = EDUCATION_SERVICE.get_members(token, school_object_id)
@@ -168,7 +168,7 @@ def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
     
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     out_users, usersnextlink = EDUCATION_SERVICE.get_members(token, school_object_id, nextlink=nextlink)
 
     ajax_result = {}
@@ -182,7 +182,7 @@ def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
     
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     out_students, studentsnextlink = EDUCATION_SERVICE.get_students(token, user_info['school_id'], nextlink=nextlink)
 
     ajax_result = {}
@@ -196,7 +196,7 @@ def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = request.session['ms_user']
 
-    token = TOKEN_SERVICE.get_access_token('aad')
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     out_teachers, teachersnextlink = EDUCATION_SERVICE.get_students(token, user_info['school_id'], nextlink=nextlink)
 
     ajax_result = {}

@@ -27,7 +27,7 @@ def admin(request):
 def linkaccounts(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.session['ms_user']
-    user_links = LOCAL_USER.get_links()
+    user_links = LOCAL_USER.get_links(user_info['tenant_id'])
     parameter = {}
     parameter['user'] = user_info
     parameter['user_links'] = user_links
@@ -39,14 +39,14 @@ def unlinkaccounts(request, link_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.session['ms_user']
     LOCAL_USER.remove_link(link_id)
-    user_links = LOCAL_USER.get_links()
+    user_links = LOCAL_USER.get_links(user_info['tenant_id'])
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user_info
     parameter['user_links'] = user_links
+    parameter['links'] = links
     return render(request, 'admin/linkedaccounts.html', parameter)
 
-#@ms_login_required
+@ms_login_required
 def consent(request):
     redirect_scheme = request.scheme
     redirect_host = request.get_host()

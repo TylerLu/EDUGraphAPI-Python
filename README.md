@@ -276,13 +276,13 @@ In this sample, [Django's built-in ORM](https://docs.djangoproject.com/en/1.11/t
 
 Below are are tables:
 
-| Table                        | Description                              |
-| ---------------------------- | ---------------------------------------- |
-| Users                        | Contains the user's information: name, email, hashed password...<br>*O365UserId* and *O365Email* are used to connect the local user with an O365 user. |
-| UserRoles                    | Contains users' role. Three roles are used in this sample: admin, teacher, and student. |
-| Organizations                | A row in this table represents a tenant in AAD.<br>*IsAdminConsented* column records than if the tenant consented by an administrator. |
-| TokenCache                   | Contains the users' access/refresh tokens. |
-| ClassroomSeatingArrangements | Contains the classroom seating arrangements. |
+| Table                          | Description                              |
+| ------------------------------ | ---------------------------------------- |
+| auth_user and users            | Contains the user's information: name, email, hashed password...<br>*O365UserId* and *O365Email* are used to connect the local user with an O365 user. |
+| user_roles                     | Contains users' role. Three roles are used in this sample: admin, teacher, and student. |
+| organizations                  | A row in this table represents a tenant in AAD.<br>*IsAdminConsented* column records than if the tenant consented by an administrator. |
+| token_cache                    | Contains the users' access/refresh tokens. |
+| classroom_seating_arrangements | Contains the classroom seating arrangements. |
 
 You will find the **DbContext** class and related model interfaces in the **/data/dbContext.ts** file.
 

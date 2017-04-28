@@ -10,13 +10,12 @@ class EducationService(object):
 
     def __init__(self):
         self.api_base_uri = 'https://graph.windows.net/canvizEDU.onmicrosoft.com/'
-        self.version = '?api-version=1.6'
         self.rest_api_service = RestApiService()
         self._token_re = re.compile('\$skiptoken=.*')
     
-    def get_schools(self, token, school_uid):
+    def get_schools(self, token, school_uid=''):
         '''
-        Get all schools that exist in the Azure Active Directory tenant.
+        Get all schools that exist in the Azure Active Directory tenant. 
         '''
         schools_list = []
         version = '?api-version=beta'
@@ -28,6 +27,7 @@ class EducationService(object):
     def get_school(self, token, object_id):
         '''
         Get a school by using the object_id.
+        <param name="object_id">The Object ID of the school administrative unit in Azure Active Directory.</param>
         '''
         school_result = {}
         version = '?api-version=beta'
@@ -38,6 +38,8 @@ class EducationService(object):
     def get_section_members(self, token, section_object_id, object_type=''):
         '''
         Get a section members by using the object_id.
+        <param name="section_object_id">The Object ID of the section.</param>
+        <param name="object_type">The members type.</param>
         '''
         member_list = []
         version = '?api-version=1.5'
@@ -52,6 +54,7 @@ class EducationService(object):
     def _get_my_sections(self, token, load_members=False):
         '''
         Get my sections
+        <param name="load_members">Include members or not.</param>
         '''
         mysection_list = []
         version = '?api-version=1.5'
@@ -68,6 +71,7 @@ class EducationService(object):
     def get_my_sections(self, token, school_id):
         '''
         Get my sections within a school
+        <param name="school_id">The school id.</param>
         '''
         section_list = self._get_my_sections(token, True)
         mysection_list = []
@@ -83,6 +87,10 @@ class EducationService(object):
     def get_all_sections(self, token, school_id, mysection_emails=[], top=12, nextlink=''):
         '''
         Get sections within a school
+        <param name="school_id">The school id.</param>
+        <param name="mysection_emails">All my section's email</param>
+        <param name="top">Get record number from API</param>
+        <param name="nextlink">Get skiptoken from nextlink</param>
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
@@ -98,6 +106,7 @@ class EducationService(object):
     def get_section(self, token, object_id):
         '''
         Get a section by using the object_id.
+        <param name="object_id">The Object ID of the section.</param>
         '''
         section_result = {}
         version = '?api-version=1.5'
@@ -108,6 +117,9 @@ class EducationService(object):
     def get_members(self, token, object_id, top=12, nextlink=''):
         '''
         Get members within a school
+        <param name="object_id">The Object ID of the school.</param>
+        <param name="top">Get record number from API</param>
+        <param name="nextlink">Get skiptoken from nextlink</param>
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
@@ -122,6 +134,9 @@ class EducationService(object):
     def get_students(self, token, school_id, top=12, nextlink=''):
         '''
         Get students within a school
+        <param name="school_id">The school id.</param>
+        <param name="top">Get record number from API</param>
+        <param name="nextlink">Get skiptoken from nextlink</param>
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
@@ -136,6 +151,9 @@ class EducationService(object):
     def get_teachers(self, token, school_id, top=12, nextlink=''):
         '''
         Get teachers within a school
+        <param name="school_id">The school id.</param>
+        <param name="top">Get record number from API</param>
+        <param name="nextlink">Get skiptoken from nextlink</param>
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
@@ -147,6 +165,20 @@ class EducationService(object):
         teachers_list, next_link = self.rest_api_service.get_object_list(url, token, model=EduUser, next_key='odata.nextLink')
         return teachers_list, next_link
     
+    def get_my_groups(self, token, school_id):
+        '''
+        Get my groups
+        <param name="school_id">The school id.</param>
+        '''
+        groups_list = []
+        version = '?api-version=1.5'
+        url = self.api_base_uri + 'me/memberOf' + version
+        group_list = self.rest_api_service.get_object_list(url, token, model=Section)
+        for section in group_list:
+            if section['school_id'] == school_id:
+                groups_list.append(section['display_name'])
+        return groups_list
+
     def _normalize_schools(self, school_list, school_uid=''):
         out_schools = []
         temp_schools = []
@@ -169,15 +201,3 @@ class EducationService(object):
             out_sections.append(section)
         return out_sections
 
-    def get_my_groups(self, token, school_id):
-        '''
-        Get my groups
-        '''
-        groups_list = []
-        version = '?api-version=1.5'
-        url = self.api_base_uri + 'me/memberOf' + version
-        group_list = self.rest_api_service.get_object_list(url, token, model=Section)
-        for section in group_list:
-            if section['school_id'] == school_id:
-                groups_list.append(section['display_name'])
-        return groups_list

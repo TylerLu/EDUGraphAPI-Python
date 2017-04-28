@@ -2,7 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
  *   * See LICENSE in the project root for license information.  
 '''
-from account.models import LocalUser, ClassroomSeatingArrangements, UserRoles
+from account.models import LocalUser, ClassroomSeatingArrangements, UserRoles, Organizations
 
 from django.contrib.auth.models import User
 
@@ -38,6 +38,12 @@ class LocalUserService(object):
         except:
             ret = False
         return ret
+    
+    def create_organization(self, user_info):
+        organization = Organizations.objects.get_or_create(tenantId=user_info['tenant_id'])[0]
+        organization.name = user_info['tenant_name']
+        organization.isAdminConsented = True
+        organization.save()
 
     def check_link_status(self, user_info):
         user_info['arelinked'] = False
@@ -88,6 +94,7 @@ class LocalUserService(object):
 
     def create(self, user_info):
         result = True
+        organization_obj = Organizations.objects.get(tenantId=user_info['tenant_id'])
         try:
             first_name = user_info['first_name']
             last_name = user_info['last_name']
@@ -106,6 +113,7 @@ class LocalUserService(object):
             local.o365UserId = o365_user_id
             local.o365Email = o365_user_mail
             local.favoriteColor = color
+            local.organization_id = organization_obj.id
             local.save()
         except Exception as e:
             print(e)
@@ -123,7 +131,7 @@ class LocalUserService(object):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
-        local = LocalUser(user=user)
+        local = LocalUser.objects.get_or_create(user=user)[0]
         local.o365UserId = o365_user_id
         local.o365Email = o365_user_mail
         local.save()
@@ -177,9 +185,10 @@ class LocalUserService(object):
                 if int(position) != 0:
                     ClassroomSeatingArrangements.objects.create(userId=user_id, classId=class_id, position=position)
     
-    def get_links(self):
+    def get_links(self, tenant_id):
+        organization_obj = Organizations.objects.get(tenantId=tenant_id)
         links = []
-        links_obj = LocalUser.objects.all()
+        links_obj = LocalUser.objects.filter(organization_id=organization_obj.id)
         for link in links_obj:
             if link.user.email and link.o365Email:
                 record = {}

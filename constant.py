@@ -30,9 +30,9 @@ username_cookie = "O365CookieUsername"
 
 email_cookie = "O365CookieEmail"
 
-token_source = {'aad': 'https://graph.windows.net',
-                'ms': 'https://graph.microsoft.com'
-                }
+class Resources():
+    AADGraph = "https://graph.windows.net"
+    MSGraph = "https://graph.microsoft.com"
 
 class Roles():
     Admin = "Admin"

@@ -7,7 +7,6 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate
 from django.conf import settings
 
-from services.token_service import TokenService
 from services.local_user_service import LocalUserService
 
 from decorator import ms_login_required
@@ -15,7 +14,6 @@ from decorator import ms_login_required
 from .forms import CreateLocalInfo, LoginLocalInfo
 
 LOCAL_USER = LocalUserService()
-TOKEN_SERVICE = TokenService()
 
 @ms_login_required
 def link(request):
@@ -70,6 +68,7 @@ def loginlocal(request):
     parameter['links'] = links
     parameter['user'] = user_info
     parameter['login_local_form'] = login_local_form
+    errors = []
     # POST /link/loginlocal
     if request.method == 'POST':
         login_local_form = LoginLocalInfo(request.POST)
@@ -86,6 +85,10 @@ def loginlocal(request):
                 user_info['o365Email'] = user_info['mail']
                 request.session['ms_user'] = user_info
                 return HttpResponseRedirect('/Schools')
+            else:
+                errors.append('Invalid login attempt.')
+                parameter['errors'] = errors
+                return render(request, 'link/loginlocal.html', parameter)
     # GET /link/loginlocal
     else:
         return render(request, 'link/loginlocal.html', parameter)

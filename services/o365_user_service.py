@@ -10,6 +10,17 @@ class O365UserService(object):
         self._aad_api_service = AADGraphService()
         self._ms_api_service = MSGraphService()
 
+    def get_user(self, token, ms_token):
+        admin_ids = self._aad_api_service.get_admin_ids(token)
+        extra_info = self._aad_api_service.get_user_extra_info(token)
+        ms_client = self._ms_api_service.get_client(ms_token)
+        user = self._normalize_base_user_info(ms_client, extra_info, admin_ids)
+        return user
+
+    def get_photo(self, token, user_object_id):
+        photo = self._ms_api_service.get_user_photo(token, user_object_id)
+        return photo
+
     def _check_admin(self, role):
         if role == 'Admin':
             return True
@@ -60,6 +71,18 @@ class O365UserService(object):
         else:
             mail = user_dict['mail']
         return mail
+    
+    def _get_organization(self, client):
+        tenant_id = ''
+        tenant_name = ''
+        organization_obj = client.organization.get()
+        organization_list = organization_obj.organization()
+        tenant_ids = []
+        for item in organization_list:
+            tenant_ids.append((item.id_, item.display_name))
+        if tenant_ids:
+            tenant_id, tenant_name = tenant_ids[0]
+        return tenant_id, tenant_name
 
     def _normalize_base_user_info(self, client, extra_info, admin_ids=None):
         '''
@@ -80,15 +103,6 @@ class O365UserService(object):
         user_info['isstudent'] = self._check_student(user_info['role'])
         user_info['school_uid'] = extra_info.get('school_uid')
         user_info['school_id'] = extra_info.get('school_id')
+        user_info['tenant_id'], user_info['tenant_name'] = self._get_organization(client)
         return user_info
 
-    def get_current_user(self, token, ms_token):
-        admin_ids = self._aad_api_service.get_admin_ids(token)
-        extra_info = self._aad_api_service.get_user_extra_info(token)
-        ms_client = self._ms_api_service.get_client(ms_token)
-        user = self._normalize_base_user_info(ms_client, extra_info, admin_ids)
-        return user
-
-    def get_photo(self, token, user_object_id):
-        photo = self._ms_api_service.get_user_photo(token, user_object_id)
-        return photo
