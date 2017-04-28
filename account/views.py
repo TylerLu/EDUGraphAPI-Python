@@ -11,19 +11,23 @@ from django.conf import settings
 
 import constant
 from services.token_service import TokenService
+from services.ms_graph_service import MSGraphService
+from services.aad_graph_service import AADGraphService
 from services.local_user_service import LocalUserService
 from services.o365_user_service import O365UserService
 
 from .forms import UserInfo, UserRegInfo
 
 LOCAL_USER = LocalUserService()
-O365_USER = O365UserService()
 TOKEN_SERVICE = TokenService()
 
 def index(request):
-    request.session['ms_user'] = {}
-    request.session[constant.username_cookie] = ''
-    request.session[constant.email_cookie] = ''
+    if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
+        return HttpResponseRedirect('/Account/O365login')
+    else:
+        request.session['ms_user'] = {}
+        request.session[constant.username_cookie] = ''
+        request.session[constant.email_cookie] = ''
     #user = authenticate(username='test@test.com', password='123456')
     #login(request, user)
     #print(user)
@@ -38,7 +42,6 @@ def relogin(request):
     return render(request, 'account/login.html', {'user_form':user_form, 'links':links})
 
 def my_login(request):
-    print(request.user)
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     redirect_scheme = request.scheme
     redirect_host = request.get_host()
@@ -84,13 +87,24 @@ def ms_login(request):
         TOKEN_SERVICE.code = code
         TOKEN_SERVICE.redirect_uri = redirect_uri
 
-    token = TOKEN_SERVICE.set_access_token(constant.Resources.AADGraph)
+    aad_token = TOKEN_SERVICE.set_access_token(constant.Resources.AADGraph)
     ms_token = TOKEN_SERVICE.set_access_token(constant.Resources.MSGraph)
-    user_info = O365_USER.get_user(token, ms_token)
+    
+    ms_graph_service = MSGraphService(token=ms_token)
+    ms_client = ms_graph_service.get_client()
+
+    o365_user_service = O365UserService()
+    client_user = o365_user_service.get_client_user(ms_client)
+
+    aad_graph_service = AADGraphService(client_user['tenant_id'], aad_token)
+    admin_ids = aad_graph_service.get_admin_ids()
+    extra_user = aad_graph_service.get_user_extra_info()
+
+    user_info = o365_user_service.get_user(client_user, admin_ids, extra_user)
 
     LOCAL_USER.create_organization(user_info)
     LOCAL_USER.check_link_status(user_info)
-
+    
     request.session['ms_user'] = user_info
     request.session[constant.username_cookie] = user_info['display_name']
     request.session[constant.email_cookie] = user_info['mail']
@@ -106,7 +120,8 @@ def ms_login(request):
 def photo(request, user_object_id):
     user_info = request.session['ms_user']
     token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
-    user_photo = O365_USER.get_photo(token, user_object_id)
+    ms_graph_service = MSGraphService(token=token)
+    user_photo = ms_graph_service.get_photo(user_object_id)
     if not user_photo:
         local_photo_path = settings.STATICFILES_DIRS[0] + '/Images/DefaultUserPhoto.jpg'
         local_photo_file = open(local_photo_path, 'rb')
@@ -117,11 +132,12 @@ def o365_signin(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     username = request.session[constant.username_cookie]
     email = request.session[constant.email_cookie]
-
+    
     user_info = request.session['ms_user']
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    if token:
-        return HttpResponseRedirect('/Schools')
+    if user_info:
+        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
+        if token:
+            return HttpResponseRedirect('/Schools')
 
     parameter = {}
     parameter['links'] = links
@@ -134,13 +150,14 @@ def external_login(request):
     redirect_host = request.get_host()
 
     user_info = request.session['ms_user']
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
-    if token and ms_token:
-        return HttpResponseRedirect('/Schools')
-    else:
-        redirect_url = constant.o365_signin_url % (redirect_scheme, redirect_host)
-        return HttpResponseRedirect(redirect_url)
+    if user_info:
+        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
+        ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
+        if token and ms_token:
+            return HttpResponseRedirect('/Schools')
+
+    redirect_url = constant.o365_signin_url % (redirect_scheme, redirect_host)
+    return HttpResponseRedirect(redirect_url)
 
 def register(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
@@ -178,8 +195,6 @@ def login_o365(request):
 
 def logoff(request):
     request.session['ms_user'] = {}
-    request.session[constant.username_cookie] = ''
-    request.session[constant.email_cookie] = ''
     redirect_scheme = request.scheme
     redirect_host = request.get_host()
     redirect_uri = redirect_scheme + '://' + redirect_host + '/Account/Login'

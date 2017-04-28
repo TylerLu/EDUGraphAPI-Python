@@ -46,7 +46,7 @@ def unlinkaccounts(request, link_id):
     parameter['links'] = links
     return render(request, 'admin/linkedaccounts.html', parameter)
 
-@ms_login_required
+#@ms_login_required
 def consent(request):
     redirect_scheme = request.scheme
     redirect_host = request.get_host()

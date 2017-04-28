@@ -12,6 +12,14 @@ class DemoHelper(object):
         self.path_links = self._convert()
         self._object_id_filter = re.compile('\w+-\w+-\w+-\w+-\w+')
         
+    def get_links(self, path):
+        links = []
+        if path not in self.path_links:
+            path = self._filter_path(path)
+        if path in self.path_links:
+            links = self.path_links[path]
+        return links
+
     def _convert(self):
         result = {}
         if self.data:
@@ -22,11 +30,3 @@ class DemoHelper(object):
     def _filter_path(self, path):
         new_path = re.sub(self._object_id_filter, '', path)
         return new_path
-
-    def get_links(self, path):
-        links = []
-        if path not in self.path_links:
-            path = self._filter_path(path)
-        if path in self.path_links:
-            links = self.path_links[path]
-        return links

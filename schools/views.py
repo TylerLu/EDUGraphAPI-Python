@@ -11,14 +11,12 @@ import json
 import constant
 from decorator import ms_login_required
 from services.token_service import TokenService
-from services.local_user_service import LocalUserService
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
+from services.local_user_service import LocalUserService
 
 LOCAL_USER = LocalUserService()
 TOKEN_SERVICE = TokenService()
-MSGRAPH_SERVICE = MSGraphService()
-EDUCATION_SERVICE = EducationService()
 
 @ms_login_required
 def schools(request):
@@ -31,7 +29,8 @@ def schools(request):
             return HttpResponseRedirect('/Account/O365login')
         else:
             return HttpResponseRedirect('/')
-    out_schools = EDUCATION_SERVICE.get_schools(token, user_info['school_id'])
+    education_service = EducationService(user_info['tenant_id'], token)
+    out_schools = education_service.get_schools(user_info['school_id'])
     # set parameter for template
     parameter = {}
     parameter['links'] = links
@@ -48,10 +47,11 @@ def classes(request, school_object_id):
     user_info['school_object_id'] = school_object_id
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
-    
-    my_sections, mysection_emails = EDUCATION_SERVICE.get_my_sections(token, school_info['id'])
-    all_sections, sectionsnextlink = EDUCATION_SERVICE.get_all_sections(token, school_info['id'], mysection_emails)
+    education_service = EducationService(user_info['tenant_id'], token)
+
+    school_info = education_service.get_school(school_object_id)
+    my_sections, mysection_emails = education_service.get_my_sections(school_info['id'])
+    all_sections, sectionsnextlink = education_service.get_all_sections(school_info['id'], mysection_emails)
 
     # set parameter for template
     parameter = {}
@@ -66,12 +66,14 @@ def classes(request, school_object_id):
 @ms_login_required
 def classnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
+    user_info = request.session['ms_user']
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
+    education_service = EducationService(user_info['tenant_id'], token)
 
-    my_sections, mysection_emails = EDUCATION_SERVICE.get_my_sections(token, school_info['id'])
-    all_sections, sectionsnextlink = EDUCATION_SERVICE.get_all_sections(token, school_info['id'], mysection_emails, nextlink=nextlink)
+    school_info = education_service.get_school(school_object_id)
+    my_sections, mysection_emails = education_service.get_my_sections(school_info['id'])
+    all_sections, sectionsnextlink = education_service.get_all_sections(school_info['id'], mysection_emails, nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Sections'] = {}
@@ -91,11 +93,12 @@ def classdetails(request, school_object_id, class_object_id):
     user_info['color'] = LOCAL_USER.get_color(user_info)
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
-    section_info = EDUCATION_SERVICE.get_section(token, class_object_id)
+    education_service = EducationService(user_info['tenant_id'], token)
 
-    out_teachers = EDUCATION_SERVICE.get_section_members(token, class_object_id, 'Teacher')
-    out_students = EDUCATION_SERVICE.get_section_members(token, class_object_id, 'Student')
+    school_info = education_service.get_school(school_object_id)
+    section_info = education_service.get_section(class_object_id)
+    out_teachers = education_service.get_section_members(class_object_id, 'Teacher')
+    out_students = education_service.get_section_members(class_object_id, 'Student')
 
     # get students position from database
     LOCAL_USER.get_positions(out_students, class_object_id)
@@ -105,11 +108,12 @@ def classdetails(request, school_object_id, class_object_id):
     seatrange = range(1, 37)
 
     ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
-    out_documents = MSGRAPH_SERVICE.get_documents(ms_token, class_object_id)
-    documents_root = MSGRAPH_SERVICE.get_documents_root(ms_token, class_object_id)
+    ms_graph_service = MSGraphService(token=ms_token)
 
-    out_conversations = MSGRAPH_SERVICE.get_conversations(ms_token, class_object_id, section_info['email'])
-    conversations_root = MSGRAPH_SERVICE.get_conversations_root(section_info['email'])
+    out_documents = ms_graph_service.get_documents(class_object_id)
+    documents_root = ms_graph_service.get_documents_root(class_object_id)
+    out_conversations = ms_graph_service.get_conversations(class_object_id, section_info['email'])
+    conversations_root = ms_graph_service.get_conversations_root(section_info['email'])
 
     # set parameter for template
     parameter = {}
@@ -142,13 +146,12 @@ def users(request, school_object_id):
     user_info['school_object_id'] = school_object_id
     
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    school_info = EDUCATION_SERVICE.get_school(token, school_object_id)
-    
-    out_users, usersnextlink = EDUCATION_SERVICE.get_members(token, school_object_id)
+    education_service = EducationService(user_info['tenant_id'], token)
 
-    out_teachers, teachersnextlink = EDUCATION_SERVICE.get_teachers(token, school_info['id'])
-
-    out_students, studentsnextlink = EDUCATION_SERVICE.get_students(token, school_info['id'])
+    school_info = education_service.get_school(school_object_id)
+    out_users, usersnextlink = education_service.get_members(school_object_id)
+    out_teachers, teachersnextlink = education_service.get_teachers(school_info['id'])
+    out_students, studentsnextlink = education_service.get_students(school_info['id'])
 
     # set parameter for template
     parameter = {}
@@ -169,7 +172,9 @@ def usernext(request, school_object_id):
     user_info = request.session['ms_user']
     
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    out_users, usersnextlink = EDUCATION_SERVICE.get_members(token, school_object_id, nextlink=nextlink)
+    education_service = EducationService(user_info['tenant_id'], token)
+
+    out_users, usersnextlink = education_service.get_members(school_object_id, nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Users'] = {}
@@ -183,7 +188,9 @@ def studentnext(request, school_object_id):
     user_info = request.session['ms_user']
     
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    out_students, studentsnextlink = EDUCATION_SERVICE.get_students(token, user_info['school_id'], nextlink=nextlink)
+    education_service = EducationService(user_info['tenant_id'], token)
+
+    out_students, studentsnextlink = education_service.get_students(user_info['school_id'], nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Students'] = {}
@@ -197,7 +204,9 @@ def teachernext(request, school_object_id):
     user_info = request.session['ms_user']
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    out_teachers, teachersnextlink = EDUCATION_SERVICE.get_students(token, user_info['school_id'], nextlink=nextlink)
+    education_service = EducationService(user_info['tenant_id'], token)
+    
+    out_teachers, teachersnextlink = education_service.get_students(user_info['school_id'], nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Teachers'] = {}

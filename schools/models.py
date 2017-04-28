@@ -15,7 +15,7 @@ class GraphObjectBase(object):
          if property_name in self._prop_dict:
             return self._prop_dict[property_name]
          else:
-            return None
+            return ''
 
 class School(GraphObjectBase):
     def __init__(self, prop_dict={}):
@@ -59,7 +59,7 @@ class School(GraphObjectBase):
 
     @property
     def highestgrade(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_HighestGrad')
+        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_HighestGrade')
 
     @property
     def zip(self):
@@ -217,7 +217,9 @@ class Section(GraphObjectBase):
 
     @property
     def combined_course_number(self):
-        combined_course_number = self.course_name[0:3].upper() + re.match('\d+', self.course_number).group()
+        combined_course_number = ''
+        if self.course_name and self.course_number:
+            combined_course_number = self.course_name[0:3].upper() + re.match('\d+', self.course_number).group()
         return combined_course_number
 
     @property
@@ -226,8 +228,10 @@ class Section(GraphObjectBase):
 
     @property
     def term_start_date(self):
-        convert_date = datetime.datetime.strptime(self.start_date, '%m/%d/%Y')
-        out_start_date = convert_date.strftime('%Y-%m-%dT%H:%M:%S')
+        out_start_date = ''
+        if self.start_date:
+            convert_date = datetime.datetime.strptime(self.start_date, '%m/%d/%Y')
+            out_start_date = convert_date.strftime('%Y-%m-%dT%H:%M:%S')
         return out_start_date
 
     @property
@@ -240,8 +244,10 @@ class Section(GraphObjectBase):
 
     @property
     def term_end_date(self):
-        convert_date = datetime.datetime.strptime(self.end_date, '%m/%d/%Y')
-        out_end_date = convert_date.strftime('%Y-%m-%dT%H:%M:%S')
+        out_end_date = ''
+        if self.end_date:
+            convert_date = datetime.datetime.strptime(self.end_date, '%m/%d/%Y')
+            out_end_date = convert_date.strftime('%Y-%m-%dT%H:%M:%S')
         return out_end_date
     
     @property
@@ -299,7 +305,6 @@ class EduUser(GraphObjectBase):
     @property
     def photo(self):
         photo = '/Photo/UserPhoto/%s' % self.uid
-        print(photo)
         return photo
 
 class Document(GraphObjectBase):

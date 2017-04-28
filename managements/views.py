@@ -9,12 +9,11 @@ from django.conf import settings
 import constant
 from decorator import ms_login_required
 from services.token_service import TokenService
-from services.local_user_service import LocalUserService
 from services.education_service import EducationService
+from services.local_user_service import LocalUserService
 
 LOCAL_USER = LocalUserService()
 TOKEN_SERVICE = TokenService()
-EDUCATION_SERVICE = EducationService()
 
 @ms_login_required
 def aboutme(request):
@@ -22,9 +21,10 @@ def aboutme(request):
     user_info = request.session['ms_user']
     user_info['showcolor'] = True
     user_info['color'] = LOCAL_USER.get_color(user_info)
-
+    
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    groups = EDUCATION_SERVICE.get_my_groups(token, user_info['school_id'])
+    education_service = EducationService(user_info['tenant_id'], token)
+    groups = education_service.get_my_groups(user_info['school_id'])
 
     parameter = {}
     parameter['links'] = links

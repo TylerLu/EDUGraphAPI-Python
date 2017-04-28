@@ -6,20 +6,19 @@ from services.aad_graph_service import AADGraphService
 
 class O365UserService(object):
 
-    def __init__(self):
-        self._aad_api_service = AADGraphService()
-        self._ms_api_service = MSGraphService()
-
-    def get_user(self, token, ms_token):
-        admin_ids = self._aad_api_service.get_admin_ids(token)
-        extra_info = self._aad_api_service.get_user_extra_info(token)
-        ms_client = self._ms_api_service.get_client(ms_token)
-        user = self._normalize_base_user_info(ms_client, extra_info, admin_ids)
+    def get_client_user(self, client):
+        user = self._normalize_client_user_info(client)
         return user
-
-    def get_photo(self, token, user_object_id):
-        photo = self._ms_api_service.get_user_photo(token, user_object_id)
-        return photo
+    
+    def get_user(self, client_user, admin_ids, extra_info):
+        user_info = client_user
+        user_info['isauthenticated'] = True
+        user_info['role'] = self._check_role(user_info['uid'], admin_ids, extra_info.get('sku_ids'))
+        user_info['isadmin'] = self._check_admin(user_info['role'])
+        user_info['isstudent'] = self._check_student(user_info['role'])
+        user_info['school_uid'] = extra_info.get('school_uid')
+        user_info['school_id'] = extra_info.get('school_id')
+        return user_info
 
     def _check_admin(self, role):
         if role == 'Admin':
@@ -84,25 +83,19 @@ class O365UserService(object):
             tenant_id, tenant_name = tenant_ids[0]
         return tenant_id, tenant_name
 
-    def _normalize_base_user_info(self, client, extra_info, admin_ids=None):
+    def _normalize_client_user_info(self, client):
         '''
         normalize sign in user info from MS Graph client
         '''
         user_obj = client.me.get()
         user_dict = user_obj.to_dict()
         user_info = {}
-        user_info['isauthenticated'] = True
         user_info['uid'] = user_dict['id']
         user_info['mail'] = self._assign_mail(user_dict)
         user_info['photo'] = '/Photo/UserPhoto/%s' % user_dict['id']
         user_info['display_name'] = self._assign_full_name(user_dict)
         user_info['first_name'] = user_dict['givenName']
         user_info['last_name'] = user_dict['surname']
-        user_info['role'] = self._check_role(user_dict['id'], admin_ids, extra_info.get('sku_ids'))
-        user_info['isadmin'] = self._check_admin(user_info['role'])
-        user_info['isstudent'] = self._check_student(user_info['role'])
-        user_info['school_uid'] = extra_info.get('school_uid')
-        user_info['school_id'] = extra_info.get('school_id')
         user_info['tenant_id'], user_info['tenant_name'] = self._get_organization(client)
         return user_info
 
