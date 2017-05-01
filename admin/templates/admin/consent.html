@@ -7,8 +7,9 @@
 
 {% block content %}
 <h2>Admin Consent</h2>
+<hr />
 {% if consented %}
-	<form action="/Consent" method="POST">
+	<form action="/OnlyConsent" method="POST">
         <p>To use this application in this tenancy you must first provide Admin Consent. </p>
         <p>Please click the button below to proceed.</p>
         <p class="form-group">

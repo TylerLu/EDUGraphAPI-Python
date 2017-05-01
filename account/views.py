@@ -1,20 +1,22 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate as auth_authenticate
 
 from django.conf import settings
 
 import constant
+from decorator import login_required
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService
 from services.aad_graph_service import AADGraphService
 from services.local_user_service import LocalUserService
 from services.o365_user_service import O365UserService
+from services.auth_service import login, authenticate, logout
 
 from .forms import UserInfo, UserRegInfo
 
@@ -22,19 +24,12 @@ LOCAL_USER = LocalUserService()
 TOKEN_SERVICE = TokenService()
 
 def index(request):
-    if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
-        return HttpResponseRedirect('/Account/O365login')
-    else:
-        request.session['ms_user'] = {}
-        request.session[constant.username_cookie] = ''
-        request.session[constant.email_cookie] = ''
-    #user = authenticate(username='test@test.com', password='123456')
-    #login(request, user)
-    #print(user)
+    request.session[constant.username_cookie] = ''
+    request.session[constant.email_cookie] = ''
     return HttpResponseRedirect('/Account/Login')
 
 def relogin(request):
-    request.session['ms_user'] = {}
+    login(request)
     request.session[constant.username_cookie] = ''
     request.session[constant.email_cookie] = ''
     user_form = UserInfo()
@@ -57,16 +52,26 @@ def my_login(request):
             data = user_form.clean()
             email = data['Email']
             password = data['Password']
-            user = authenticate(username=email, password=password)
-        if user is not None:
-            if hasattr(user, 'localuser') and user.localuser.o365Email:
-                user_info = LOCAL_USER.get_user(user.username)
-                request.session['ms_user'] = user_info
-                return HttpResponseRedirect('/link')
+        if email and password:
+            user = auth_authenticate(username=email, password=password)
+            if user is not None:
+                if hasattr(user, 'localuser') and user.localuser.o365UserId:
+                    login_local_user(request, user)
+                else:
+                    user_info = set_local_user(user)
+                    login(request, user_info)
             else:
                 errors.append('Invalid login attempt.')
                 return render(request, 'account/login.html', {'user_form':user_form, 'errors':errors, 'links':links})
-        # 0365 login
+            ret = authenticate(request.user)
+            if ret:
+                if request.user['arelinked']:
+                    if request.user['role'] != 'Admin':
+                        return HttpResponseRedirect('/Schools')
+                    else:
+                        return HttpResponseRedirect('/Admin')
+                else:
+                    return HttpResponseRedirect('/link')
         else:
             if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
                 return HttpResponseRedirect('/Account/O365login')
@@ -78,18 +83,48 @@ def my_login(request):
         user_form = UserInfo()
         return render(request, 'account/login.html', {'user_form':user_form, 'links':links})
 
-def ms_login(request):
+def set_local_user(user):
+    user_info = {}
+    user_info['islocal'] = True
+    user_info['mail'] = user.email
+    user_info['display_name'] = user.username
+    user_info['isauthenticated'] = True
+    user_info['arelinked'] = False
+    return user_info
+
+def login_local_user(request, user):
+    aad_token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.localuser.o365UserId)
+    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.localuser.o365UserId)
+
+    ms_graph_service = MSGraphService(token=ms_token)
+    ms_client = ms_graph_service.get_client()
+
+    o365_user_service = O365UserService()
+    client_user = o365_user_service.get_client_user(ms_client)
+
+    aad_graph_service = AADGraphService(client_user['tenant_id'], aad_token)
+    admin_ids = aad_graph_service.get_admin_ids()
+    extra_user = aad_graph_service.get_user_extra_info()
+    user_info = o365_user_service.get_user(client_user, admin_ids, extra_user)
+
+    LOCAL_USER.check_link_status(user_info)
+    login(request, user_info)
+
+    request.session[constant.username_cookie] = user_info['display_name']
+    request.session[constant.email_cookie] = user_info['mail']
+
+def o365_auth_callback(request):
     redirect_scheme = request.scheme
     redirect_host = request.get_host()
     redirect_uri = constant.redirect_uri % (redirect_scheme, redirect_host)
     code = request.GET.get('code', '')
-    if code:
-        TOKEN_SERVICE.code = code
-        TOKEN_SERVICE.redirect_uri = redirect_uri
 
-    aad_token = TOKEN_SERVICE.set_access_token(constant.Resources.AADGraph)
-    ms_token = TOKEN_SERVICE.set_access_token(constant.Resources.MSGraph)
-    
+    aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
+    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result)
+
+    ms_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
+    ms_token = TOKEN_SERVICE.cache_tokens(ms_auth_result)
+
     ms_graph_service = MSGraphService(token=ms_token)
     ms_client = ms_graph_service.get_client()
 
@@ -104,8 +139,8 @@ def ms_login(request):
 
     LOCAL_USER.create_organization(user_info)
     LOCAL_USER.check_link_status(user_info)
-    
-    request.session['ms_user'] = user_info
+
+    login(request, user_info)
     request.session[constant.username_cookie] = user_info['display_name']
     request.session[constant.email_cookie] = user_info['mail']
 
@@ -117,9 +152,9 @@ def ms_login(request):
     else:
         return HttpResponseRedirect('/link')
 
+@login_required
 def photo(request, user_object_id):
-    user_info = request.session['ms_user']
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, request.user['uid'])
     ms_graph_service = MSGraphService(token=token)
     user_photo = ms_graph_service.get_photo(user_object_id)
     if not user_photo:
@@ -132,10 +167,10 @@ def o365_signin(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     username = request.session[constant.username_cookie]
     email = request.session[constant.email_cookie]
-    
-    user_info = request.session['ms_user']
-    if user_info:
-        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
+
+    ret = authenticate(request.user)
+    if ret:
+        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, request.user['uid'])
         if token:
             return HttpResponseRedirect('/Schools')
 
@@ -149,11 +184,11 @@ def external_login(request):
     redirect_scheme = request.scheme
     redirect_host = request.get_host()
 
-    user_info = request.session['ms_user']
-    if user_info:
-        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-        ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
-        if token and ms_token:
+    ret = authenticate(request.user)
+    if ret:
+        aad_token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, request.user['uid'])
+        ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, request.user['uid'])
+        if aad_token and ms_token:
             return HttpResponseRedirect('/Schools')
 
     redirect_url = constant.o365_signin_url % (redirect_scheme, redirect_host)
@@ -174,10 +209,14 @@ def register(request):
             ret = LOCAL_USER.register(data)
             if ret:
                 user_info = {}
-                user_info['isauthenticated'] = True
                 user_info['islocal'] = True
+                user_info['isauthenticated'] = True
+                user_info['mail'] = data['Email']
                 user_info['display_name'] = data['Email']
-                request.session['ms_user'] = user_info
+                user_info['arelinked'] = False
+                user_info['uid'] = 'register'
+                user_info['tenant_id'] = 'register'
+                login(request, user_info)
                 return HttpResponseRedirect('/link')
             else:
                 errors.append('Name %s is already taken.' % data['Email'])
@@ -187,17 +226,18 @@ def register(request):
     else:
         return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'links':links})
 
-def login_o365(request):
-    redirect_scheme = request.scheme
-    redirect_host = request.get_host()
-    redirect_url = constant.o365_login_url % (redirect_scheme, redirect_host)
-    return HttpResponseRedirect(redirect_url)
-
+@login_required
 def logoff(request):
-    request.session['ms_user'] = {}
-    redirect_scheme = request.scheme
-    redirect_host = request.get_host()
-    redirect_uri = redirect_scheme + '://' + redirect_host + '/Account/Login'
-    logoff_url = constant.log_out_url % (redirect_uri, redirect_uri)
-    return HttpResponseRedirect(logoff_url)
-    
+    user_info = request.user
+    logout(request)
+    if user_info['arelinked']:
+        return HttpResponseRedirect('/Account/O365login')
+    else:
+        request.session[constant.username_cookie] = ''
+        request.session[constant.email_cookie] = ''
+        redirect_scheme = request.scheme
+        redirect_host = request.get_host()
+        redirect_uri = redirect_scheme + '://' + redirect_host + '/Account/Login'
+        logoff_url = constant.log_out_url % (redirect_uri, redirect_uri)
+        return HttpResponseRedirect(logoff_url)
+

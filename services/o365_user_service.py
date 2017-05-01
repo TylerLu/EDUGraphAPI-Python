@@ -1,3 +1,7 @@
+'''
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
+'''
 from constant import Roles
 from constant import O365ProductLicenses
 
@@ -9,7 +13,7 @@ class O365UserService(object):
     def get_client_user(self, client):
         user = self._normalize_client_user_info(client)
         return user
-    
+
     def get_user(self, client_user, admin_ids, extra_info):
         user_info = client_user
         user_info['isauthenticated'] = True
@@ -24,7 +28,7 @@ class O365UserService(object):
         if role == 'Admin':
             return True
         return False
-    
+
     def _check_role(self, uid, admin_ids, sku_ids):
         roles = []
         role = ''
@@ -44,7 +48,7 @@ class O365UserService(object):
             elif 'Student' in roles:
                 role = 'Student'
         return role
-    
+
     def _check_student(self, role):
         if role == 'Student':
             return True
@@ -58,11 +62,11 @@ class O365UserService(object):
         else:
             full_name = user_dict['displayName']
         return full_name
-    
+
     def _assign_photo(self, uid):
         photo = '/Photo/UserPhoto/%s' % uid
         return photo
-    
+
     def _assign_mail(self, user_dict):
         mail = ''
         if not user_dict['mail']:
@@ -70,7 +74,7 @@ class O365UserService(object):
         else:
             mail = user_dict['mail']
         return mail
-    
+
     def _get_organization(self, client):
         tenant_id = ''
         tenant_name = ''

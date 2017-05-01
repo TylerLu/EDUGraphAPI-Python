@@ -30,9 +30,8 @@ urlpatterns = [
     url(r'^Account/Register', account_views.register, name='register'),
     url(r'^Account/LogOff', account_views.logoff, name='logoff'),
 
-    url(r'^MS/Login', account_views.ms_login, name='ms_login'),
-    url(r'^LoginO365', account_views.login_o365, name='login_o365'),
-    
+    url(r'^Auth/O365/Callback', account_views.o365_auth_callback, name='o365_auth_callback'),
+
 
     url(r'^Photo/UserPhoto/(?P<user_object_id>\w+-\w+-\w+-\w+-\w+)', account_views.photo, name='photo'),
 
@@ -52,11 +51,14 @@ urlpatterns = [
     url(r'^link$', link_views.link, name='link'),
     url(r'^link/createlocal', link_views.createlocal, name='createlocal'),
     url(r'^link/loginlocal', link_views.loginlocal, name='loginlocal'),
-    
+    url(r'^link/LoginO365', link_views.login_o365, name='login_o365'),
+    url(r'^link/ProcessCode', link_views.processcode, name='processcode'),
+
     url(r'^Admin$', admin_views.admin, name='admin'),
-    url(r'^Admin/LinkedAccounts', admin_views.linkaccounts, name='linkaccounts'),
-    url(r'^UnlinkAccounts/(?P<link_id>\d+)', admin_views.unlinkaccounts, name='unlinkaccounts'),
+    url(r'^Admin/LinkedAccounts', admin_views.linked_accounts, name='linked_accounts'),
+    url(r'^UnlinkAccount/(?P<link_id>\d+)', admin_views.unlink_account, name='unlink_account'),
     url(r'^Consent', admin_views.consent, name='consent'),
     url(r'^Unconsent', admin_views.unconsent, name='unconsent'),
     url(r'^Admin/Consent', admin_views.consent_alone, name='consent_alone'),
+    url(r'^OnlyConsent', admin_views.only_consent, name='only_consent'),
 ]

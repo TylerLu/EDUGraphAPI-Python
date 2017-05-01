@@ -1,17 +1,17 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 import constant
 from services.rest_api_service import RestApiService
 
 class AADGraphService(object):
-    
+
     def __init__(self, tenant_id, token):
-        self.api_base_uri = constant.Resources.AADGraph + '/' + tenant_id + '/'
+        self.api_base_uri = constant.Resources.AADGraph + tenant_id + '/'
         self.token = token
         self.rest_api_service = RestApiService()
-        
+
     def get_admin_ids(self):
         admin_ids = set()
         version = '?api-version=1.6'

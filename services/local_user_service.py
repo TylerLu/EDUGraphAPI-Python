@@ -1,16 +1,16 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 from account.models import LocalUser, ClassroomSeatingArrangements, UserRoles, Organizations
 
 from django.contrib.auth.models import User
 
 class LocalUserService(object):
-    
+
     def __init__(self):
         pass
-    
+
     def check_login(self, data):
         result = False
         try:
@@ -38,12 +38,23 @@ class LocalUserService(object):
         except:
             ret = False
         return ret
-    
+
     def create_organization(self, user_info):
         organization = Organizations.objects.get_or_create(tenantId=user_info['tenant_id'])[0]
         organization.name = user_info['tenant_name']
         organization.isAdminConsented = True
         organization.save()
+
+    def update_organization(self, user_info, label):
+        organization = Organizations.objects.filter(tenantId=user_info['tenant_id'])
+        if organization:
+            organization.update(isAdminConsented=label)
+
+    def check_admin(self, user_info):
+        user_info['isadminconsented'] = False
+        organization = Organizations.objects.filter(tenantId=user_info['tenant_id'])
+        if organization:
+            user_info['isadminconsented'] = organization[0].isAdminConsented
 
     def check_link_status(self, user_info):
         user_info['arelinked'] = False
@@ -65,7 +76,7 @@ class LocalUserService(object):
             user_info['localmessage'] = 'There is a local account: %s matching your O365 account.' % o365_user_mail
         else:
             pass
-    
+
     def get_user(self, username):
         user_info = {}
         try:
@@ -76,7 +87,7 @@ class LocalUserService(object):
             user_info['mail'] = user.localuser.o365Email
             user_info['first_name'] = user.first_name
             user_info['last_name'] = user.last_name
-            user_info['display_name'] = user.localuser.o365Email 
+            user_info['display_name'] = user.localuser.o365Email
             role = UserRoles.objects.get(o365UserId=user.localuser.o365UserId)
             user_info['role'] = role.name
             if user_info['role'] != 'Admin':
@@ -86,7 +97,7 @@ class LocalUserService(object):
         except:
             pass
         return user_info
-    
+
     def update_role(self, uid, role_name):
          role = UserRoles.objects.get_or_create(o365UserId=uid)[0]
          role.name = role_name
@@ -119,8 +130,10 @@ class LocalUserService(object):
             print(e)
             result = False
         return result
-    
+
     def link(self, user_info, data):
+        ret = True
+        organization_obj = Organizations.objects.get(tenantId=user_info['tenant_id'])
         local_mail = data['Email']
         password = data['Password']
         first_name = user_info['first_name']
@@ -128,13 +141,40 @@ class LocalUserService(object):
         o365_user_mail = user_info['mail']
         o365_user_id = user_info['uid']
         user = User.objects.get(username=local_mail)
-        user.first_name = first_name
-        user.last_name = last_name
-        user.save()
-        local = LocalUser.objects.get_or_create(user=user)[0]
-        local.o365UserId = o365_user_id
-        local.o365Email = o365_user_mail
-        local.save()
+        if hasattr(user, 'localuser') and user.localuser.o365UserId:
+            ret = False
+        else:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            local = LocalUser.objects.get_or_create(user=user)[0]
+            local.o365UserId = o365_user_id
+            local.o365Email = o365_user_mail
+            local.organization_id = organization_obj.id
+            local.save()
+        return ret
+
+    def link_o365(self, local_user, o365_user):
+        ret = True
+        organization_obj = Organizations.objects.get(tenantId=o365_user['tenant_id'])
+        local_mail = local_user['mail']
+        first_name = o365_user['first_name']
+        last_name = o365_user['last_name']
+        o365_user_mail = o365_user['mail']
+        o365_user_id = o365_user['uid']
+        user = User.objects.get(username=local_mail)
+        if hasattr(user, 'localuser') and user.localuser.o365UserId:
+            ret = False
+        else:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            local = LocalUser.objects.get_or_create(user=user)[0]
+            local.o365UserId = o365_user_id
+            local.o365Email = o365_user_mail
+            local.organization_id = organization_obj.id
+            local.save()
+        return ret
 
     def get_color(self, user_info):
         color = ''
@@ -145,8 +185,9 @@ class LocalUserService(object):
         return color
 
     def update_color(self, color, user_info):
-        local = LocalUser.objects.filter(o365Email=user_info['mail'])[0]
+        local = LocalUser.objects.filter(o365Email=user_info['mail'])
         if local:
+            local = local[0]
             local.favoriteColor = color
             local.save()
 
@@ -159,7 +200,7 @@ class LocalUserService(object):
             except:
                 pass
             student['position'] = position
-    
+
     def get_colors(self, students):
         for student in students:
             color = ''
@@ -184,7 +225,7 @@ class LocalUserService(object):
             else:
                 if int(position) != 0:
                     ClassroomSeatingArrangements.objects.create(userId=user_id, classId=class_id, position=position)
-    
+
     def get_links(self, tenant_id):
         organization_obj = Organizations.objects.get(tenantId=tenant_id)
         links = []
@@ -197,7 +238,7 @@ class LocalUserService(object):
                 record['o365Email'] = link.o365Email
                 links.append(record)
         return links
-    
+
     def remove_link(self, link_id):
         local = LocalUser.objects.filter(id=link_id)
         email = ''
@@ -206,3 +247,11 @@ class LocalUserService(object):
         LocalUser.objects.filter(id=link_id).delete()
         if email:
             User.objects.filter(email=email).delete()
+
+    def remove_links(self, tenant_id):
+        org_obj = Organizations.objects.filter(tenantId=tenant_id)
+        if org_obj:
+            org = org_obj[0]
+            local = LocalUser.objects.filter(organization_id=org.id)
+            if local:
+                local.delete()

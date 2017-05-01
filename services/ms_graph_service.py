@@ -14,7 +14,7 @@ class MSGraphService(object):
         self.http_provider = msgraph.HttpProvider()
         self.auth_provider = AuthProvider()
 
-        self.api_base_uri = constant.Resources.MSGraph + '/v1.0/' + tenant_id
+        self.api_base_uri = constant.Resources.MSGraph + 'v1.0' + tenant_id + '/'
         self.token = token
         self.rest_api_service = RestApiService()
         

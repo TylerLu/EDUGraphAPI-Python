@@ -1,6 +1,6 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 import os
 
@@ -8,13 +8,13 @@ client_id = os.environ['ClientId']
 
 client_secret = os.environ['ClientSecret']
 
-redirect_uri = '%s://%s/MS/Login'
+redirect_uri = '%s://%s/Auth/O365/Callback'
 
 login_base_uri = 'https://login.microsoftonline.com/common/oauth2/authorize?'
 
 o365_signin_url = login_base_uri + 'response_type=code&client_id=%s&redirect_uri=%s' % (client_id, redirect_uri)
 
-o365_login_url = login_base_uri + 'response_type=code&client_id=%s&redirect_uri=%s&prompt=login' % (client_id, redirect_uri)
+o365_login_url = login_base_uri + 'response_type=code&client_id=%s&prompt=login&redirect_uri=' % (client_id)
 
 admin_consent_url = login_base_uri + 'response_type=code&client_id=%s&redirect_uri=%s&prompt=admin_consent' % (client_id, redirect_uri)
 
@@ -31,8 +31,8 @@ username_cookie = "O365CookieUsername"
 email_cookie = "O365CookieEmail"
 
 class Resources():
-    AADGraph = "https://graph.windows.net"
-    MSGraph = "https://graph.microsoft.com"
+    AADGraph = "https://graph.windows.net/"
+    MSGraph = "https://graph.microsoft.com/"
 
 class Roles():
     Admin = "Admin"

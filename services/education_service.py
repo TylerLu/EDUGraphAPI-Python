@@ -1,6 +1,6 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 import re
 import constant
@@ -10,14 +10,14 @@ from schools.models import School, Section, EduUser
 class EducationService(object):
 
     def __init__(self, tenant_id, token):
-        self.api_base_uri = constant.Resources.AADGraph + '/' + tenant_id + '/'
+        self.api_base_uri = constant.Resources.AADGraph + tenant_id + '/'
         self.token = token
         self.rest_api_service = RestApiService()
         self._token_re = re.compile('\$skiptoken=.*')
-    
+
     def get_schools(self, school_uid=''):
         '''
-        Get all schools that exist in the Azure Active Directory tenant. 
+        Get all schools that exist in the Azure Active Directory tenant.
         '''
         schools_list = []
         version = '?api-version=beta'
@@ -25,7 +25,7 @@ class EducationService(object):
         school_list = self.rest_api_service.get_object_list(url, self.token, model=School)
         out_schools = self._normalize_schools(school_list, school_uid)
         return out_schools
-    
+
     def get_school(self, object_id):
         '''
         Get a school by using the object_id.
@@ -36,7 +36,7 @@ class EducationService(object):
         url = self.api_base_uri + 'administrativeUnits/%s' % object_id + version
         school_result = self.rest_api_service.get_object(url, self.token, model=School)
         return school_result
-    
+
     def get_section_members(self, section_object_id, object_type=''):
         '''
         Get a section members by using the object_id.
@@ -65,8 +65,8 @@ class EducationService(object):
 
         for section in section_list:
             if load_members:
-                member_list = self.get_section_members(self.token, section['object_id'])
-                section['teachers'] =  [i for i in member_list if i['object_type'] == 'Teacher']
+                member_list = self.get_section_members(section['object_id'], 'Teacher')
+                section['teachers'] =  member_list
             mysection_list.append(section)
         return mysection_list
 
@@ -85,7 +85,7 @@ class EducationService(object):
                 mysection_emails.append(section['email'])
         mysection_list.sort(key=lambda d:d['combined_course_number'])
         return mysection_list, mysection_emails
-    
+
     def get_all_sections(self, school_id, mysection_emails=[], top=12, nextlink=''):
         '''
         Get sections within a school
@@ -115,7 +115,7 @@ class EducationService(object):
         url = self.api_base_uri + 'groups/%s' % object_id + version
         section_result = self.rest_api_service.get_object(url, self.token, model=Section)
         return section_result
-    
+
     def get_members(self, object_id, top=12, nextlink=''):
         '''
         Get members within a school
@@ -149,7 +149,7 @@ class EducationService(object):
         url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Student'&$top=%s%s" % (school_id, top, skiptoken)
         students_list, next_link = self.rest_api_service.get_object_list(url, self.token, model=EduUser, next_key='odata.nextLink')
         return students_list, next_link
-    
+
     def get_teachers(self, school_id, top=12, nextlink=''):
         '''
         Get teachers within a school
@@ -166,7 +166,7 @@ class EducationService(object):
         url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Teacher'&$top=%s%s" % (school_id, top, skiptoken)
         teachers_list, next_link = self.rest_api_service.get_object_list(url, self.token, model=EduUser, next_key='odata.nextLink')
         return teachers_list, next_link
-    
+
     def get_my_groups(self, school_id):
         '''
         Get my groups
@@ -192,7 +192,7 @@ class EducationService(object):
         temp_schools.sort(key=lambda d:d['name'])
         out_schools.extend(temp_schools)
         return out_schools
-    
+
     def _normalize_all_sections(self, section_list, mysection_emails):
         out_sections = []
         for section in section_list:

@@ -9,7 +9,7 @@
 	{% if user.islocal %}
         <div class="form-horizontal" id="linkAccountPrompt">
             <hr />
-			<form action="/LoginO365" method="post">{% csrf_token %}
+			<form action="/link/LoginO365" method="post">{% csrf_token %}
                 <p>
                     <input type="submit" value="Link to existing O365 account" class="btn btn-primary" /> &nbsp; &nbsp;
                 </p>

@@ -1,6 +1,6 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -9,7 +9,8 @@ from django.conf import settings
 import json
 
 import constant
-from decorator import ms_login_required
+from decorator import login_required
+from services.auth_service import login
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
@@ -18,10 +19,10 @@ from services.local_user_service import LocalUserService
 LOCAL_USER = LocalUserService()
 TOKEN_SERVICE = TokenService()
 
-@ms_login_required
+@login_required
 def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.session['ms_user']
+    user_info = request.user
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     if not token:
@@ -29,6 +30,7 @@ def schools(request):
             return HttpResponseRedirect('/Account/O365login')
         else:
             return HttpResponseRedirect('/')
+
     education_service = EducationService(user_info['tenant_id'], token)
     out_schools = education_service.get_schools(user_info['school_id'])
     # set parameter for template
@@ -38,13 +40,13 @@ def schools(request):
     parameter['schools'] = out_schools
     return render(request, 'schools/index.html', parameter)
 
-@ms_login_required
+@login_required
 def classes(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    # get user info from session
-    user_info = request.session['ms_user']
+    user_info = request.user
     user_info['isinaschool'] = True
     user_info['school_object_id'] = school_object_id
+    login(request, user_info)
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -63,10 +65,10 @@ def classes(request, school_object_id):
     parameter['mysections'] = my_sections
     return render(request, 'schools/classes.html', parameter)
 
-@ms_login_required
+@login_required
 def classnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.session['ms_user']
+    user_info = request.user
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -82,15 +84,13 @@ def classnext(request, school_object_id):
     ajax_result['MySections'] = my_sections
     return JsonResponse(ajax_result, safe=False)
 
-@ms_login_required
+@login_required
 def classdetails(request, school_object_id, class_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    # get user info from session
-    user_info = request.session['ms_user']
-    user_info['isinaschool'] = True
-    user_info['school_object_id'] = school_object_id
+    user_info = request.user
     user_info['class_object_id'] = class_object_id
     user_info['color'] = LOCAL_USER.get_color(user_info)
+    login(request, user_info)
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -130,21 +130,18 @@ def classdetails(request, school_object_id, class_object_id):
     parameter['seatrange'] = seatrange
     return render(request, 'schools/classdetails.html', parameter)
 
-@ms_login_required
+@login_required
 def saveseat(request):
     if request.is_ajax() and request.method == 'POST':
         seat_arrangements = json.loads(request.body.decode())
         LOCAL_USER.update_positions(seat_arrangements)
     return HttpResponse(json.dumps({'save':'ok'}))
 
-@ms_login_required
+@login_required
 def users(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    # get user info from session
-    user_info = request.session['ms_user']
-    user_info['isinaschool'] = True
-    user_info['school_object_id'] = school_object_id
-    
+    user_info = request.user
+
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
 
@@ -166,11 +163,11 @@ def users(request, school_object_id):
     parameter['teachersnextlink'] = teachersnextlink
     return render(request, 'schools/users.html', parameter)
 
-@ms_login_required
+@login_required
 def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.session['ms_user']
-    
+    user_info = request.user
+
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
 
@@ -182,11 +179,11 @@ def usernext(request, school_object_id):
     ajax_result['Users']['NextLink'] = usersnextlink
     return JsonResponse(ajax_result, safe=False)
 
-@ms_login_required
+@login_required
 def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.session['ms_user']
-    
+    user_info = request.user
+
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
 
@@ -198,14 +195,14 @@ def studentnext(request, school_object_id):
     ajax_result['Students']['NextLink'] = studentsnextlink
     return JsonResponse(ajax_result, safe=False)
 
-@ms_login_required
+@login_required
 def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.session['ms_user']
+    user_info = request.user
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
-    
+
     out_teachers, teachersnextlink = education_service.get_students(user_info['school_id'], nextlink=nextlink)
 
     ajax_result = {}

@@ -114,7 +114,7 @@
 		<div id="myclasses" class="tiles-secondary-container">
 			<div class="section-tiles">
 			{% if mysections|length == 0%}
-				{% if isstudent %}
+				{% if user.isstudent %}
 				<div class="nodata"> Not enrolled in any classes.</div>
 				{% else %}
 				<div class="nodata"> Not teaching any classes.</div>
