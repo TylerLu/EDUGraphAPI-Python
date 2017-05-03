@@ -45,34 +45,25 @@ class TokenService(object):
         return auth_result.get('accessToken')
 
     def _is_valid(self, expires_on):
-        expires_on_time = datetime.datetime.strptime(expires_on, "%Y-%m-%d %H:%M:%S.%f")
-        current_time = datetime.datetime.now()
-        return current_time < expires_on_time - datetime.timedelta(minutes=5)
+        now = datetime.datetime.now(expires_on.tzinfo)
+        return now < expires_on - datetime.timedelta(minutes=5)
 
     def _refresh_token(self, resource, uid):
-        token_cache = TokenCache.objects.filter(o365UserId=uid)
-        last_time = None
-        last_refresh = ''
-        for cache in token_cache:
-            format_expireson = datetime.datetime.strptime(cache.expiresOn, "%Y-%m-%d %H:%M:%S.%f")
-            if not last_time:
-                last_time = format_expireson
-                last_refresh = cache.refreshToken
-            elif format_expireson > last_time:
-                last_time = format_expireson
-                last_refresh = cache.refreshToken
+        cache = TokenCache.objects.filter(o365UserId=uid).order_by('-expiresOn').first()
+        if cache is None:
+            raise RefreshTokenException
         try:
-            auth_result = self._context.acquire_token_with_refresh_token(last_refresh, constant.client_id, resource, constant.client_secret)
+            auth_result = self._context.acquire_token_with_refresh_token(cache.accessToken, constant.client_id, resource, constant.client_secret)
         except:
             raise RefreshTokenException
         return auth_result
 
-    def _create_or_update_token(self, result):
-        accessToken = result.get('accessToken', '')
-        expiresOn = result.get('expiresOn', '')
-        refreshToken = result.get('refreshToken', '')
-        resource = result.get('resource', '')
-        uid = result.get('oid', '')
+    def _create_or_update_token(self, auth_result):
+        accessToken = auth_result.get('accessToken', '')
+        expiresOn =  auth_result.get('expiresOn', '')
+        refreshToken = auth_result.get('refreshToken', '')
+        resource = auth_result.get('resource', '')
+        uid = auth_result.get('oid', '')
         if uid and accessToken and expiresOn and refreshToken and resource:
             token = TokenCache.objects.get_or_create(o365UserId=uid, resource=resource)[0]
             token.accessToken = accessToken
