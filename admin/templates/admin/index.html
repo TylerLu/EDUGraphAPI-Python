@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
 
 {% block title %}Admin{% endblock %}
 
@@ -7,7 +11,7 @@
 
 {% block content %}
 <h2>Admin</h2>
-{% if not user.isadminconsented %}
+{% if not user.is_admin_consented %}
     <div>
         <h3>Admin Consent</h3>
         <hr />
@@ -45,7 +49,7 @@
     <hr />
     <div>
         <p>Click the button below to enable access to all your tenant users.</p>
-		<form action="" method="POST">{% csrf_token %}
+		<form action="/Admin/AddAppRoleAssignments" method="POST">{% csrf_token %}
             <p class="form-group">
                 <input type="submit" value="Enable User Access" class="btn btn-default" />
             </p>

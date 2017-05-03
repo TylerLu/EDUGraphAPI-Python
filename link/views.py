@@ -32,7 +32,7 @@ def link(request):
     return render(request, 'link/index.html', parameter)
 
 @login_required
-def createlocal(request):
+def create_local(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.user
     create_local_form = CreateLocalInfo()
@@ -56,17 +56,17 @@ def createlocal(request):
             parameter['errors'] = errors
             return render(request, 'link/createlocal.html', parameter)
         else:
-            user_info['arelinked'] = True
+            user_info['are_linked'] = True
             user_info['email'] = user_info['mail']
             user_info['o365Email'] = user_info['mail']
-            request.session['ms_user'] = user_info
-            return HttpResponseRedirect('/Schools')
+            login(request, user_info)
+            return HttpResponseRedirect('/')
     # GET /link/createlocal
     else:
         return render(request, 'link/createlocal.html', parameter)
 
 @login_required
-def loginlocal(request):
+def login_local(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.user
     login_local_form = LoginLocalInfo()
@@ -86,17 +86,26 @@ def loginlocal(request):
             if user is not None:
                 ret = LOCAL_USER.link(user_info, data)
                 if ret:
-                    user_info['arelinked'] = True
+                    user_info['are_linked'] = True
                     user_info['email'] = email
                     user_info['o365Email'] = user_info['mail']
                     login(request, user_info)
-                    return HttpResponseRedirect('/Schools')
+                    return HttpResponseRedirect('/')
             errors.append('Invalid login attempt.')
             parameter['errors'] = errors
             return render(request, 'link/loginlocal.html', parameter)
     # GET /link/loginlocal
     else:
-        return render(request, 'link/loginlocal.html', parameter)
+        if user_info['local_existed']:
+            data = {'Email': user_info['mail']}
+            LOCAL_USER.link(user_info, data)
+            user_info['are_linked'] = True
+            user_info['email'] = user_info['mail']
+            user_info['o365Email'] = user_info['mail']
+            login(request, user_info)
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'link/loginlocal.html', parameter)
 
 def login_o365(request):
     scheme = request.scheme
@@ -105,7 +114,7 @@ def login_o365(request):
     auth_url = constant.o365_login_url + redirect_uri
     return HttpResponseRedirect(auth_url)
 
-def processcode(request):
+def process_code(request):
     scheme = request.scheme
     host = request.get_host()
     redirect_uri = '%s://%s/link/ProcessCode' % (scheme, host)
@@ -130,17 +139,14 @@ def processcode(request):
     user_info = o365_user_service.get_user(client_user, admin_ids, extra_user)
 
     LOCAL_USER.create_organization(user_info)
+    LOCAL_USER.check_link_status(user_info)
 
-    if not user_info.get('arelinked', False):
-        if user_info.get('localexisted') and user_info['mail'] != request.user['mail']:
+    if not user_info.get('are_linked', False):
+        if user_info.get('local_existed') and user_info['mail'] != request.user['mail']:
             return HttpResponseRedirect('/')
         ret = LOCAL_USER.link_o365(request.user, user_info)
         if ret:
-            user_info['arelinked'] = True
-            request.user.pop('uid')
-            request.user.pop('tenant_id')
-            request.user.pop('arelinked')
-            user_info.update(request.user)
+            user_info['are_linked'] = True
             login(request, user_info)
             if user_info['role'] != 'Admin':
                 return HttpResponseRedirect('/Schools')

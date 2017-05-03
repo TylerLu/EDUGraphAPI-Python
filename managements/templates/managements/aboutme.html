@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
 
 {% block title %}About Me{% endblock %}
 
@@ -8,12 +12,12 @@
     	About Me
 	</h2>
     <div class="margin-top-12 margin-btm-12 aboutme">
-		<b>Username:</b><br /> {{ user.display_name }}<img src="{{ user.photo }}" />
+		<b>Username:</b><br /> {{ user.display_name }} <img src="{{ user.photo }}" />
     </div>
     <div class="margin-top-12 margin-btm-12">
 		<b>Logged in as:</b><br /> {{ user.role }}
     </div>
-	{% if user.showcolor %}
+	{% if user.show_color %}
     <div class="margin-btm-12">
         <b>Favorite Color:</b>
 		<form action="/Manage/UpdateFavoriteColor" method="post">{% csrf_token %}

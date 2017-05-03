@@ -4,25 +4,27 @@
  *   * See LICENSE in the project root for license information.  
 {% endcomment %}  
 
-{% block title %}Admin Consent{% endblock %}
+{% block title %}Unlink Accounts{% endblock %}
 
 {% block csslink %}
 {% endblock %}
 
 {% block content %}
-<h2>Admin Consent</h2>
-<hr />
-{% if consented %}
-	<form action="/OnlyConsent" method="POST">
-        <p>To use this application in this tenancy you must first provide Admin Consent. </p>
-        <p>Please click the button below to proceed.</p>
-        <p class="form-group">
-            <input type="submit" value="Consent" class="btn btn-primary" />
-        </p>
+<h2>Unlink Accounts</h2>
+<h3>Are you sure you want to unlink the accounts?</h3>
+<div>
+    <hr />
+    <dl class="dl-horizontal">
+    </dl>
+	<form action="" method="POST">
+		<p>Local Account: {{ user.email }}</p>
+		<p>Office 365 Account: {{ user.o365Email }}</p>
+        <div class="form-actions no-color">
+            <input type="submit" value="Unlink" class="btn btn-default" /> |
+			<a href="/LinkedAccounts">Back to List</a>
+        </div>
 	</form>
-{% else %}
-    <p>Admin Consent has been applied.</p>
-{% endif %}
+</div>
 {% endblock %}
 
 {% block localjs %}

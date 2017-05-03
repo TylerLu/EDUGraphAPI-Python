@@ -20,12 +20,12 @@ TOKEN_SERVICE = TokenService()
 def aboutme(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.user
-    user_info['showcolor'] = True
+    user_info['show_color'] = True
     user_info['color'] = LOCAL_USER.get_color(user_info)
     login(request, user_info)
 
     ret = authenticate(request.user)
-    if ret:
+    if ret and user_info['role'] != 'Admin':
         token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, request.user['uid'])
         education_service = EducationService(user_info['tenant_id'], token)
         groups = education_service.get_my_groups(user_info['school_id'])

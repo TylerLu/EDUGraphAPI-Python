@@ -1,3 +1,7 @@
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
 <div class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container">
 		<div class="navbar-header">
@@ -10,16 +14,16 @@
 		</div>
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
-				<li><a href="/Account/Login">Home</a></li>
-				{% if user.isinaschool %}
+				<li><a href="/">Home</a></li>
+				{% if user.is_in_a_school %}
 				<li><a href="/Schools/{{ user.school_object_id }}/Classes">Classes</a></li>
 				<li><a href="/Schools/{{ user.school_object_id }}/Users">Teachers & Students</a></li>
 				{% endif %}
-				{% if user.isauthenticated and user.isadmin %}
+				{% if user.is_authenticated and user.is_admin %}
 				<li><a href="/Admin">Admin</a></li>
 				{% endif %}
 			</ul>
-		{% if user.isauthenticated %}
+		{% if user.is_authenticated %}
 		<form action="/Account/LogOff" class="navbar-right" id="logoutForm" method="post">{% csrf_token %}
         	<div class="userinfo">
 				<a href="javascript:void(0);" id="userinfolink">Logged in as: {{ user.role }}. Hello {{ user.display_name }}

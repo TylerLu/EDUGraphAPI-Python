@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
 
 {% load set_var %}
 
@@ -13,7 +17,7 @@
     	<div class="container">
             <div class="col-md-6 secondnav">
                 <a href="/Schools"> All Schools</a>
-				><a href="/Schools/{{ user.school_object_id }}/Classes">{{ school.name }}</a>
+				> <a href="/Schools/{{ user.school_object_id }}/Classes">{{ school.name }}</a>
 				> {{ section.course_name }}
             </div>
         </div>
@@ -38,7 +42,7 @@
             </div>
             <div class="col-md-6">
 				{% for teach in teachers %}
-				<span>Teacher:</span>{{ teach.name }}
+				<span>Teacher:</span> {{ teach.name }}
 				{% if not forloop.last %}<br />{% endif %} 
 				{% endfor %}
             </div>
@@ -67,7 +71,7 @@
 					<tbody>
 						{% for student in students %}
 						<tr class="tr-content">
-							<td><img src="/static/Images/header-default.jpg" realheader="{{ student.photo|safe }}"/>{{ student.name }}</td>
+							<td><img src="/static/Images/header-default.jpg" realheader="{{ student.photo|safe }}"/> {{ student.name }}</td>
 							<td>{{ student.grade }}</td>
 						</tr>
 						{% endfor %}
@@ -136,7 +140,7 @@
             </div>
             <div id="seatingchart" class="tab-pane fade ">
                 <div class="left" id="dvleft">
-					{% if not user.isstudent %}
+					{% if not user.is_student %}
 					<div class="tip"> To assign seats for each student, drag and drop student profile icons below onto the seating map to the right.</div>
 					{% else %}
 					<div class="assignseat tip"><div class="greenicon" style="background-color:{{ user.color }}"></div>Your assigned seat </div>
@@ -181,7 +185,7 @@
                     </div>
                 </div>
                 <div class="right" id="dvright">
-					{% if not user.isstudent %}
+					{% if not user.is_student %}
 						<div class="teacherdesk" style="background-color:{{ user.color }}">Teacher's desk</div>
 					{% else %}
 						<div class="teacherdesk" style="">Teacher's desk</div>
@@ -195,7 +199,7 @@
                     </div>
                 </div>
                 <div id="dvedit" class="dvedit">
-					{% if not user.isstudent %}
+					{% if not user.is_student %}
 						<img id="imgedit" src="/static/Images/edit.png" />
 						<img id="imgsave" src="/static/Images/save.png" />
 						<img id="imgcancel" src="/static/Images/cancel.png" />

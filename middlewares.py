@@ -9,7 +9,7 @@ from django.utils.deprecation import MiddlewareMixin
 import os
 from services.token_service import RefreshTokenException
 
-class HandleRefreshTokenExceptionMiddlewar(MiddlewareMixin):
+class HandleRefreshTokenExceptionMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
         if isinstance(exception, RefreshTokenException):
@@ -29,7 +29,7 @@ class HandleRefreshTokenExceptionMiddlewar(MiddlewareMixin):
 
 from services.auth_service import login, get_user
 
-class HandleUserAuthMiddlewar(MiddlewareMixin):
+class HandleUserAuthMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         if not isinstance(request.user, dict):

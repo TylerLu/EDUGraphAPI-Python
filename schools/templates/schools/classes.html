@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
 
 {% block title %}CLASSES{% endblock %}
 
@@ -37,7 +41,7 @@
 		<div>
 			<div class="col-md-4 usericon">
 				<div class="icon"></div>
-				{% if user.isstudent %}
+				{% if user.is_student %}
 				<div>Not Enrolled</div>
 				{% else %}
 				<div>Not Teaching</div>
@@ -114,7 +118,7 @@
 		<div id="myclasses" class="tiles-secondary-container">
 			<div class="section-tiles">
 			{% if mysections|length == 0%}
-				{% if user.isstudent %}
+				{% if user.is_student %}
 				<div class="nodata"> Not enrolled in any classes.</div>
 				{% else %}
 				<div class="nodata"> Not teaching any classes.</div>

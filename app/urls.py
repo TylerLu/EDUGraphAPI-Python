@@ -23,10 +23,10 @@ from admin import views as admin_views
 
 urlpatterns = [
     url(r'^$', account_views.index, name='index'),
-    url(r'^Account/Login', account_views.my_login, name='login'),
+    url(r'^Account/Login', account_views.login, name='login'),
     url(r'^Account/ReLogin', account_views.relogin, name='relogin'),
-    url(r'^Account/O365login', account_views.o365_signin, name='o365signin'),
-    url(r'^Account/ExternalLogin', account_views.external_login, name='exlogin'),
+    url(r'^Account/O365Login', account_views.o365_login, name='o365_login'),
+    url(r'^Account/O365LoginOnly', account_views.o365_login_only, name='o365_login_only'),
     url(r'^Account/Register', account_views.register, name='register'),
     url(r'^Account/LogOff', account_views.logoff, name='logoff'),
 
@@ -49,14 +49,15 @@ urlpatterns = [
     url(r'^Manage/UpdateFavoriteColor', manage_views.updatecolor, name='updatecolor'),
 
     url(r'^link$', link_views.link, name='link'),
-    url(r'^link/createlocal', link_views.createlocal, name='createlocal'),
-    url(r'^link/loginlocal', link_views.loginlocal, name='loginlocal'),
+    url(r'^link/createlocal', link_views.create_local, name='create_local'),
+    url(r'^link/loginlocal', link_views.login_local, name='login_local'),
     url(r'^link/LoginO365', link_views.login_o365, name='login_o365'),
-    url(r'^link/ProcessCode', link_views.processcode, name='processcode'),
+    url(r'^link/ProcessCode', link_views.process_code, name='link_process_code'),
 
     url(r'^Admin$', admin_views.admin, name='admin'),
     url(r'^Admin/LinkedAccounts', admin_views.linked_accounts, name='linked_accounts'),
     url(r'^UnlinkAccount/(?P<link_id>\d+)', admin_views.unlink_account, name='unlink_account'),
+    url(r'^Admin/AddAppRoleAssignments', admin_views.add_app_roles, name='add_app_roles'),
     url(r'^Consent', admin_views.consent, name='consent'),
     url(r'^Unconsent', admin_views.unconsent, name='unconsent'),
     url(r'^Admin/Consent', admin_views.consent_alone, name='consent_alone'),

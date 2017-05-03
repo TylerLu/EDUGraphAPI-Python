@@ -16,10 +16,10 @@ class O365UserService(object):
 
     def get_user(self, client_user, admin_ids, extra_info):
         user_info = client_user
-        user_info['isauthenticated'] = True
         user_info['role'] = self._check_role(user_info['uid'], admin_ids, extra_info.get('sku_ids'))
-        user_info['isadmin'] = self._check_admin(user_info['role'])
-        user_info['isstudent'] = self._check_student(user_info['role'])
+        user_info['is_authenticated'] = True
+        user_info['is_admin'] = self._check_admin(user_info['role'])
+        user_info['is_student'] = self._check_student(user_info['role'])
         user_info['school_uid'] = extra_info.get('school_uid')
         user_info['school_id'] = extra_info.get('school_id')
         return user_info

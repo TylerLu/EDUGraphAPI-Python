@@ -25,11 +25,6 @@ def schools(request):
     user_info = request.user
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    if not token:
-        if request.session.get(constant.username_cookie) and request.session.get(constant.email_cookie):
-            return HttpResponseRedirect('/Account/O365login')
-        else:
-            return HttpResponseRedirect('/')
 
     education_service = EducationService(user_info['tenant_id'], token)
     out_schools = education_service.get_schools(user_info['school_id'])
@@ -44,7 +39,7 @@ def schools(request):
 def classes(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.user
-    user_info['isinaschool'] = True
+    user_info['is_in_a_school'] = True
     user_info['school_object_id'] = school_object_id
     login(request, user_info)
 

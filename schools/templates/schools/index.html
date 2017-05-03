@@ -1,11 +1,15 @@
 {% extends 'base.html' %}
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
 
 {% load  set_var %}
 
 {% block title %}ALL SCHOOLS{% endblock %}
 
 {% block content %}
-{% if user.arelinked %}
+{% if user.are_linked %}
 <div class="row schools">
 <div class="tophero">
 	<div class="col-md-6">
@@ -97,7 +101,7 @@
 <script type='text/javascript' src='https://www.bing.com/api/maps/mapcontrol' async defer></script>
 {% else %}
 <br/>
-	{% if not user.islocal %}
+	{% if not user.is_local %}
 		<p>
 		You will need to link your O365 and local accounts in order to use the functionality of this demo application. Please click on the browser 'Back' button to go back and link your existing local account or create a local account.
 		</p>

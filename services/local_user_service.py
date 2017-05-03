@@ -51,15 +51,15 @@ class LocalUserService(object):
             organization.update(isAdminConsented=label)
 
     def check_admin(self, user_info):
-        user_info['isadminconsented'] = False
+        user_info['is_admin_consented'] = False
         organization = Organizations.objects.filter(tenantId=user_info['tenant_id'])
         if organization:
-            user_info['isadminconsented'] = organization[0].isAdminConsented
+            user_info['is_admin_consented'] = organization[0].isAdminConsented
 
     def check_link_status(self, user_info):
-        user_info['arelinked'] = False
-        user_info['localexisted'] = False
-        user_info['localmessage'] = ''
+        user_info['are_linked'] = False
+        user_info['local_existed'] = False
+        user_info['local_message'] = ''
 
         o365_user_id = user_info['uid']
         o365_user_mail = user_info['mail']
@@ -68,12 +68,12 @@ class LocalUserService(object):
         if local_user:
             user_obj = local_user[0]
             if user_obj.o365UserId and user_obj.o365Email and user_obj.user.email:
-                user_info['arelinked'] = True
+                user_info['are_linked'] = True
                 user_info['email'] = user_obj.user.email
                 user_info['o365Email'] = user_obj.o365Email
         elif local_mail:
-            user_info['localexisted'] = True
-            user_info['localmessage'] = 'There is a local account: %s matching your O365 account.' % o365_user_mail
+            user_info['local_existed'] = True
+            user_info['local_message'] = 'There is a local account: %s matching your O365 account.' % o365_user_mail
         else:
             pass
 
@@ -81,8 +81,8 @@ class LocalUserService(object):
         user_info = {}
         try:
             user = User.objects.get(username=username)
-            user_info['isauthenticated'] = True
-            user_info['islocal'] = True
+            user_info['is_authenticated'] = True
+            user_info['is_local'] = True
             user_info['uid'] = user.localuser.o365UserId
             user_info['mail'] = user.localuser.o365Email
             user_info['first_name'] = user.first_name
@@ -91,9 +91,9 @@ class LocalUserService(object):
             role = UserRoles.objects.get(o365UserId=user.localuser.o365UserId)
             user_info['role'] = role.name
             if user_info['role'] != 'Admin':
-                user_info['isadmin'] = False
+                user_info['is_admin'] = False
             if user_info['role'] != 'Student':
-                user_info['isstudent'] = False
+                user_info['is_student'] = False
         except:
             pass
         return user_info
@@ -135,7 +135,6 @@ class LocalUserService(object):
         ret = True
         organization_obj = Organizations.objects.get(tenantId=user_info['tenant_id'])
         local_mail = data['Email']
-        password = data['Password']
         first_name = user_info['first_name']
         last_name = user_info['last_name']
         o365_user_mail = user_info['mail']

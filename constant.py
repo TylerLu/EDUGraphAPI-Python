@@ -8,15 +8,13 @@ client_id = os.environ['ClientId']
 
 client_secret = os.environ['ClientSecret']
 
-redirect_uri = '%s://%s/Auth/O365/Callback'
-
 login_base_uri = 'https://login.microsoftonline.com/common/oauth2/authorize?'
 
-o365_signin_url = login_base_uri + 'response_type=code&client_id=%s&redirect_uri=%s' % (client_id, redirect_uri)
+o365_signin_url = login_base_uri + 'response_type=code&client_id=%s&redirect_uri=' % (client_id)
 
 o365_login_url = login_base_uri + 'response_type=code&client_id=%s&prompt=login&redirect_uri=' % (client_id)
 
-admin_consent_url = login_base_uri + 'response_type=code&client_id=%s&redirect_uri=%s&prompt=admin_consent' % (client_id, redirect_uri)
+admin_consent_url = login_base_uri + 'response_type=code&client_id=%s&prompt=admin_consent&direct_uri=' % (client_id)
 
 log_out_url = 'https://login.microsoftonline.com/common/oauth2/logout?redirect_uri=%s&post_logout_redirect_uri=%s'
 
