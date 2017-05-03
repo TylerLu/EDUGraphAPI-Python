@@ -278,11 +278,12 @@ Below are are tables:
 
 | Table                          | Description                              |
 | ------------------------------ | ---------------------------------------- |
-| auth_user and users            | Contains the user's information: name, email, hashed password...<br>*O365UserId* and *O365Email* are used to connect the local user with an O365 user. |
-| user_roles                     | Contains users' role. Three roles are used in this sample: admin, teacher, and student. |
-| organizations                  | A row in this table represents a tenant in AAD.<br>*IsAdminConsented* column records than if the tenant consented by an administrator. |
+| auth_user                      | Django built-in user table which contains users's authentication information: username, email, password... |
+| users                          | Contains users' extra information: *favoriteColor*, *organization_id*,  *o365UserId*, and *o365Email*. The later two are used to connect the local user with an O365 user. |
+| user_roles                     | Contains users' roles. Three roles are used in this sample: admin, teacher, and student. |
+| organizations                  | A row in this table represents a tenant in AAD.<br>*isAdminConsented* column records if the tenant consented by an administrator. |
 | token_cache                    | Contains the users' access/refresh tokens. |
-| classroom_seating_arrangements | Contains the classroom seating arrangements. |
+| classroom_seating_arrangements | Contains the classroom seating arrangements data. |
 
 You will find the **DbContext** class and related model interfaces in the **/data/dbContext.ts** file.
 
