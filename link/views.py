@@ -122,10 +122,9 @@ def process_code(request):
     code = request.GET.get('code', '')
 
     aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
-    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result)
-
-    ms_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
-    ms_token = TOKEN_SERVICE.cache_tokens(ms_auth_result)
+    o365_user_id = aad_auth_result.get('oid')
+    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)
+    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
 
     ms_graph_service = MSGraphService(token=ms_token)
     ms_client = ms_graph_service.get_client()
