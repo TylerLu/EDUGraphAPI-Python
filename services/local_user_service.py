@@ -2,7 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
-from account.models import LocalUser, ClassroomSeatingArrangements, UserRoles, Organizations
+from account.models import LocalUser, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
 
 from django.contrib.auth.models import User
 
@@ -16,7 +16,7 @@ class LocalUserService(object):
         try:
             email = data['Email']
             password = data['Password']
-            user = User.objects.get(email=email)
+            user = User.objects.get(username=email)
             if password == user.password and user.o365UserId and len(user.o365UserId.strip()) > 0:
                 result = True
         except:
@@ -67,9 +67,9 @@ class LocalUserService(object):
         local_mail = User.objects.filter(username=o365_user_mail)
         if local_user:
             user_obj = local_user[0]
-            if user_obj.o365UserId and user_obj.o365Email and user_obj.user.email:
+            if user_obj.o365UserId and user_obj.o365Email and user_obj.user.username:
                 user_info['are_linked'] = True
-                user_info['email'] = user_obj.user.email
+                user_info['email'] = user_obj.user.username
                 user_info['o365Email'] = user_obj.o365Email
         elif local_mail:
             user_info['local_existed'] = True
@@ -225,6 +225,15 @@ class LocalUserService(object):
                 if int(position) != 0:
                     ClassroomSeatingArrangements.objects.create(userId=user_id, classId=class_id, position=position)
 
+    def get_link(self, link_id):
+        local = LocalUser.objects.filter(id=link_id)
+        email = ''
+        o365Email = ''
+        if local:
+            email = local[0].user.username
+            o365Email = local[0].o365Email
+        return email, o365Email
+
     def get_links(self, tenant_id):
         organization_obj = Organizations.objects.get(tenantId=tenant_id)
         links = []
@@ -233,24 +242,24 @@ class LocalUserService(object):
             if link.user.email and link.o365Email:
                 record = {}
                 record['id'] = link.id
-                record['email'] = link.user.email
+                record['email'] = link.user.username
                 record['o365Email'] = link.o365Email
                 links.append(record)
         return links
 
     def remove_link(self, link_id):
         local = LocalUser.objects.filter(id=link_id)
-        email = ''
         if local:
-            email = local[0].user.email
-        LocalUser.objects.filter(id=link_id).delete()
-        if email:
-            User.objects.filter(email=email).delete()
+            o365_user_id = local[0].o365UserId
+            local.update(o365UserId='', o365Email='', organization_id='')
+            UserRoles.objects.filter(o365UserId=o365_user_id).delete()
 
     def remove_links(self, tenant_id):
         org_obj = Organizations.objects.filter(tenantId=tenant_id)
         if org_obj:
             org = org_obj[0]
             local = LocalUser.objects.filter(organization_id=org.id)
-            if local:
-                local.delete()
+            for item in local:
+                o365_user_id = item.o365UserId
+                item.update(o365UserId='', o365Email='', organization_id='')
+                UserRoles.objects.filter(o365UserId=o365_user_id).delete()

@@ -25,6 +25,7 @@ def admin(request):
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user_info
+    parameter['error'] = request.session['Error']
     return render(request, 'admin/index.html', parameter)
 
 @login_required
@@ -45,7 +46,6 @@ def unlink_account(request, link_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = request.user
     parameter = {}
-    parameter['user'] = user_info
     parameter['links'] = links
     if request.method == 'POST':
         LOCAL_USER.remove_link(link_id)
@@ -53,6 +53,9 @@ def unlink_account(request, link_id):
         parameter['user_links'] = user_links
         return render(request, 'admin/linkaccounts.html', parameter)
     else:
+        email, o365Email = LOCAL_USER.get_link(link_id)
+        parameter['email'] = email
+        parameter['o365Email'] = o365Email
         return render(request, 'admin/unlinkaccounts.html', parameter)
 
 @login_required
