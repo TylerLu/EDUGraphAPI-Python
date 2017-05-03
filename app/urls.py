@@ -26,7 +26,7 @@ urlpatterns = [
     url(r'^Account/Login', account_views.login, name='login'),
     url(r'^Account/ReLogin', account_views.relogin, name='relogin'),
     url(r'^Account/O365Login', account_views.o365_login, name='o365_login'),
-    url(r'^Account/O365LoginOnly', account_views.o365_login_only, name='o365_login_only'),
+    url(r'^Account/O365Signin', account_views.o365_signin, name='o365_signin'),
     url(r'^Account/Register', account_views.register, name='register'),
     url(r'^Account/LogOff', account_views.logoff, name='logoff'),
 

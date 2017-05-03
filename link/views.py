@@ -29,6 +29,7 @@ def link(request):
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user_info
+    parameter['error'] = request.session['Error']
     return render(request, 'link/index.html', parameter)
 
 @login_required
@@ -142,16 +143,15 @@ def process_code(request):
     LOCAL_USER.check_link_status(user_info)
 
     if not user_info.get('are_linked', False):
-        if user_info.get('local_existed') and user_info['mail'] != request.user['mail']:
-            return HttpResponseRedirect('/')
         ret = LOCAL_USER.link_o365(request.user, user_info)
         if ret:
             user_info['are_linked'] = True
+            user_info['is_local'] = request.user['is_local']
+            user_info['mail'] = request.user['mail']
             login(request, user_info)
-            if user_info['role'] != 'Admin':
-                return HttpResponseRedirect('/Schools')
-            else:
-                return HttpResponseRedirect('/Admin')
+            return HttpResponseRedirect('/')
 
-    return HttpResponseRedirect('/')
+    request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % user_info['mail']
+    return HttpResponseRedirect('/link')
+
 

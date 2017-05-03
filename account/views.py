@@ -25,6 +25,8 @@ LOCAL_USER = LocalUserService()
 TOKEN_SERVICE = TokenService()
 
 def index(request):
+    request.session['Error'] = ''
+    request.session['Message'] = ''
     if not authenticate(request.user):
         response =  HttpResponseRedirect('/Account/Login')
         response.set_cookie(constant.username_cookie, '')
@@ -50,6 +52,8 @@ def relogin(request):
 
 def login(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
+    parameter = {}
+    parameter['links'] = links
     # post /Account/Login
     if request.method == 'POST':
         email = ''
@@ -67,17 +71,20 @@ def login(request):
                 return HttpResponseRedirect('/')
             else:
                 errors.append('Invalid login attempt.')
-                return render(request, 'account/login.html', {'user_form':user_form, 'errors':errors, 'links':links})
+                parameter['user_form'] = user_form
+                parameter['errors'] = errors
+                return render(request, 'account/login.html', parameter)
     # get /Account/Login
     else:
         user_form = UserInfo()
-        return render(request, 'account/login.html', {'user_form':user_form, 'links':links})
+        parameter['user_form'] = user_form
+        return render(request, 'account/login.html', parameter)
 
 def o365_login(request):
-    if request.COOKIES.get(constant.username_cookie) and request.COOKIES.get(constant.email_cookie):
+    username = request.COOKIES.get(constant.username_cookie)
+    email = request.COOKIES.get(constant.email_cookie)
+    if username and email:
         links = settings.DEMO_HELPER.get_links(request.get_full_path())
-        username = request.COOKIES[constant.username_cookie]
-        email = request.COOKIES[constant.email_cookie]
         parameter = {}
         parameter['links'] = links
         parameter['username'] = username
@@ -119,9 +126,16 @@ def o365_auth_callback(request):
 
     auth_login(request, user_info)
     response =  HttpResponseRedirect('/')
-    response.set_cookie(constant.username_cookie, user_info['display_name'], 300)
-    response.set_cookie(constant.email_cookie, user_info['mail'], 300)
+    response.set_cookie(constant.username_cookie, user_info['display_name'])
+    response.set_cookie(constant.email_cookie, user_info['mail'])
     return response
+
+def o365_signin(request):
+    scheme = request.scheme
+    host = request.get_host()
+    redirect_uri = '%s://%s/Auth/O365/Callback' % (scheme, host)
+    o365_login_url = constant.o365_signin_url + redirect_uri
+    return HttpResponseRedirect(o365_login_url)
 
 @login_required
 def photo(request, user_object_id):
@@ -133,13 +147,6 @@ def photo(request, user_object_id):
         local_photo_file = open(local_photo_path, 'rb')
         user_photo = local_photo_file.read()
     return HttpResponse(user_photo, content_type='image/jpeg')
-
-def o365_login_only(request):
-    scheme = request.scheme
-    host = request.get_host()
-    redirect_uri = '%s://%s/Auth/O365/Callback' % (scheme, host)
-    o365_login_url = constant.o365_signin_url + redirect_uri
-    return HttpResponseRedirect(o365_login_url)
 
 def register(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
@@ -193,6 +200,8 @@ def login_local_user(request, user):
         user_info['display_name'] = user.username
         user_info['is_authenticated'] = True
         user_info['are_linked'] = False
+        user_info['uid'] = 'local'
+        user_info['tenant_id'] = 'local'
         auth_login(request, user_info)
     else:
         aad_token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.localuser.o365UserId)

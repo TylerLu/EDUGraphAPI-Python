@@ -11,6 +11,7 @@ class DemoHelper(object):
             self.data = json.load(jsonfile)
         self.path_links = self._convert()
         self._object_id_filter = re.compile('\w+-\w+-\w+-\w+-\w+')
+        self._number_filter = re.compile('\d+')
         
     def get_links(self, path):
         links = []
@@ -29,4 +30,5 @@ class DemoHelper(object):
 
     def _filter_path(self, path):
         new_path = re.sub(self._object_id_filter, '', path)
+        new_path = re.sub(self._number_filter, '', path)
         return new_path

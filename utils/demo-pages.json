@@ -42,7 +42,7 @@
 		]
 	},
 	{
-		"path": "/Account/O365login",
+		"path": "/Account/O365Login",
 		"links": [
 			{
 				"title": "Controller",
@@ -161,6 +161,27 @@
 		]
 	},
 	{
+		"path": "/UnlinkAccount/",
+		"links": [
+			{
+				"title": "Controller",
+				"url": "services/local_user_service.py"
+			},
+			{
+				"title": "View",
+        		"url": "admin/views.py"
+			},
+			{
+				"title": "Model",
+				"url": "account/models.py"
+			},
+      		{
+        		"title": "Template",
+        		"url": "admin/templates/admin/unlinkaccounts.html"
+      		}
+		]
+	},
+	{
 		"path": "/Admin/Consent",
 		"links": [
 			{
@@ -241,7 +262,7 @@
 		]
 	},
 	{
-		"path": "/Schools/Users",
+		"path": "/Schools//Users",
 		"links": [
 			{
 				"title": "Controller",

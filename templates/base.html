@@ -20,8 +20,22 @@
 
 <div class="containerbg">
 <div class="container body-content">
+{% if error %}
+	<div class="message-container bg-danger">
+		<p>{{ error }}</p>
+	</div>
+{% endif %}
+{% if message %}
+	<div class="message-container bg-success">
+	{% for line in message %}
+		<p>{{ line }}</p>
+	</div>
+	{% endfor %}
+{% endif %}
+
 {% block content %}
 {% endblock %}
+
 </div>
 </div>
 
