@@ -11,41 +11,43 @@ class RefreshTokenException(Exception):
     pass
 
 class TokenService(object):
-    '''
+    '''    
+    This class is responsible for cache and retrieve tokens to and from the backend database. 
     In this sample, tokens are cached in clear text in database. For real projects, they should be encrypted.
     '''
     def __init__(self):
-        self._context = adal.AuthenticationContext(constant.authorize_token_uri)
+        pass
 
-    def get_token_with_code(self, code, redirect_uri, resource):
-        result = self._context.acquire_token_with_authorization_code(code, redirect_uri, resource, constant.client_id, constant.client_secret)
+    def get_token_with_code(self, code, redirect_uri, resource):        
+        auth_context = adal.AuthenticationContext(constant.authorize_token_uri)
+        result = auth_context.acquire_token_with_authorization_code(code, redirect_uri, resource, constant.client_id, constant.client_secret)
         return result
 
     def get_access_token(self, resource, uid):
-        access_token = ''
-        token_cache = TokenCache.objects.filter(o365UserId=uid, resource=resource)
-        if token_cache:
-            token_cache = token_cache[0]
-            if self._valid_time(token_cache.expiresOn):
-                access_token = token_cache.accessToken
-        if not access_token:
-            auth_result = self._refresh_token(resource, uid)
-            self._create_or_update_token(auth_result)
-            access_token = auth_result.get('accessToken')
-        return access_token
+        '''
+        Get access token.
+        If the cached token is exipred, a new refresh token will be got with the refresh token, cached and returned to the invoker.
+        If there is no refresh token or the refresh token is expired, RefreshTokenException will be raised.
+        '''
+        token_cache = TokenCache.objects.filter(o365UserId=uid, resource=resource).first()
+        if token_cache and self._is_valid(token_cache.expiresOn):
+            return token_cache.accessToken
 
-    def cache_tokens(self, auth_result):
-        resource = auth_result['resource']
+        auth_result = self._refresh_token(resource, uid)
         self._create_or_update_token(auth_result)
         return auth_result.get('accessToken')
 
-    def _valid_time(self, expires_on):
-        format_expireson = datetime.datetime.strptime(expires_on, "%Y-%m-%d %H:%M:%S.%f")
+    def cache_tokens(self, auth_result):
+        '''
+        Cache access token and refresh token.
+        '''
+        self._create_or_update_token(auth_result)
+        return auth_result.get('accessToken')
+
+    def _is_valid(self, expires_on):
+        expires_on_time = datetime.datetime.strptime(expires_on, "%Y-%m-%d %H:%M:%S.%f")
         current_time = datetime.datetime.now()
-        format_expireson = format_expireson + datetime.timedelta(minutes=-5)
-        if current_time < format_expireson:
-            return True
-        return False
+        return current_time < expires_on_time - datetime.timedelta(minutes=5)
 
     def _refresh_token(self, resource, uid):
         token_cache = TokenCache.objects.filter(o365UserId=uid)
