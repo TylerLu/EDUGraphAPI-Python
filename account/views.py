@@ -75,7 +75,14 @@ def login(request):
 
 def o365_login(request):
     if request.COOKIES.get(constant.username_cookie) and request.COOKIES.get(constant.email_cookie):
-        return HttpResponseRedirect('/Account/O365login')
+        links = settings.DEMO_HELPER.get_links(request.get_full_path())
+        username = request.COOKIES[constant.username_cookie]
+        email = request.COOKIES[constant.email_cookie]
+        parameter = {}
+        parameter['links'] = links
+        parameter['username'] = username
+        parameter['email'] = email
+        return render(request, 'account/O365login.html', parameter)
     else:
         scheme = request.scheme
         host = request.get_host()
@@ -167,14 +174,14 @@ def register(request):
 def logoff(request):
     user_info = request.user
     logout(request)
-    if user_info['arelinked']:
-        return HttpResponseRedirect('/Account/O365login')
+    if user_info['are_linked']:
+        return HttpResponseRedirect('/')
     else:
-        request.session[constant.username_cookie] = ''
-        request.session[constant.email_cookie] = ''
-        redirect_scheme = request.scheme
-        redirect_host = request.get_host()
-        redirect_uri = redirect_scheme + '://' + redirect_host + '/Account/Login'
+        request.set_cookie(constant.username_cookie, '')
+        request.set_cookie(constant.email_cookie, '')
+        scheme = request.scheme
+        host = request.get_host()
+        redirect_uri = scheme + '://' + host
         logoff_url = constant.log_out_url % (redirect_uri, redirect_uri)
         return HttpResponseRedirect(logoff_url)
 
@@ -205,5 +212,5 @@ def login_local_user(request, user):
         LOCAL_USER.check_link_status(user_info)
         auth_login(request, user_info)
 
-        request.COOKIES[constant.username_cookie] = user_info['display_name']
-        request.COOKIES[constant.email_cookie] = user_info['mail']
+        request.set_cookie(constant.username_cookie, user_info['display_name'])
+        request.set_cookie(constant.email_cookie, user_info['mail'])
