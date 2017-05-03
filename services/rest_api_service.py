@@ -7,6 +7,14 @@ import json
 import requests
 import constant
 
+class HttpException(Exception):
+    def __init__(self, status_code):
+        self.status_code = status_code
+
+    @property
+    def status_code(self):
+        return self.status_code
+
 class RestApiService(object):
 
     def get_raw(self, url, token, headers=None):
@@ -16,10 +24,7 @@ class RestApiService(object):
         if headers:
             s_headers.update(headers)
         response = self._send(method, url, s_headers)
-        content = ''
-        if response.status_code == 200:
-            content = response.text
-        return content
+        return response.text
 
     def get_json(self, url, token, headers=None):
         method = 'GET'
@@ -29,10 +34,7 @@ class RestApiService(object):
         if headers:
             s_headers.update(headers)
         response = self._send(method, url, s_headers)
-        content = ''
-        if response.status_code == 200:
-            content = json.loads(response.text)
-        return content
+        return json.loads(response.text)
 
     def get_img(self, url, token, headers=None):
         method = 'GET'
@@ -41,10 +43,7 @@ class RestApiService(object):
         if headers:
             s_headers.update(headers)
         response = self._send(method, url, s_headers)
-        content = ''
-        if response.status_code == 200:
-            content = response.content
-        return content
+        return response.content
 
     def get_object_list(self, url, token, key='value', headers=None, model=None, next_key=''):
         content = self.get_json(url, token, headers)
@@ -82,4 +81,9 @@ class RestApiService(object):
         request = requests.Request(method, url, headers)
         prepped = request.prepare()
         response = session.send(prepped)
+        if response.status_code < 200 or response.status_code > 299:
+            raise HttpException(response.status_code)
         return response
+
+
+
