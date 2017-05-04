@@ -5,9 +5,6 @@
 from constant import Roles
 from constant import O365ProductLicenses
 
-from services.ms_graph_service import MSGraphService
-from services.aad_graph_service import AADGraphService
-
 class O365UserService(object):
 
     def get_client_user(self, client):
