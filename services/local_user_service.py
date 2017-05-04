@@ -261,5 +261,5 @@ class LocalUserService(object):
             local = LocalUser.objects.filter(organization_id=org.id)
             for item in local:
                 o365_user_id = item.o365UserId
-                item.update(o365UserId='', o365Email='', organization_id='')
                 UserRoles.objects.filter(o365UserId=o365_user_id).delete()
+            local.update(o365UserId='', o365Email='', organization_id='')

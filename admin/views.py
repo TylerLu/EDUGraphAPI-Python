@@ -106,11 +106,18 @@ def process_code(request):
 def unconsent(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_info = get_user()
+
     LOCAL_USER.update_organization(user_info, False)
     LOCAL_USER.remove_links(user_info['tenant_id'])
+    
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
+    aad_graph_service = AADGraphService(user_info['tenant_id'], token)
+    aad_graph_service.delete_app_id()
+
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user_info
+    request.session['Message'] = 'Admin unconsented successfully!'
     return HttpResponseRedirect('/Admin')
 
 def add_app_roles(request):

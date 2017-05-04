@@ -40,3 +40,13 @@ class AADGraphService(object):
         for license in licenses_list:
             sku_ids.add(license['skuId'])
         return sku_ids
+
+    def delete_app_id(self):
+        app_id = ''
+        url = self.api_base_uri + "/servicePrincipals?api-version=1.6&$filter=appId eq '%s'" % constant.client_id
+        app_content = self.rest_api_service.get_json(url, self.token)
+        app_id = app_content['value'][0]['objectId']
+
+        version = '?api-version=1.6'
+        url = self.api_base_uri + '/servicePrincipals/%s' % app_id + version
+        self.rest_api_service.delete(url, self.token)
