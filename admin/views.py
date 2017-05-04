@@ -112,7 +112,8 @@ def unconsent(request):
     
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     aad_graph_service = AADGraphService(user_info['tenant_id'], token)
-    aad_graph_service.delete_app_id()
+    app_id = aad_graph_service.get_app_id()
+    aad_graph_service.delete_app(app_id)
 
     parameter = {}
     parameter['links'] = links
@@ -121,7 +122,20 @@ def unconsent(request):
     return HttpResponseRedirect('/Admin')
 
 def add_app_roles(request):
-    return HttpResponseRedirect('/')
+    user_info = get_user()
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
+    aad_graph_service = AADGraphService(user_info['tenant_id'], token)
+    app_id = aad_graph_service.get_app_id()
+    app_name = aad_graph_service.get_app_name()
+
+    if not app_id:
+        request.session['Error'] = 'Could not found the service principal. Please provdie the admin consent.'
+        return HttpResponseRedirect('/Admin')
+    
+    aad_graph_service.add_app_users(app_id, app_name)
+    count = 0
+    request.session["Message"] = 'User access was successfully enabled for %d user(s).' % count if count > 0 else 'User access was enabled for all users.'
+    return HttpResponseRedirect("/Admin");
 
 def consent_alone(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
