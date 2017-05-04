@@ -7,19 +7,13 @@ from constant import O365ProductLicenses
 
 class O365UserService(object):
 
-    def get_client_user(self, graph_user, graph_organization):
-        user = self._normalize_client_user_info(graph_user, graph_organization)
-        return user
-
-    def get_user(self, client_user, admin_ids, license_ids):
-        user_info = client_user
+    def get_client_user(self, graph_user, graph_organization, admin_ids, license_ids):
+        user_info = self._normalize_client_user_info(graph_user, graph_organization)
         role = self._check_role(user_info['uid'], admin_ids, license_ids)
         user_info['role'] = role
         user_info['is_authenticated'] = True
         user_info['is_admin'] = role == 'Admin'
         user_info['is_student'] = role == 'Student'
-        #user_info['school_uid'] = extra_info.get('school_uid')
-        #user_info['school_id'] = extra_info.get('school_id')
         return user_info
 
     def _check_role(self, uid, admin_ids, sku_ids):
@@ -50,10 +44,6 @@ class O365UserService(object):
         else:
             full_name = user_dict['displayName']
         return full_name
-
-    def _assign_photo(self, uid):
-        photo = '/Photo/UserPhoto/%s' % uid
-        return photo
 
     def _assign_mail(self, user_dict):
         mail = ''
