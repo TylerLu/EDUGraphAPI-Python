@@ -23,7 +23,8 @@
        Office 365 account
     </div>
     <div class="formstyle">
-		<form action="/Account/O365Signin">{% csrf_token %}
+		<form action="/Account/O365Login" method="post">
+            {% csrf_token %}
             <div id="socialLoginList">
                 <p>
 					<button type="submit" class="btn btn-default btn-ms-login" id="" name="provider" value="" title=""></button>

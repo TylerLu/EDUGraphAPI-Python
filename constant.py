@@ -20,13 +20,15 @@ log_out_url = 'https://login.microsoftonline.com/common/oauth2/logout?redirect_u
 
 authorize_token_uri = 'https://login.microsoftonline.com/canvizEDU.onmicrosoft.com'
 
+microsoft_certs_uri = 'https://login.microsoftonline.com/common/discovery/v2.0/keys'
+
 company_admin_role_name = "Company Administrator"
 
 bing_map_key = os.environ['BingMapKey']
 
-username_cookie = "O365CookieUsername"
+o365_username_cookie = "O365CookieUsername"
 
-email_cookie = "O365CookieEmail"
+o365_email_cookie = "O365CookieEmail"
 
 class Resources():
     AADGraph = "https://graph.windows.net/"

@@ -17,7 +17,7 @@ from services.aad_graph_service import AADGraphService
 from services.local_user_service import LocalUserService
 from services.o365_user_service import O365UserService
 from services.auth_service import login as auth_login 
-from services.auth_service import authenticate, logout
+from services.auth_service import authenticate, logout, get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri
 
 from .forms import UserInfo, UserRegInfo
 
@@ -28,27 +28,13 @@ def index(request):
     request.session['Error'] = ''
     request.session['Message'] = ''
     if not authenticate(request.user):
-        response =  HttpResponseRedirect('/Account/Login')
-        response.set_cookie(constant.username_cookie, '')
-        response.set_cookie(constant.email_cookie, '')
-        return response
+        return HttpResponseRedirect('/Account/Login')
+    if not request.user['are_linked']:
+        return HttpResponseRedirect('/link')    
+    if request.user['role'] == 'Admin':
+        return HttpResponseRedirect('/Admin')
     else:
-        if not request.user['are_linked']:
-            return HttpResponseRedirect('/link')
-        else:
-            if request.user['role'] == 'Admin':
-                return HttpResponseRedirect('/Admin')
-            else:
-                return HttpResponseRedirect('/Schools')
-
-def relogin(request):
-    auth_login(request)
-    user_form = UserInfo()
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    response = render(request, 'account/login.html', {'user_form':user_form, 'links':links})
-    response.set_cookie(constant.username_cookie, '')
-    response.set_cookie(constant.email_cookie, '')
-    return response
+        return HttpResponseRedirect('/Schools')
 
 def login(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
@@ -76,47 +62,58 @@ def login(request):
                 return render(request, 'account/login.html', parameter)
     # get /Account/Login
     else:
-        user_form = UserInfo()
-        parameter['user_form'] = user_form
-        return render(request, 'account/login.html', parameter)
+        o365_username = request.COOKIES.get(constant.o365_username_cookie)
+        o365_email = request.COOKIES.get(constant.o365_email_cookie)
+        if o365_username and o365_email:
+            links = settings.DEMO_HELPER.get_links(request.get_full_path())
+            parameter = {}
+            parameter['links'] = links
+            parameter['username'] = o365_username
+            parameter['email'] = o365_email
+            return render(request, 'account/O365login.html', parameter)
+        else:    
+            user_form = UserInfo()
+            parameter['user_form'] = user_form
+            return render(request, 'account/login.html', parameter)
 
 def o365_login(request):
-    username = request.COOKIES.get(constant.username_cookie)
-    email = request.COOKIES.get(constant.email_cookie)
-    if username and email:
-        links = settings.DEMO_HELPER.get_links(request.get_full_path())
-        parameter = {}
-        parameter['links'] = links
-        parameter['username'] = username
-        parameter['email'] = email
-        return render(request, 'account/O365login.html', parameter)
-    else:
-        scheme = request.scheme
-        host = request.get_host()
-        redirect_uri = '%s://%s/Auth/O365/Callback' % (scheme, host)
-        o365_login_url = constant.o365_login_url + redirect_uri
-        return HttpResponseRedirect(o365_login_url)
+    extra_params = {
+        'scope': 'openid+profile',
+        'nonce': get_random_string()
+    }
+    o365_email = request.COOKIES.get(constant.o365_email_cookie)
+    if o365_email:
+        extra_params['login_hint'] = o365_email
+    o365_login_url = get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', get_random_string(), extra_params) 
+    return HttpResponseRedirect(o365_login_url)
+
+def relogin(request):
+    response = HttpResponseRedirect('/Account/Login')
+    response.set_cookie(constant.o365_username_cookie, '')
+    response.set_cookie(constant.o365_email_cookie, '')
+    return response
 
 def o365_auth_callback(request):
-    scheme = request.scheme
-    host = request.get_host()
-    redirect_uri = '%s://%s/Auth/O365/Callback' % (scheme, host)
-    code = request.GET.get('code', '')
+    validate_state(request)
+    code = request.POST.get('code')
+    id_token = get_id_token(request)
+    
+    o365_user_id = id_token.get('oid')
+    tenant_id = id_token.get('tid')
 
+    redirect_uri = get_redirect_uri(request, 'Auth/O365/Callback')
     aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
-    o365_user_id = aad_auth_result.get('oid')
-    organzation_id = '64446b5c-6d85-4d16-9ff2-94eddc0c2439'
     aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)
     ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
 
     ms_graph_service = MSGraphService(access_token=ms_token)
     graph_user = ms_graph_service.get_me()
-    graph_org = ms_graph_service.get_organization(organzation_id)
+    graph_org = ms_graph_service.get_organization(tenant_id)
 
     o365_user_service = O365UserService()
     client_user = o365_user_service.get_client_user(graph_user, graph_org)
 
-    aad_graph_service = AADGraphService(client_user['tenant_id'], aad_token)
+    aad_graph_service = AADGraphService(tenant_id, aad_token)
     admin_ids = aad_graph_service.get_admin_ids()
     license_ids = aad_graph_service.get_license_ids()
 
@@ -127,16 +124,10 @@ def o365_auth_callback(request):
 
     auth_login(request, user_info)
     response =  HttpResponseRedirect('/')
-    response.set_cookie(constant.username_cookie, user_info['display_name'])
-    response.set_cookie(constant.email_cookie, user_info['mail'])
+    response.set_cookie(constant.o365_username_cookie, user_info['display_name'])
+    response.set_cookie(constant.o365_email_cookie, user_info['mail'])
     return response
 
-def o365_signin(request):
-    scheme = request.scheme
-    host = request.get_host()
-    redirect_uri = '%s://%s/Auth/O365/Callback' % (scheme, host)
-    o365_login_url = constant.o365_signin_url + redirect_uri
-    return HttpResponseRedirect(o365_login_url)
 
 @login_required
 def photo(request, user_object_id):
@@ -185,8 +176,8 @@ def logoff(request):
     if user_info['are_linked']:
         return HttpResponseRedirect('/')
     else:
-        request.set_cookie(constant.username_cookie, '')
-        request.set_cookie(constant.email_cookie, '')
+        request.set_cookie(constant.o365_username_cookie, '')
+        request.set_cookie(constant.o365_email_cookie, '')
         scheme = request.scheme
         host = request.get_host()
         redirect_uri = scheme + '://' + host
@@ -205,7 +196,6 @@ def login_local_user(request, user):
         user_info['tenant_id'] = 'local'
         auth_login(request, user_info)
     else:
-        import pdb; pdb.set_trace()
         aad_token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.localuser.o365UserId)
         ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.localuser.o365UserId)
 
@@ -225,5 +215,5 @@ def login_local_user(request, user):
         LOCAL_USER.check_link_status(user_info)
         auth_login(request, user_info)
 
-        request.set_cookie(constant.username_cookie, user_info['display_name'])
-        request.set_cookie(constant.email_cookie, user_info['mail'])
+        request.set_cookie(constant.o365_username_cookie, user_info['display_name'])
+        request.set_cookie(constant.o365_email_cookie, user_info['mail'])
