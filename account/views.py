@@ -116,9 +116,9 @@ def o365_auth_callback(request):
 
     aad_graph_service = AADGraphService(client_user['tenant_id'], aad_token)
     admin_ids = aad_graph_service.get_admin_ids()
-    extra_user = aad_graph_service.get_user_extra_info()
+    license_ids = aad_graph_service.get_license_ids()
 
-    user_info = o365_user_service.get_user(client_user, admin_ids, extra_user)
+    user_info = o365_user_service.get_user(client_user, admin_ids, license_ids)
 
     LOCAL_USER.create_organization(user_info)
     LOCAL_USER.check_link_status(user_info)

@@ -27,7 +27,11 @@ def schools(request):
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
 
     education_service = EducationService(user_info['tenant_id'], token)
+    user_info['school_id'] = education_service.get_school_id()
+    user_info['school_uid'] = education_service.get_school_uid()
     out_schools = education_service.get_schools(user_info['school_id'])
+
+    login(request, user_info)
     # set parameter for template
     parameter = {}
     parameter['links'] = links

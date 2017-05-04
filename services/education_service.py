@@ -15,6 +15,26 @@ class EducationService(object):
         self.rest_api_service = RestApiService()
         self._token_re = re.compile('\$skiptoken=.*')
 
+    def get_school_id(self):
+        version = '?api-version=1.6'
+        url = self.api_base_uri + 'me' + version
+        user_content = self.rest_api_service.get_json(url, self.token)
+        school_id = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId', '')
+        return school_id
+
+    def get_school_uid(self):
+        school_uid = ''
+        version = '?api-version=1.6'
+        url = self.api_base_uri + 'me' + version
+        user_content = self.rest_api_service.get_json(url, self.token)
+        sid = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_StudentId', '')
+        tid = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_TeacherId', '')
+        if sid:
+            school_uid = sid
+        elif tid:
+            school_uid = tid
+        return school_uid
+
     def get_schools(self, school_uid=''):
         '''
         Get all schools that exist in the Azure Active Directory tenant.
