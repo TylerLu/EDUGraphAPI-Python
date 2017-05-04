@@ -17,8 +17,7 @@ from services.aad_graph_service import AADGraphService
 from services.local_user_service import LocalUserService
 from services.o365_user_service import O365UserService
 from services.auth_service import login as auth_login 
-from services.auth_service import authenticate, logout, get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri
-
+from services.auth_service import authenticate, get_user, logout,  get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri
 from .forms import UserInfo, UserRegInfo
 
 LOCAL_USER = LocalUserService()
@@ -27,11 +26,12 @@ TOKEN_SERVICE = TokenService()
 def index(request):
     request.session['Error'] = ''
     request.session['Message'] = ''
-    if not authenticate(request.user):
+    user = get_user()
+    if not authenticate(user):
         return HttpResponseRedirect('/Account/Login')
-    if not request.user['are_linked']:
+    if not user['are_linked']:
         return HttpResponseRedirect('/link')    
-    if request.user['role'] == 'Admin':
+    if user['role'] == 'Admin':
         return HttpResponseRedirect('/Admin')
     else:
         return HttpResponseRedirect('/Schools')
@@ -110,19 +110,17 @@ def o365_auth_callback(request):
     graph_user = ms_graph_service.get_me()
     graph_org = ms_graph_service.get_organization(tenant_id)
 
-    o365_user_service = O365UserService()
-    client_user = o365_user_service.get_client_user(graph_user, graph_org)
-
     aad_graph_service = AADGraphService(tenant_id, aad_token)
     admin_ids = aad_graph_service.get_admin_ids()
     license_ids = aad_graph_service.get_license_ids()
 
-    user_info = o365_user_service.get_user(client_user, admin_ids, license_ids)
+    o365_user_service = O365UserService()
+    user_info = o365_user_service.get_client_user(graph_user, graph_org, admin_ids, license_ids)
 
     LOCAL_USER.create_organization(user_info)
     LOCAL_USER.check_link_status(user_info)
 
-    auth_login(request, user_info)
+    auth_login(user_info)
     response =  HttpResponseRedirect('/')
     response.set_cookie(constant.o365_username_cookie, user_info['display_name'])
     response.set_cookie(constant.o365_email_cookie, user_info['mail'])
@@ -131,7 +129,8 @@ def o365_auth_callback(request):
 
 @login_required
 def photo(request, user_object_id):
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, request.user['uid'])
+    user = get_user()
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user['uid'])
     ms_graph_service = MSGraphService(access_token=token)
     user_photo = ms_graph_service.get_photo(user_object_id)
     if not user_photo:
@@ -171,22 +170,23 @@ def register(request):
 
 @login_required
 def logoff(request):
-    user_info = request.user
-    logout(request)
+    user_info = get_user()
+    logout()
     if user_info['are_linked']:
         return HttpResponseRedirect('/')
     else:
-        request.set_cookie(constant.o365_username_cookie, '')
-        request.set_cookie(constant.o365_email_cookie, '')
         scheme = request.scheme
         host = request.get_host()
         redirect_uri = scheme + '://' + host
         logoff_url = constant.log_out_url % (redirect_uri, redirect_uri)
-        return HttpResponseRedirect(logoff_url)
+        response =  HttpResponseRedirect(logoff_url)
+        response.set_cookie(constant.username_cookie, '')
+        response.set_cookie(constant.email_cookie, '')
+        return response
 
 def login_local_user(request, user):
     if not hasattr(user, 'localuser') or not user.localuser.o365UserId:
-        user_info = request.user
+        user_info = get_user()
         user_info['is_local'] = True
         user_info['mail'] = user.email
         user_info['display_name'] = user.username
@@ -194,7 +194,7 @@ def login_local_user(request, user):
         user_info['are_linked'] = False
         user_info['uid'] = 'local'
         user_info['tenant_id'] = 'local'
-        auth_login(request, user_info)
+        auth_login(user_info)
     else:
         aad_token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.localuser.o365UserId)
         ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.localuser.o365UserId)
@@ -204,16 +204,15 @@ def login_local_user(request, user):
         graph_user = ms_graph_service.get_me()
         graph_org = ms_graph_service.get_organization(organzation_id)
 
-        o365_user_service = O365UserService()
-        client_user = o365_user_service.get_client_user(graph_user, graph_org)
-
-        aad_graph_service = AADGraphService(client_user['tenant_id'], aad_token)
+        aad_graph_service = AADGraphService(graph_org['id'], aad_token)
         admin_ids = aad_graph_service.get_admin_ids()
-        extra_user = aad_graph_service.get_user_extra_info()
-        user_info = o365_user_service.get_user(client_user, admin_ids, extra_user)
+        license_ids = aad_graph_service.get_license_ids()
+
+        o365_user_service = O365UserService()
+        user_info = o365_user_service.get_client_user(graph_user, graph_org, admin_ids, license_ids)
 
         LOCAL_USER.check_link_status(user_info)
-        auth_login(request, user_info)
+        auth_login(user_info)
 
         request.set_cookie(constant.o365_username_cookie, user_info['display_name'])
         request.set_cookie(constant.o365_email_cookie, user_info['mail'])

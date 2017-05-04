@@ -10,11 +10,7 @@ client_secret = os.environ['ClientSecret']
 
 login_base_uri = 'https://login.microsoftonline.com/common/oauth2/authorize?'
 
-o365_signin_url = login_base_uri + 'response_type=code&client_id=%s&redirect_uri=' % (client_id)
-
-o365_login_url = login_base_uri + 'response_type=code&client_id=%s&prompt=login&redirect_uri=' % (client_id)
-
-admin_consent_url = login_base_uri + 'response_type=code&client_id=%s&prompt=admin_consent&direct_uri=' % (client_id)
+admin_consent_url = login_base_uri + 'response_type=code&client_id=%s&prompt=admin_consent&redirect_uri=' % (client_id)
 
 log_out_url = 'https://login.microsoftonline.com/common/oauth2/logout?redirect_uri=%s&post_logout_redirect_uri=%s'
 

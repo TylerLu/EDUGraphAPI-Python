@@ -40,6 +40,15 @@ class RestApiService(object):
             s_headers.update(headers)
         response = self._send(method, url, s_headers)
         return json.loads(response.text)
+    
+    def delete(self, url, token, headers=None):
+        method = 'DELETE'
+        s_headers = {'Accept': 'application/json',
+                     'Content-Type': 'application/json'}
+        self._set_header_token(s_headers, token)
+        if headers:
+            s_headers.update(headers)
+        self._send(method, url, s_headers)
 
     def get_img(self, url, token, headers=None):
         method = 'GET'

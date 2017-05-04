@@ -30,5 +30,5 @@ class DemoHelper(object):
 
     def _filter_path(self, path):
         new_path = re.sub(self._object_id_filter, '', path)
-        new_path = re.sub(self._number_filter, '', path)
+        new_path = re.sub(self._number_filter, '', new_path)
         return new_path
