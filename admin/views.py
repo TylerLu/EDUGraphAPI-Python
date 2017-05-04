@@ -11,6 +11,9 @@ import constant
 from decorator import admin_only, login_required
 from services.auth_service import get_user
 from services.token_service import TokenService
+from services.ms_graph_service import MSGraphService
+from services.aad_graph_service import AADGraphService
+from services.o365_user_service import O365UserService
 from services.local_user_service import LocalUserService
 
 LOCAL_USER = LocalUserService()
@@ -25,7 +28,9 @@ def admin(request):
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user_info
-    parameter['error'] = request.session['Error']
+    if request.session['Message']:
+        parameter['message'] = request.session['Message'].split('\r\n')
+        request.session['Message'] = ''
     return render(request, 'admin/index.html', parameter)
 
 @login_required
@@ -61,13 +66,40 @@ def unlink_account(request, link_id):
 @login_required
 @admin_only
 def consent(request):
-    user_info = get_user()
-    LOCAL_USER.update_organization(user_info, True)
     scheme = request.scheme
     host = request.get_host()
-    redirect_uri = '%s://%s/Auth/O365/Callback' % (scheme, host)
+    redirect_uri = '%s://%s/Admin/ProcessCode' % (scheme, host)
     consent_url = constant.admin_consent_url + redirect_uri
     return HttpResponseRedirect(consent_url)
+
+def process_code(request):
+    scheme = request.scheme
+    host = request.get_host()
+    redirect_uri = '%s://%s/Admin/ProcessCode' % (scheme, host)
+    code = request.GET.get('code', '')
+
+    aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
+    o365_user_id = aad_auth_result.get('oid')    
+    organzation_id = '64446b5c-6d85-4d16-9ff2-94eddc0c2439'
+    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)
+    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
+
+    ms_graph_service = MSGraphService(access_token=ms_token)
+    graph_user = ms_graph_service.get_me()
+    graph_org = ms_graph_service.get_organization(organzation_id)
+    
+    aad_graph_service = AADGraphService(graph_org['id'], aad_token)
+    admin_ids = aad_graph_service.get_admin_ids()
+    license_ids = aad_graph_service.get_license_ids()
+
+    o365_user_service = O365UserService()
+    user_info = o365_user_service.get_client_user(graph_user, graph_org, admin_ids, license_ids)
+
+    LOCAL_USER.update_organization(user_info, True)
+    LOCAL_USER.check_link_status(user_info)
+
+    request.session['Message'] = 'Admin consented successfully!'
+    return HttpResponseRedirect('/Admin')
 
 @login_required
 @admin_only

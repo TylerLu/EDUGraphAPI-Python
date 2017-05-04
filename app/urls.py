@@ -56,6 +56,7 @@ urlpatterns = [
 
     url(r'^Admin$', admin_views.admin, name='admin'),
     url(r'^Admin/LinkedAccounts', admin_views.linked_accounts, name='linked_accounts'),
+    url(r'^Admin/ProcessCode', admin_views.process_code, name='admin_process_code'),
     url(r'^UnlinkAccount/(?P<link_id>\d+)', admin_views.unlink_account, name='unlink_account'),
     url(r'^Admin/AddAppRoleAssignments', admin_views.add_app_roles, name='add_app_roles'),
     url(r'^Consent', admin_views.consent, name='consent'),
