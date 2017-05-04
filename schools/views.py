@@ -107,7 +107,7 @@ def classdetails(request, school_object_id, class_object_id):
     seatrange = range(1, 37)
 
     ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
-    ms_graph_service = MSGraphService(token=ms_token)
+    ms_graph_service = MSGraphService(access_token=ms_token)
 
     out_documents = ms_graph_service.get_documents(class_object_id)
     documents_root = ms_graph_service.get_documents_root(class_object_id)

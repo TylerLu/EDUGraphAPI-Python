@@ -126,7 +126,7 @@ def process_code(request):
     aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)
     ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
 
-    ms_graph_service = MSGraphService(token=ms_token)
+    ms_graph_service = MSGraphService(access_token=ms_token)
     ms_client = ms_graph_service.get_client()
 
     o365_user_service = O365UserService()

@@ -16,37 +16,15 @@ class AuthProvider(AuthProviderBase):
         self.__access_token = ''
 
     def access_token(self, value):
-        """
-        Sets the access_token for the AuthProvider
-        Returns:
-            str: The access token
-        """
         self.__access_token = value
 
-    def authenticate_request(self, request):
-        """Append the required authentication headers
-        to the specified request. This will only function
-        if a session has been successfully created using
-        :func:`authenticate`. This will also refresh the
-        authentication token if necessary.
-
-        Args:
-            request (:class:`RequestBase<microsoft.request_base.RequestBase>`):
-                The request to authenticate
-        """
-        key = 'Authorization'
-        value = 'Bearer {0}'.format(self.__access_token)
-        option = HeaderOption(key, value)
-        request.append_option(option)
-        key = 'Accept'
-        value = 'application/json'
-        option = HeaderOption(key, value)
-        request.append_option(option)
-        key = 'Content-Type'
-        value = 'application/json'
-        option = HeaderOption(key, value)
-        request.append_option(option)
+    def authenticate_request(self, request):   
+        request.append_option(HeaderOption('Authorization', 'Bearer {0}'.format(self.__access_token)))
+        request.append_option(HeaderOption('Accept', 'application/json'))
+        request.append_option(HeaderOption('Content-Type', 'application/json'))
 
     def refresh_token(self):
-        """Refresh the token currently used by the session"""
+        """
+        No need to refresh token. The other parts of the app ensure that the access token is invalid.
+        """
         pass
