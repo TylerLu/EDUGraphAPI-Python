@@ -185,13 +185,14 @@ def logoff(request):
     if user_info['are_linked']:
         return HttpResponseRedirect('/')
     else:
-        request.set_cookie(constant.username_cookie, '')
-        request.set_cookie(constant.email_cookie, '')
         scheme = request.scheme
         host = request.get_host()
         redirect_uri = scheme + '://' + host
         logoff_url = constant.log_out_url % (redirect_uri, redirect_uri)
-        return HttpResponseRedirect(logoff_url)
+        response =  HttpResponseRedirect(logoff_url)
+        response.set_cookie(constant.username_cookie, '')
+        response.set_cookie(constant.email_cookie, '')
+        return response
 
 def login_local_user(request, user):
     if not hasattr(user, 'localuser') or not user.localuser.o365UserId:
