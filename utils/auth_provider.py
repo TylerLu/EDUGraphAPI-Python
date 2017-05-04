@@ -19,7 +19,7 @@ class AuthProvider(AuthProviderBase):
         self.__access_token = value
 
     def authenticate_request(self, request):   
-        request.append_option(HeaderOption('Authorization', 'Bearer {0}'.format(self.__access_token))
+        request.append_option(HeaderOption('Authorization', 'Bearer {0}'.format(self.__access_token)))
         request.append_option(HeaderOption('Accept', 'application/json'))
         request.append_option(HeaderOption('Content-Type', 'application/json'))
 
