@@ -108,7 +108,7 @@ def o365_auth_callback(request):
     aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)
     ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
 
-    ms_graph_service = MSGraphService(token=ms_token)
+    ms_graph_service = MSGraphService(access_token=ms_token)
     ms_client = ms_graph_service.get_client()
 
     o365_user_service = O365UserService()
@@ -139,7 +139,7 @@ def o365_signin(request):
 @login_required
 def photo(request, user_object_id):
     token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, request.user['uid'])
-    ms_graph_service = MSGraphService(token=token)
+    ms_graph_service = MSGraphService(access_token=token)
     user_photo = ms_graph_service.get_photo(user_object_id)
     if not user_photo:
         local_photo_path = settings.STATICFILES_DIRS[0] + '/Images/DefaultUserPhoto.jpg'
@@ -207,7 +207,7 @@ def login_local_user(request, user):
         aad_token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.localuser.o365UserId)
         ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.localuser.o365UserId)
 
-        ms_graph_service = MSGraphService(token=ms_token)
+        ms_graph_service = MSGraphService(access_token=ms_token)
         ms_client = ms_graph_service.get_client()
 
         o365_user_service = O365UserService()
