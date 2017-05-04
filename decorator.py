@@ -15,7 +15,5 @@ def admin_only(func):
     def decorator(request, *args, **kwargs):
         if request.user.get('role') != 'Admin':
             return HttpResponseRedirect('/Account/Login')
-        if not request.user['are_linked']:
-            return HttpResponseRedirect('/Account/Login')
         return func(request, *args, **kwargs)
     return decorator
