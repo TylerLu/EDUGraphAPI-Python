@@ -7,13 +7,18 @@ import json
 import requests
 import constant
 
-class HttpException(Exception):
-    def __init__(self, status_code):
-        self.status_code = status_code
+class HttpRequestFailed(Exception):
+    def __init__(self, request, response):
+        self._request = request
+        self._response = response
 
     @property
-    def status_code(self):
-        return self.status_code
+    def response(self):
+        return self._request
+        
+    @property
+    def response(self):
+        return self._response
 
 class RestApiService(object):
 
@@ -82,7 +87,7 @@ class RestApiService(object):
         prepped = request.prepare()
         response = session.send(prepped)
         if response.status_code < 200 or response.status_code > 299:
-            raise HttpException(response.status_code)
+            raise HttpRequestFailed(request, response)
         return response
 
 
