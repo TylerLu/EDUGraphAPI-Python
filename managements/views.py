@@ -31,7 +31,7 @@ def aboutme(request):
     else:
         groups = []
 
-    user_info = request.user
+    user_info = get_user()
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user_info
