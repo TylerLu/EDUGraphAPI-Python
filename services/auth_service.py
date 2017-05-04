@@ -44,28 +44,30 @@ class AuthService(object):
         user_obj = AuthUser()
         self.user = dict((name, getattr(user_obj, name)) for name in dir(user_obj) if not name.startswith('__')  and not callable(getattr(user_obj, name)))
 
-    def login(self, request, user):
-        if not user:
-            setattr(request, 'user', self.user)
-        else:
-            for key in user:
-                self.user[key] = user[key]
-            setattr(request, 'user', self.user)
+    def login(self, user):
+        for key in user:
+            self.user[key] = user[key]
 
     def get_user(self):
         return self.user
 
-    def logoff(self, request):
-        self.user = {}
-        setattr(request, 'user', self.user)
+    def logout(self):
+        self._reset()
+    
+    def _reset(self):
+        for key in self.user:
+            if isinstance(self.user[key], bool):
+                self.user[key] = False
+            if isinstance(self.user[key], str):
+                self.user[key] = ''
 
-def login(request, user=None):
+def login(user):
     auth_service = AuthService()
-    auth_service.login(request, user)
+    auth_service.login(user)
 
-def logout(request):
+def logout():
     auth_service = AuthService()
-    auth_service.logoff(request)
+    auth_service.logout()
 
 def get_user():
     auth_service = AuthService()

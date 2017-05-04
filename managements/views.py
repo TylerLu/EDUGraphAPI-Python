@@ -9,7 +9,7 @@ from django.conf import settings
 import constant
 from decorator import login_required
 from services.token_service import TokenService
-from services.auth_service import login, authenticate
+from services.auth_service import login, get_user
 from services.education_service import EducationService
 from services.local_user_service import LocalUserService
 
@@ -19,14 +19,13 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def aboutme(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     user_info['show_color'] = True
     user_info['color'] = LOCAL_USER.get_color(user_info)
-    login(request, user_info)
+    login(user_info)
 
-    ret = authenticate(request.user)
-    if ret and user_info['role'] != 'Admin':
-        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, request.user['uid'])
+    if user_info['role'] != 'Admin' and user_info['school_id']:
+        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
         education_service = EducationService(user_info['tenant_id'], token)
         groups = education_service.get_my_groups(user_info['school_id'])
     else:
@@ -45,7 +44,7 @@ def aboutme(request):
 def updatecolor(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     # get user info from session
-    user_info = request.user
+    user_info = get_user()
     color = request.POST.get('favoritecolor')
     LOCAL_USER.update_color(color, user_info)
     user_info['color'] = LOCAL_USER.get_color(user_info)

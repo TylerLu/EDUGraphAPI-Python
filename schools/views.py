@@ -10,8 +10,8 @@ import json
 
 import constant
 from decorator import login_required
-from services.auth_service import login
 from services.token_service import TokenService
+from services.auth_service import login, get_user
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
 from services.local_user_service import LocalUserService
@@ -22,7 +22,7 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
 
@@ -31,7 +31,7 @@ def schools(request):
     user_info['school_uid'] = education_service.get_school_uid()
     out_schools = education_service.get_schools(user_info['school_id'])
 
-    login(request, user_info)
+    login(user_info)
     # set parameter for template
     parameter = {}
     parameter['links'] = links
@@ -42,10 +42,10 @@ def schools(request):
 @login_required
 def classes(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     user_info['is_in_a_school'] = True
     user_info['school_object_id'] = school_object_id
-    login(request, user_info)
+    login(user_info)
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -67,7 +67,7 @@ def classes(request, school_object_id):
 @login_required
 def classnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.user
+    user_info = get_user()
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -86,10 +86,10 @@ def classnext(request, school_object_id):
 @login_required
 def classdetails(request, school_object_id, class_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     user_info['class_object_id'] = class_object_id
     user_info['color'] = LOCAL_USER.get_color(user_info)
-    login(request, user_info)
+    login(user_info)
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -139,7 +139,7 @@ def saveseat(request):
 @login_required
 def users(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -165,7 +165,7 @@ def users(request, school_object_id):
 @login_required
 def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.user
+    user_info = get_user()
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -181,7 +181,7 @@ def usernext(request, school_object_id):
 @login_required
 def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.user
+    user_info = get_user()
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)
@@ -197,7 +197,7 @@ def studentnext(request, school_object_id):
 @login_required
 def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = request.user
+    user_info = get_user()
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
     education_service = EducationService(user_info['tenant_id'], token)

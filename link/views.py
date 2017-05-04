@@ -9,8 +9,8 @@ from django.conf import settings
 
 import constant
 from decorator import login_required
-from services.auth_service import login
 from services.token_service import TokenService
+from services.auth_service import login, get_user
 from services.ms_graph_service import MSGraphService
 from services.aad_graph_service import AADGraphService
 from services.o365_user_service import O365UserService
@@ -24,18 +24,20 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def link(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     # set parameter for template
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user_info
-    parameter['error'] = request.session['Error']
+    if request.session['Error']:
+        parameter['error'] = request.session['Error']
+        request.session['Error'] = ''
     return render(request, 'link/index.html', parameter)
 
 @login_required
 def create_local(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     create_local_form = CreateLocalInfo()
     parameter = {}
     parameter['links'] = links
@@ -60,7 +62,7 @@ def create_local(request):
             user_info['are_linked'] = True
             user_info['email'] = user_info['mail']
             user_info['o365Email'] = user_info['mail']
-            login(request, user_info)
+            login(user_info)
             return HttpResponseRedirect('/')
     # GET /link/createlocal
     else:
@@ -69,7 +71,7 @@ def create_local(request):
 @login_required
 def login_local(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     login_local_form = LoginLocalInfo()
     parameter = {}
     parameter['links'] = links
@@ -90,7 +92,7 @@ def login_local(request):
                     user_info['are_linked'] = True
                     user_info['email'] = email
                     user_info['o365Email'] = user_info['mail']
-                    login(request, user_info)
+                    login(user_info)
                     return HttpResponseRedirect('/')
             errors.append('Invalid login attempt.')
             parameter['errors'] = errors
@@ -103,7 +105,7 @@ def login_local(request):
             user_info['are_linked'] = True
             user_info['email'] = user_info['mail']
             user_info['o365Email'] = user_info['mail']
-            login(request, user_info)
+            login(user_info)
             return HttpResponseRedirect('/')
         else:
             return render(request, 'link/loginlocal.html', parameter)
@@ -130,26 +132,25 @@ def process_code(request):
     ms_graph_service = MSGraphService(access_token=ms_token)
     graph_user = ms_graph_service.get_me()
     graph_org = ms_graph_service.get_organization(organzation_id)
+    
+    aad_graph_service = AADGraphService(graph_org['id'], aad_token)
+    admin_ids = aad_graph_service.get_admin_ids()
+    license_ids = aad_graph_service.get_license_ids()
 
     o365_user_service = O365UserService()
-    client_user = o365_user_service.get_client_user(graph_user, graph_org)
-
-    aad_graph_service = AADGraphService(client_user['tenant_id'], aad_token)
-    admin_ids = aad_graph_service.get_admin_ids()
-    extra_user = aad_graph_service.get_user_extra_info()
-
-    user_info = o365_user_service.get_user(client_user, admin_ids, extra_user)
+    user_info = o365_user_service.get_client_user(graph_user, graph_org, admin_ids, license_ids)
 
     LOCAL_USER.create_organization(user_info)
     LOCAL_USER.check_link_status(user_info)
 
     if not user_info.get('are_linked', False):
-        ret = LOCAL_USER.link_o365(request.user, user_info)
+        user = get_user()
+        ret = LOCAL_USER.link_o365(user, user_info)
         if ret:
             user_info['are_linked'] = True
             user_info['is_local'] = request.user['is_local']
             user_info['mail'] = request.user['mail']
-            login(request, user_info)
+            login(user_info)
             return HttpResponseRedirect('/')
 
     request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % user_info['mail']

@@ -9,7 +9,7 @@ from django.conf import settings
 
 import constant
 from decorator import admin_only, login_required
-from services.auth_service import login
+from services.auth_service import get_user
 from services.token_service import TokenService
 from services.local_user_service import LocalUserService
 
@@ -20,7 +20,7 @@ TOKEN_SERVICE = TokenService()
 @admin_only
 def admin(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     LOCAL_USER.check_admin(user_info)
     parameter = {}
     parameter['links'] = links
@@ -32,7 +32,7 @@ def admin(request):
 @admin_only
 def linked_accounts(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     user_links = LOCAL_USER.get_links(user_info['tenant_id'])
     parameter = {}
     parameter['user'] = user_info
@@ -44,7 +44,7 @@ def linked_accounts(request):
 @admin_only
 def unlink_account(request, link_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     parameter = {}
     parameter['links'] = links
     if request.method == 'POST':
@@ -61,7 +61,7 @@ def unlink_account(request, link_id):
 @login_required
 @admin_only
 def consent(request):
-    user_info = request.user
+    user_info = get_user()
     LOCAL_USER.update_organization(user_info, True)
     scheme = request.scheme
     host = request.get_host()
@@ -73,7 +73,7 @@ def consent(request):
 @admin_only
 def unconsent(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     LOCAL_USER.update_organization(user_info, False)
     LOCAL_USER.remove_links(user_info['tenant_id'])
     parameter = {}
@@ -86,7 +86,7 @@ def add_app_roles(request):
 
 def consent_alone(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = request.user
+    user_info = get_user()
     user_info['is_authenticated'] = False
     parameter = {}
     parameter['links'] = links
