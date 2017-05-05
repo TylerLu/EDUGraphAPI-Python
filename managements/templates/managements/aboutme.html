@@ -15,15 +15,15 @@
 		<b>Username:</b><br /> {{ user.display_name }} <img src="{{ user.photo }}" />
     </div>
     <div class="margin-top-12 margin-btm-12">
-		<b>Logged in as:</b><br /> {{ user.role }}
+		<b>Logged in as:</b><br /> {{ user.main_role }}
     </div>
-	{% if user.show_color %}
+	{% if show_color %}
     <div class="margin-btm-12">
         <b>Favorite Color:</b>
 		<form action="/Manage/UpdateFavoriteColor" method="post">{% csrf_token %}
 			<select name="favoritecolor">
 				{% for color in colors %}
-				{% if color.value == user.color %}
+				{% if color.value == favorite_color %}
 				<option value={{ color.value }} selected>
 				{% else %}
 				<option value={{ color.value }}>

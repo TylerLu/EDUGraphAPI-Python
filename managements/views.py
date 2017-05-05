@@ -9,7 +9,7 @@ from django.conf import settings
 import constant
 from decorator import login_required
 from services.token_service import TokenService
-from services.auth_service import login, get_user
+from services.auth_service import get_current_user
 from services.education_service import EducationService
 from services.local_user_service import LocalUserService
 
@@ -19,39 +19,26 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def aboutme(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-    user_info['show_color'] = True
-    user_info['color'] = LOCAL_USER.get_color(user_info)
-    login(user_info)
-
-    if user_info['role'] != 'Admin' and user_info['school_id']:
-        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-        education_service = EducationService(user_info['tenant_id'], token)
-        groups = education_service.get_my_groups(user_info['school_id'])
+    user = get_current_user(request)
+    parameter = {}
+    parameter['links'] = links
+    parameter['user'] = user
+    if user.local_user.is_authenticated:
+        parameter['show_color'] = user.local_user.is_authenticated
+        parameter['colors'] = constant.FavoriteColors        
+        parameter['favorite_color'] = LOCAL_USER.get_favorite_color(user.user_id)
+    if not user.is_admin and user.o365_user is not None:
+        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+        education_service = EducationService(user.tenant_id, token)
+        school_id = education_service.get_school_id()
+        parameter['groups'] = education_service.get_my_groups(school_id)
     else:
-        groups = []
-
-    user_info = get_user()
-    parameter = {}
-    parameter['links'] = links
-    parameter['user'] = user_info
-    parameter['colors'] = constant.FavoriteColors
-    parameter['groups'] = groups
-    request.session['colors'] = constant.FavoriteColors
-    request.session['groups'] = groups
+        parameter['groups'] = []
     return render(request, 'managements/aboutme.html', parameter)
 
+@login_required
 def updatecolor(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    # get user info from session
-    user_info = get_user()
+    user = get_current_user(request)
     color = request.POST.get('favoritecolor')
-    LOCAL_USER.update_color(color, user_info)
-    user_info['color'] = LOCAL_USER.get_color(user_info)
-    parameter = {}
-    parameter['links'] = links
-    parameter['user'] = user_info
-    parameter['colors'] = request.session['colors']
-    parameter['groups'] = request.session['groups']
-    parameter['savemessage'] = "<span class='saveresult'>Favorite color has been updated!</span>"
-    return render(request, 'managements/aboutme.html', parameter)
+    LOCAL_USER.update_favorite_color(color, user.user_id)
+    return HttpResponseRedirect('/Manage/AboutMe')

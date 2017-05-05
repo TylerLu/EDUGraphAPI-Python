@@ -87,7 +87,10 @@ class UnifiedUser(object):
     @property
     def o365_user_id(self):
         return self.o365_user.id
-
+        
+    @property
+    def user_id(self):
+        return self.local_user.id
         
     @property
     def tenant_id(self):
@@ -100,6 +103,25 @@ class UnifiedUser(object):
     @property
     def is_o365(self):
         return not self.local_user.is_authenticated
+  
+    @property
+    def display_name(self):
+        user = self.o365_user
+        if not user and self.local_user.is_authenticated:
+            user = self.local_user
+        if user:
+            return "%s %s" % (user.first_name, user.last_name)
+        return ''
+    
+    @property
+    def main_role(self):
+        if not self.o365_user:
+            return None
+        roles = self.o365_user.roles
+        for role in ['Admin', 'Teacher', 'Student']:
+            if role in roles:
+                return role
+        return None
 
     @property
     def local_user(self):

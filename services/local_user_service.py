@@ -143,18 +143,15 @@ class LocalUserService(object):
         link.save()
         return link
 
-    def get_color(self, user_info):
-        color = ''
-        try:
-            color = LocalUser.objects.get(o365Email=user_info['mail']).favoriteColor
-        except:
-            pass
-        return color
+    def get_favorite_color(self, user_id):
+        profile = LocalUser.objects.filter(user_id=user_id).first()
+        if profile:
+            return profile.favoriteColor
+        return None
 
-    def update_color(self, color, user_info):
-        local = LocalUser.objects.filter(o365Email=user_info['mail'])
+    def update_favorite_color(self, color, user_id):
+        local = LocalUser.objects.filter(user_id=user_id).first()
         if local:
-            local = local[0]
             local.favoriteColor = color
             local.save()
 
