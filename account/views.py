@@ -5,6 +5,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 
+from django.contrib.auth import login as auth_login 
+from django.contrib.auth import logout as auth_logout 
 from django.contrib.auth import authenticate as auth_authenticate
 
 from django.conf import settings
@@ -16,8 +18,7 @@ from services.ms_graph_service import MSGraphService
 from services.aad_graph_service import AADGraphService
 from services.local_user_service import LocalUserService
 from services.o365_user_service import O365UserService
-from services.auth_service import login as auth_login 
-from services.auth_service import authenticate, get_user, logout,  get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri
+from services.auth_service import authenticate, get_user, logout,  get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri, get_current_user
 from .forms import UserInfo, UserRegInfo
 
 LOCAL_USER = LocalUserService()
@@ -26,12 +27,12 @@ TOKEN_SERVICE = TokenService()
 def index(request):
     request.session['Error'] = ''
     request.session['Message'] = ''
-    user = get_user()
-    if not authenticate(user):
+    user = get_current_user(request)
+    if not user.is_authenticated:
         return HttpResponseRedirect('/Account/Login')
-    if not user['are_linked']:
+    if not user.are_linked:
         return HttpResponseRedirect('/link')    
-    if user['role'] == 'Admin':
+    if user.is_admin:
         return HttpResponseRedirect('/Admin')
     else:
         return HttpResponseRedirect('/Schools')
@@ -40,6 +41,7 @@ def login(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     parameter = {}
     parameter['links'] = links
+    # TODO: split the post to a new method
     # post /Account/Login
     if request.method == 'POST':
         email = ''
@@ -53,7 +55,10 @@ def login(request):
         if email and password:
             user = auth_authenticate(username=email, password=password)
             if user is not None:
-                login_local_user(request, user)
+                auth_login(request, user)
+                o365_user = LOCAL_USER.get_o365_user(user)
+                if o365_user:
+                    request.session[constant.o365_user_session_key] = o365_user.to_json()
                 return HttpResponseRedirect('/')
             else:
                 errors.append('Invalid login attempt.')
@@ -103,34 +108,27 @@ def o365_auth_callback(request):
 
     redirect_uri = get_redirect_uri(request, 'Auth/O365/Callback')
     aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
-    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)
+    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)    
     ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
 
-    ms_graph_service = MSGraphService(access_token=ms_token)
-    graph_user = ms_graph_service.get_me()
-    graph_org = ms_graph_service.get_organization(tenant_id)
+    o365_user_service = O365UserService(tenant_id, ms_token, aad_token)
+    o365_user = o365_user_service.get_o365_user()
+    request.session[constant.o365_user_session_key] = o365_user.to_json()
 
-    aad_graph_service = AADGraphService(tenant_id, aad_token)
-    admin_ids = aad_graph_service.get_admin_ids()
-    license_ids = aad_graph_service.get_license_ids()
-
-    o365_user_service = O365UserService()
-    user_info = o365_user_service.get_client_user(graph_user, graph_org, admin_ids, license_ids)
-
-    LOCAL_USER.create_organization(user_info)
-    LOCAL_USER.check_link_status(user_info)
-
-    auth_login(user_info)
+    LOCAL_USER.create_organization(o365_user.tenant_id, o365_user._tenant_name)
+    local_user = LOCAL_USER.get_user_by_o365_email(o365_user.email)
+    if local_user:
+        login(local_user)
+ 
     response =  HttpResponseRedirect('/')
-    response.set_cookie(constant.o365_username_cookie, user_info['display_name'])
-    response.set_cookie(constant.o365_email_cookie, user_info['mail'])
+    response.set_cookie(constant.o365_username_cookie, o365_user.display_name)
+    response.set_cookie(constant.o365_email_cookie, o365_user.email)
     return response
-
 
 @login_required
 def photo(request, user_object_id):
-    user = get_user()
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user['uid'])
+    user = get_current_user(request)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     ms_graph_service = MSGraphService(access_token=token)
     user_photo = ms_graph_service.get_photo(user_object_id)
     if not user_photo:
@@ -148,17 +146,9 @@ def register(request):
         user_reg_form = UserRegInfo(request.POST)
         if user_reg_form.is_valid():
             data = user_reg_form.clean()
-            ret = LOCAL_USER.register(data)
-            if ret:
-                user_info = {}
-                user_info['is_local'] = True
-                user_info['is_authenticated'] = True
-                user_info['mail'] = data['Email']
-                user_info['display_name'] = data['Email']
-                user_info['are_linked'] = False
-                user_info['uid'] = 'register'
-                user_info['tenant_id'] = 'register'
-                auth_login(request, user_info)
+            user = LOCAL_USER.register(data['Email'], data['Password'], data['FavoriteColor'])
+            if user:
+                auth_login(request, user)
                 return HttpResponseRedirect('/')
             else:
                 errors.append('Name %s is already taken.' % data['Email'])
@@ -170,9 +160,11 @@ def register(request):
 
 @login_required
 def logoff(request):
-    user_info = get_user()
-    logout()
-    if user_info['are_linked']:
+    user = get_current_user(request)
+    if constant.o365_user_session_key in request.session:
+        del request.session[constant.o365_user_session_key]
+    auth_logout(request)
+    if not user.are_linked:
         return HttpResponseRedirect('/')
     else:
         scheme = request.scheme
@@ -183,36 +175,3 @@ def logoff(request):
         response.set_cookie(constant.username_cookie, '')
         response.set_cookie(constant.email_cookie, '')
         return response
-
-def login_local_user(request, user):
-    if not hasattr(user, 'localuser') or not user.localuser.o365UserId:
-        user_info = get_user()
-        user_info['is_local'] = True
-        user_info['mail'] = user.email
-        user_info['display_name'] = user.username
-        user_info['is_authenticated'] = True
-        user_info['are_linked'] = False
-        user_info['uid'] = 'local'
-        user_info['tenant_id'] = 'local'
-        auth_login(user_info)
-    else:
-        aad_token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.localuser.o365UserId)
-        ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.localuser.o365UserId)
-
-        organzation_id = '64446b5c-6d85-4d16-9ff2-94eddc0c2439'
-        ms_graph_service = MSGraphService(access_token=ms_token)
-        graph_user = ms_graph_service.get_me()
-        graph_org = ms_graph_service.get_organization(organzation_id)
-
-        aad_graph_service = AADGraphService(graph_org['id'], aad_token)
-        admin_ids = aad_graph_service.get_admin_ids()
-        license_ids = aad_graph_service.get_license_ids()
-
-        o365_user_service = O365UserService()
-        user_info = o365_user_service.get_client_user(graph_user, graph_org, admin_ids, license_ids)
-
-        LOCAL_USER.check_link_status(user_info)
-        auth_login(user_info)
-
-        request.set_cookie(constant.o365_username_cookie, user_info['display_name'])
-        request.set_cookie(constant.o365_email_cookie, user_info['mail'])

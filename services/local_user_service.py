@@ -5,6 +5,7 @@
 from account.models import LocalUser, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
 
 from django.contrib.auth.models import User
+from services.models import O365User
 
 class LocalUserService(object):
 
@@ -23,26 +24,22 @@ class LocalUserService(object):
             pass
         return result
 
-    def register(self, data):
-        email = data['Email']
-        password = data['Password']
-        favoriteColor = data['FavoriteColor']
-        ret = True
+    def register(self, email, password, favorite_color):
         try:
             user = User.objects.create(username=email)
             user.set_password(password)
             user.email = email
             user.save()
-            local = LocalUser(user=user, favoriteColor=favoriteColor)
+            local = LocalUser(user=user, favoriteColor=favorite_color)
             local.save()
+            return user
         except:
-            ret = False
-        return ret
+            return None
 
-    def create_organization(self, user_info):
-        organization = Organizations.objects.get_or_create(tenantId=user_info['tenant_id'])[0]
-        organization.name = user_info['tenant_name']
-        organization.isAdminConsented = True
+    def create_organization(self, tenant_id, tenant_name):
+        organization = Organizations.objects.get_or_create(tenantId=tenant_id)[0]
+        organization.name = tenant_name
+        #organization.isAdminConsented = True
         organization.save()
 
     def update_organization(self, user_info, label):
@@ -56,26 +53,44 @@ class LocalUserService(object):
         if organization:
             user_info['is_admin_consented'] = organization[0].isAdminConsented
 
-    def check_link_status(self, user_info):
-        user_info['are_linked'] = False
-        user_info['local_existed'] = False
-        user_info['local_message'] = ''
+    def get_user_by_o365_email(self, o365_email):
+        local_user = LocalUser.objects.filter(o365Email=o365_email).first()
+        if not local_user:
+            return None
+        return User.objects.filter(id=local_user.id).first()
 
-        o365_user_id = user_info['uid']
-        o365_user_mail = user_info['mail']
-        local_user = LocalUser.objects.filter(o365UserId=o365_user_id)
-        local_mail = User.objects.filter(username=o365_user_mail)
+
+    def get_o365_user(self, user):
+        local_user = LocalUser.objects.filter(id=user.id).first()
         if local_user:
-            user_obj = local_user[0]
-            if user_obj.o365UserId and user_obj.o365Email and user_obj.user.username:
-                user_info['are_linked'] = True
-                user_info['email'] = user_obj.user.username
-                user_info['o365Email'] = user_obj.o365Email
-        elif local_mail:
-            user_info['local_existed'] = True
-            user_info['local_message'] = 'There is a local account: %s matching your O365 account.' % o365_user_mail
-        else:
-            pass
+            display_name = '%s %s' % (user.first_name, user.last_name)
+            # TODO: get roles and tenant name
+            roles = []
+            tenant_id =''
+            tenant_name = ''
+            return O365User(user.id, local_user.o365Email, user.first_name, user.last_name, display_name, tenant_id, tenant_name, roles)
+        return None
+
+    # def check_link_status(self, user_info):
+    #     user_info['are_linked'] = False
+    #     user_info['local_existed'] = False
+    #     user_info['local_message'] = ''
+
+    #     o365_user_id = user_info['uid']
+    #     o365_user_mail = user_info['mail']
+    #     local_user = LocalUser.objects.filter(o365UserId=o365_user_id)
+    #     local_mail = User.objects.filter(username=o365_user_mail)
+    #     if local_user:
+    #         user_obj = local_user[0]
+    #         if user_obj.o365UserId and user_obj.o365Email and user_obj.user.username:
+    #             user_info['are_linked'] = True
+    #             user_info['email'] = user_obj.user.username
+    #             user_info['o365Email'] = user_obj.o365Email
+    #     elif local_mail:
+    #         user_info['local_existed'] = True
+    #         user_info['local_message'] = 'There is a local account: %s matching your O365 account.' % o365_user_mail
+    #     else:
+    #         pass
 
     def get_user(self, username):
         user_info = {}

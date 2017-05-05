@@ -3,6 +3,7 @@ import constant
 import uuid
 import jwt
 import requests
+from services.models import O365User, UnifiedUser
 '''
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
@@ -115,3 +116,13 @@ def validate_state(request):
 def get_id_token(request):
     id_token = request.POST.get('id_token')
     return jwt.decode(id_token, verify=False)
+
+
+
+    ########################################################3333
+
+
+
+
+def get_current_user(request):
+    return UnifiedUser(request)

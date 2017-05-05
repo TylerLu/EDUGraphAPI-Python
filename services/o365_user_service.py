@@ -4,67 +4,41 @@
 '''
 from constant import Roles
 from constant import O365ProductLicenses
+from services.models import O365User
+from services.ms_graph_service import MSGraphService
+from services.aad_graph_service import AADGraphService
 
 class O365UserService(object):
 
-    def get_client_user(self, graph_user, graph_organization, admin_ids, license_ids):
-        user_info = self._normalize_client_user_info(graph_user, graph_organization)
-        role = self._check_role(user_info['uid'], admin_ids, license_ids)
-        user_info['role'] = role
-        user_info['is_authenticated'] = True
-        user_info['is_admin'] = role == 'Admin'
-        user_info['is_student'] = role == 'Student'
-        return user_info
+    def __init__(self, tenant_id, ms_graph_access_token, aad_graph_service_access_token):
+        self._tenant_id = tenant_id
+        self._ms_graph_service = MSGraphService(ms_graph_access_token)
+        self._aad_graph_service = AADGraphService(self._tenant_id, aad_graph_service_access_token)
 
-    def _check_role(self, uid, admin_ids, sku_ids):
+    def get_o365_user(self):
+        me = self._ms_graph_service.get_me().to_dict()    
+        org = self._ms_graph_service.get_organization(self._tenant_id)
+
+        id = me['id']
+        first_name = me['givenName']
+        last_name = me['surname']
+        display_name = me['displayName']
+        email = me['mail']
+        if not email:
+            email = me['userPrincipalName']
+        tenant_name = org['displayName']
+        roles = self._get_roles(id) 
+        return O365User(id, email, first_name, last_name, display_name, self._tenant_id, tenant_name, roles)
+
+    def _get_roles(self, user_id):
         roles = []
-        role = ''
-        if uid in admin_ids:
+        admin_ids = self._aad_graph_service.get_admin_ids()
+        if user_id in admin_ids:
             roles.append('Admin')
-        else:
-            for sid in sku_ids:
-                if sid == O365ProductLicenses.Faculty or sid == O365ProductLicenses.FacultyPro:
-                    roles.append(Roles.Faculty)
-                if sid == O365ProductLicenses.Student or sid == O365ProductLicenses.StudentPro:
-                    roles.append(Roles.Student)
-        if roles:
-            if 'Admin' in roles:
-                role = 'Admin'
-            elif 'Faculty' in roles:
-                role = 'Teacher'
-            elif 'Student' in roles:
-                role = 'Student'
-        return role
-
-    def _assign_full_name(self, user_dict):
-        given_name = user_dict['givenName'].strip()
-        sur_name = user_dict['surname'].strip()
-        if given_name and sur_name:
-            full_name = given_name + ' ' + sur_name
-        else:
-            full_name = user_dict['displayName']
-        return full_name
-
-    def _assign_mail(self, user_dict):
-        mail = ''
-        if not user_dict['mail']:
-            mail = user_dict['userPrincipalName']
-        else:
-            mail = user_dict['mail']
-        return mail
-
-    def _normalize_client_user_info(self, graph_user, graph_organization):
-        '''
-        normalize sign in user info from MS Graph client
-        '''
-        user_dict = graph_user.to_dict()
-        user_info = {}
-        user_info['uid'] = user_dict['id']
-        user_info['mail'] = self._assign_mail(user_dict)
-        user_info['photo'] = '/Photo/UserPhoto/%s' % user_dict['id']
-        user_info['display_name'] = self._assign_full_name(user_dict)
-        user_info['first_name'] = user_dict['givenName']
-        user_info['last_name'] = user_dict['surname']
-        user_info['tenant_id'] = graph_organization['id']
-        user_info['tenant_name'] = graph_organization['displayName']
-        return user_info
+        license_ids = self._aad_graph_service.get_license_ids()
+        for license_id in license_ids:
+            if license_id == O365ProductLicenses.Faculty or license_id == O365ProductLicenses.FacultyPro:
+                roles.append(Roles.Faculty)
+            if license_id == O365ProductLicenses.Student or license_id == O365ProductLicenses.StudentPro:
+                roles.append(Roles.Student)
+        return roles

@@ -26,6 +26,8 @@ o365_username_cookie = "O365CookieUsername"
 
 o365_email_cookie = "O365CookieEmail"
 
+o365_user_session_key = '_o365_user'
+
 class Resources():
     AADGraph = "https://graph.windows.net/"
     MSGraph = "https://graph.microsoft.com/"
