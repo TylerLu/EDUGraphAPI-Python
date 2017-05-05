@@ -41,15 +41,6 @@ class RestApiService(object):
         response = self._send(method, url, s_headers)
         return json.loads(response.text)
     
-    def delete(self, url, token, headers=None):
-        method = 'DELETE'
-        s_headers = {'Accept': 'application/json',
-                     'Content-Type': 'application/json'}
-        self._set_header_token(s_headers, token)
-        if headers:
-            s_headers.update(headers)
-        self._send(method, url, s_headers)
-
     def get_img(self, url, token, headers=None):
         method = 'GET'
         s_headers = {'content-type': 'image/jpeg'}
@@ -85,17 +76,36 @@ class RestApiService(object):
             out_entity = dict((name, getattr(entity, name)) for name in dir(entity) if not name.startswith('__')  and not callable(getattr(entity, name)))
         return out_entity
 
+    def delete(self, url, token, headers=None):
+        method = 'DELETE'
+        s_headers = {'Accept': 'application/json',
+                     'Content-Type': 'application/json'}
+        self._set_header_token(s_headers, token)
+        if headers:
+            s_headers.update(headers)
+        self._send(method, url, s_headers)
+
+    def post_json(self, url, token, headers=None, data=None):
+        method = 'POST'
+        s_headers = {'Accept': 'application/json',
+                     'Content-Type': 'application/json'}
+        self._set_header_token(s_headers, token)
+        if headers:
+            s_headers.update(headers)
+        response = self._send(method, url, s_headers, data)
+
     def _set_header_token(self, headers, token):
         key = 'Authorization'
         value = 'Bearer {0}'.format(token)
         headers[key] = value
 
-    def _send(self, method, url, headers):
+    def _send(self, method, url, headers, data=None):
         session = requests.Session()
-        request = requests.Request(method, url, headers)
+        request = requests.Request(method, url, headers, data=data)
         prepped = request.prepare()
         response = session.send(prepped)
         if response.status_code < 200 or response.status_code > 299:
+            print(response.content)
             raise HttpRequestFailed(request, response)
         return response
 
