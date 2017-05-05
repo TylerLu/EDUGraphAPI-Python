@@ -11,7 +11,7 @@ import json
 import constant
 from decorator import login_required
 from services.token_service import TokenService
-from services.auth_service import login, get_user
+from services.auth_service import login, get_user, get_current_user
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
 from services.local_user_service import LocalUserService
@@ -22,9 +22,10 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
+    user = get_current_user(request)
     user_info = get_user()
 
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user_info['tenant_id'], token)
     user_info['school_id'] = education_service.get_school_id()

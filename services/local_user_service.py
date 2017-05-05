@@ -71,6 +71,9 @@ class LocalUserService(object):
             return O365User(user.id, local_user.o365Email, user.first_name, user.last_name, display_name, tenant_id, tenant_name, roles)
         return None
 
+    def get_user_by_email(email):
+        return User.objects.filter(email=email).first()
+
     # def check_link_status(self, user_info):
     #     user_info['are_linked'] = False
     #     user_info['local_existed'] = False
@@ -118,77 +121,29 @@ class LocalUserService(object):
          role.name = role_name
          role.save()
 
-    def create(self, user_info):
-        result = True
-        organization_obj = Organizations.objects.get(tenantId=user_info['tenant_id'])
-        try:
-            first_name = user_info['first_name']
-            last_name = user_info['last_name']
-            email = user_info['mail']
-            password = ''
-            o365_user_mail = user_info['mail']
-            o365_user_id = user_info['uid']
-            color = user_info['color']
-            user = User.objects.get_or_create(username=email)[0]
-            user.set_password(password)
-            user.email = email
-            user.first_name = first_name
-            user.last_name = last_name
-            user.save()
-            local = LocalUser(user=user)
-            local.o365UserId = o365_user_id
-            local.o365Email = o365_user_mail
-            local.favoriteColor = color
-            local.organization_id = organization_obj.id
-            local.save()
-        except Exception as e:
-            print(e)
-            result = False
-        return result
+    def create(self, o365_user):  #favorite_color     
+        user = User.objects.get_or_create(email=o365_user.email)[0]
+        user.set_password('')
+        user.username = o365_user.email
+        user.email = o365_user.email
+        user.first_name = o365_user.first_name
+        user.last_name = o365_user.last_name
+        user.save()  
+        return user;    
 
-    def link(self, user_info, data):
-        ret = True
-        organization_obj = Organizations.objects.get(tenantId=user_info['tenant_id'])
-        local_mail = data['Email']
-        first_name = user_info['first_name']
-        last_name = user_info['last_name']
-        o365_user_mail = user_info['mail']
-        o365_user_id = user_info['uid']
-        user = User.objects.get(username=local_mail)
-        if hasattr(user, 'localuser') and user.localuser.o365UserId:
-            ret = False
-        else:
-            user.first_name = first_name
-            user.last_name = last_name
-            user.save()
-            local = LocalUser.objects.get_or_create(user=user)[0]
-            local.o365UserId = o365_user_id
-            local.o365Email = o365_user_mail
-            local.organization_id = organization_obj.id
-            local.save()
-        return ret
+    def link(self, local_user, o365_user, favorite_color):         
+        org = Organizations.objects.get_or_create(tenantId=o365_user.tenant_id)[0]
+        org.tenantId = o365_user.tenant_id
+        org.name = o365_user.tenant_name
+        org.save()
 
-    def link_o365(self, local_user, o365_user):
-        ret = True
-        organization_obj = Organizations.objects.get(tenantId=o365_user['tenant_id'])
-        local_mail = local_user['mail']
-        first_name = o365_user['first_name']
-        last_name = o365_user['last_name']
-        o365_user_mail = o365_user['mail']
-        o365_user_id = o365_user['uid']
-        user = User.objects.get(username=local_mail)
-        if hasattr(user, 'localuser') and user.localuser.o365UserId:
-            ret = False
-        else:
-            user.first_name = first_name
-            user.last_name = last_name
-            user.save()
-            local = LocalUser.objects.get_or_create(user=user)[0]
-            local.o365UserId = o365_user_id
-            local.o365Email = o365_user_mail
-            local.organization_id = organization_obj.id
-            local.save()
-        return ret
+        link = LocalUser.objects.get_or_create(user_id=local_user.id)[0]
+        link.o365UserId = o365_user.id
+        link.o365Email = o365_user.email
+        link.favoriteColor = favorite_color
+        link.organization_id = org.id 
+        link.save()
+        return link
 
     def get_color(self, user_info):
         color = ''
@@ -278,3 +233,7 @@ class LocalUserService(object):
                 o365_user_id = item.o365UserId
                 UserRoles.objects.filter(o365UserId=o365_user_id).delete()
             local.update(o365UserId='', o365Email='', organization_id='')
+
+    def is_o365_user_linked(self, o365_user_id):
+        link = LocalUser.objects.filter(o365UserId=o365_user_id).first()
+        return link is not None

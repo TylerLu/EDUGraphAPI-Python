@@ -22,11 +22,11 @@
 	{% else %}
         <hr />
         <div class="form-horizontal">
-			{% if user.local_existed %}
-			<p>{{ user.local_message }}</p>
+			{% if local_existed %}
+			<p>{{ local_message }}</p>
 			{% endif %}
             <p>
-			{% if user.local_existed %}
+			{% if local_existed %}
 			<a class="btn btn-primary disabled" href="javascript:void(0)">Continue with new Local Account</a>
 			{% else %}
 			<a class="btn btn-primary" href="link/createlocal">Continue with new Local Account</a>
