@@ -77,6 +77,14 @@ class UnifiedUser(object):
         return self.o365_user is not None and 'Admin' in self.o365_user.roles
 
     @property
+    def is_teacher(self):
+        return self.o365_user is not None and 'Teacher' in self.o365_user.roles
+
+    @property
+    def is_student(self):
+        return self.o365_user is not None and 'Student' in self.o365_user.roles
+
+    @property
     def email(self):
         return self.local_user.email
 

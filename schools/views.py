@@ -23,59 +23,51 @@ TOKEN_SERVICE = TokenService()
 def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = get_current_user(request)
-    user_info = get_user()
-
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
-    education_service = EducationService(user_info['tenant_id'], token)
-    user_info['school_id'] = education_service.get_school_id()
-    user_info['school_uid'] = education_service.get_school_uid()
-    out_schools = education_service.get_schools(user_info['school_id'])
+    education_service = EducationService(user.tenant_id, token)
+    school_id = education_service.get_school_id()
+    school_user_id = education_service.get_school_user_id()
+    schools = education_service.get_schools(school_id)
 
-    login(user_info)
-    # set parameter for template
     parameter = {}
     parameter['links'] = links
-    parameter['user'] = user_info
-    parameter['schools'] = out_schools
+    parameter['user'] = user
+    parameter['schools'] = schools
+    parameter['school_user_id'] = school_user_id
     return render(request, 'schools/index.html', parameter)
 
 @login_required
 def classes(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-    user_info['is_in_a_school'] = True
-    user_info['school_object_id'] = school_object_id
-    login(user_info)
+    user = get_current_user(request)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    education_service = EducationService(user_info['tenant_id'], token)
+    education_service = EducationService(user.tenant_id, token)
+    school = education_service.get_school(school_object_id)
+    my_sections, mysection_emails = education_service.get_my_sections(school['id'])
+    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'], mysection_emails)
 
-    school_info = education_service.get_school(school_object_id)
-    my_sections, mysection_emails = education_service.get_my_sections(school_info['id'])
-    all_sections, sectionsnextlink = education_service.get_all_sections(school_info['id'], mysection_emails)
-
-    # set parameter for template
     parameter = {}
     parameter['links'] = links
-    parameter['user'] = user_info
-    parameter['school'] = school_info
+    parameter['user'] = user
+    parameter['school'] = school
     parameter['sectionsnextlink'] = sectionsnextlink
     parameter['sections'] = all_sections
     parameter['mysections'] = my_sections
+    parameter['school_object_id'] = school_object_id
     return render(request, 'schools/classes.html', parameter)
 
 @login_required
-def classnext(request, school_object_id):
+def classnext(request, school_object_id):    
     nextlink = request.GET.get('nextLink')
-    user_info = get_user()
+    user = get_current_user(request)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    education_service = EducationService(user_info['tenant_id'], token)
-
-    school_info = education_service.get_school(school_object_id)
-    my_sections, mysection_emails = education_service.get_my_sections(school_info['id'])
-    all_sections, sectionsnextlink = education_service.get_all_sections(school_info['id'], mysection_emails, nextlink=nextlink)
+    education_service = EducationService(user.tenant_id, token)
+    school = education_service.get_school(school_object_id)
+    my_sections, mysection_emails = education_service.get_my_sections(school['id'])
+    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'], mysection_emails, nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Sections'] = {}
@@ -87,13 +79,14 @@ def classnext(request, school_object_id):
 @login_required
 def classdetails(request, school_object_id, class_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-    user_info['class_object_id'] = class_object_id
-    user_info['color'] = LOCAL_USER.get_color(user_info)
-    login(user_info)
+    user = get_current_user(request)
 
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    education_service = EducationService(user_info['tenant_id'], token)
+    # user_info['class_object_id'] = class_object_id
+    # user_info['color'] = LOCAL_USER.get_color(user_info)
+    # login(user_info)
+
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)
 
     school_info = education_service.get_school(school_object_id)
     section_info = education_service.get_section(class_object_id)
@@ -107,7 +100,7 @@ def classdetails(request, school_object_id, class_object_id):
     # set seatrange
     seatrange = range(1, 37)
 
-    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user_info['uid'])
+    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     ms_graph_service = MSGraphService(access_token=ms_token)
 
     out_documents = ms_graph_service.get_documents(class_object_id)
@@ -118,7 +111,7 @@ def classdetails(request, school_object_id, class_object_id):
     # set parameter for template
     parameter = {}
     parameter['links'] = links
-    parameter['user'] = user_info
+    parameter['user'] = user
     parameter['school'] = school_info
     parameter['section'] = section_info
     parameter['teachers'] = out_teachers
@@ -128,6 +121,9 @@ def classdetails(request, school_object_id, class_object_id):
     parameter['conversations'] = out_conversations
     parameter['conversations_root'] = conversations_root
     parameter['seatrange'] = seatrange
+    parameter['school_object_id'] = school_object_id
+    parameter['class_object_id'] = class_object_id
+    parameter['favoriate_color'] = '' #TODO
     return render(request, 'schools/classdetails.html', parameter)
 
 @login_required
@@ -140,37 +136,36 @@ def saveseat(request):
 @login_required
 def users(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
+    user = get_current_user(request)
 
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    education_service = EducationService(user_info['tenant_id'], token)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, request.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)
 
-    school_info = education_service.get_school(school_object_id)
+    school = education_service.get_school(school_object_id)
     out_users, usersnextlink = education_service.get_members(school_object_id)
-    out_teachers, teachersnextlink = education_service.get_teachers(school_info['id'])
-    out_students, studentsnextlink = education_service.get_students(school_info['id'])
+    out_teachers, teachersnextlink = education_service.get_teachers(school['id'])
+    out_students, studentsnextlink = education_service.get_students(school['id'])
 
     # set parameter for template
     parameter = {}
     parameter['links'] = links
-    parameter['user'] = user_info
-    parameter['school'] = school_info
+    parameter['user'] = user
+    parameter['school'] = school
     parameter['users'] = out_users
     parameter['teachers'] = out_teachers
     parameter['students'] = out_students
     parameter['usersnextlink'] = usersnextlink
     parameter['studentsnextlink'] = studentsnextlink
     parameter['teachersnextlink'] = teachersnextlink
+    parameter['school_object_id'] = school_object_id
     return render(request, 'schools/users.html', parameter)
 
 @login_required
 def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = get_user()
-
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    education_service = EducationService(user_info['tenant_id'], token)
-
+    user = get_current_user(request)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)
     out_users, usersnextlink = education_service.get_members(school_object_id, nextlink=nextlink)
 
     ajax_result = {}
@@ -182,12 +177,11 @@ def usernext(request, school_object_id):
 @login_required
 def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user_info = get_user()
-
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    education_service = EducationService(user_info['tenant_id'], token)
-
-    out_students, studentsnextlink = education_service.get_students(user_info['school_id'], nextlink=nextlink)
+    user = get_current_user(request)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)    
+    school = education_service.get_school(school_object_id)
+    out_students, studentsnextlink = education_service.get_students(school['id'], nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Students'] = {}
@@ -199,11 +193,10 @@ def studentnext(request, school_object_id):
 def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user_info = get_user()
-
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    education_service = EducationService(user_info['tenant_id'], token)
-
-    out_teachers, teachersnextlink = education_service.get_students(user_info['school_id'], nextlink=nextlink)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)   
+    school = education_service.get_school(school_object_id)
+    out_teachers, teachersnextlink = education_service.get_students(school['id'], nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Teachers'] = {}

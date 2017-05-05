@@ -17,7 +17,7 @@
     	<div class="container">
             <div class="col-md-6 secondnav">
                 <a href="/Schools"> All Schools</a>
-				> <a href="/Schools/{{ user.school_object_id }}/Classes">{{ school.name }}</a>
+				> <a href="/Schools/{{ school_object_id }}/Classes">{{ school.name }}</a>
 				> {{ section.course_name }}
             </div>
         </div>
@@ -143,7 +143,7 @@
 					{% if not user.is_student %}
 					<div class="tip"> To assign seats for each student, drag and drop student profile icons below onto the seating map to the right.</div>
 					{% else %}
-					<div class="assignseat tip"><div class="greenicon" style="background-color:{{ user.color }}"></div>Your assigned seat </div>
+					<div class="assignseat tip"><div class="greenicon" style="background-color:{{ favoriate_color }}"></div>Your assigned seat </div>
 					{% endif %}
                     <ul id="lstproducts">
 						{% for student in students %}

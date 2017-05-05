@@ -52,7 +52,7 @@
 		{% else %}
 		<div class="content">
 		{% for user in users %}
-			{% if user.object_type == 'Teacher' %}
+			{% if user.is_teacher %}
 			<div class="element teacher-bg">
 			{% else %}
 			<div class="element student-bg">
@@ -129,7 +129,7 @@
 		{% endif %}
 	</div>
 </div>
-<input id="school-objectid" type="hidden" value="{{ user.school_object_id }}" />
+<input id="school-objectid" type="hidden" value="{{ school_object_id }}" />
 </div>
 {% endblock %}
 
@@ -144,5 +144,6 @@
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/respond.js"></script>
 <script src="/static/js/site.js"></script>
-<script src="/static/js/users.js"></script>
+<script src="/static/js/users.js"></script>
+
 {% endblock %}
