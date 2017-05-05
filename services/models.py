@@ -87,6 +87,11 @@ class UnifiedUser(object):
     @property
     def o365_user_id(self):
         return self.o365_user.id
+
+        
+    @property
+    def tenant_id(self):
+        return self.o365_user.tenant_id
         
     @property
     def is_local(self):

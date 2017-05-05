@@ -11,7 +11,7 @@
 
 {% block content %}
 <h2>Admin</h2>
-{% if not user.is_admin_consented %}
+{% if not is_admin_consented %}
     <div>
         <h3>Admin Consent</h3>
         <hr />

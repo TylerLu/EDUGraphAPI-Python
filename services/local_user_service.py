@@ -42,16 +42,14 @@ class LocalUserService(object):
         #organization.isAdminConsented = True
         organization.save()
 
-    def update_organization(self, user_info, label):
-        organization = Organizations.objects.filter(tenantId=user_info['tenant_id'])
+    def update_organization(self, tenant_id, is_admin_consented):
+        organization = Organizations.objects.filter(tenantId=tenant_id)
         if organization:
-            organization.update(isAdminConsented=label)
+            organization.update(isAdminConsented=is_admin_consented)
 
-    def check_admin(self, user_info):
-        user_info['is_admin_consented'] = False
-        organization = Organizations.objects.filter(tenantId=user_info['tenant_id'])
-        if organization:
-            user_info['is_admin_consented'] = organization[0].isAdminConsented
+    def is_tenant_consented(self, tenant_id):
+        org = Organizations.objects.filter(tenantId=tenant_id).filter().first()
+        return org is not None and org.isAdminConsented
 
     def get_user_by_o365_email(self, o365_email):
         local_user = LocalUser.objects.filter(o365Email=o365_email).first()
@@ -64,10 +62,10 @@ class LocalUserService(object):
         local_user = LocalUser.objects.filter(id=user.id).first()
         if local_user:
             display_name = '%s %s' % (user.first_name, user.last_name)
-            # TODO: get roles and tenant name
-            roles = []
-            tenant_id =''
-            tenant_name = ''
+            # TODO: get roles
+            roles = [ 'Admin' ]
+            tenant_id =user.organization.tenantId
+            tenant_name = user.organization.name
             return O365User(user.id, local_user.o365Email, user.first_name, user.last_name, display_name, tenant_id, tenant_name, roles)
         return None
 
@@ -204,18 +202,18 @@ class LocalUserService(object):
             o365Email = local[0].o365Email
         return email, o365Email
 
-    def get_links(self, tenant_id):
+    def get_linked_accounts(self, tenant_id):
         organization_obj = Organizations.objects.get(tenantId=tenant_id)
-        links = []
-        links_obj = LocalUser.objects.filter(organization_id=organization_obj.id)
-        for link in links_obj:
-            if link.user.email and link.o365Email:
+        accounts = []
+        profiles = LocalUser.objects.filter(organization_id=organization_obj.id)        
+        for profile in profiles:
+            if profile and profile.o365Email:
                 record = {}
-                record['id'] = link.id
-                record['email'] = link.user.username
-                record['o365Email'] = link.o365Email
-                links.append(record)
-        return links
+                record['id'] = profile.id
+                record['email'] = profile.user.username
+                record['o365Email'] = profile.o365Email
+                accounts.append(record)
+        return accounts
 
     def remove_link(self, link_id):
         local = LocalUser.objects.filter(id=link_id)

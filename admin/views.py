@@ -9,7 +9,7 @@ from django.conf import settings
 
 import constant
 from decorator import admin_only, login_required
-from services.auth_service import get_user
+from services.auth_service import get_user, get_current_user, get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri, get_current_user
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService
 from services.aad_graph_service import AADGraphService
@@ -23,11 +23,11 @@ TOKEN_SERVICE = TokenService()
 @admin_only
 def admin(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-    LOCAL_USER.check_admin(user_info)
+    user = get_current_user(request)
     parameter = {}
     parameter['links'] = links
-    parameter['user'] = user_info
+    parameter['user'] = user
+    parameter['is_admin_consented'] = LOCAL_USER.is_tenant_consented(user.tenant_id)
     if request.session['Message']:
         parameter['message'] = request.session['Message'].split('\r\n')
         request.session['Message'] = ''
@@ -37,10 +37,9 @@ def admin(request):
 @admin_only
 def linked_accounts(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-    user_links = LOCAL_USER.get_links(user_info['tenant_id'])
+    user = get_current_user(request)
+    user_links = LOCAL_USER.get_linked_accounts(user.tenant_id)
     parameter = {}
-    parameter['user'] = user_info
     parameter['user_links'] = user_links
     parameter['links'] = links
     return render(request, 'admin/linkaccounts.html', parameter)
@@ -48,83 +47,68 @@ def linked_accounts(request):
 @login_required
 @admin_only
 def unlink_account(request, link_id):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-    parameter = {}
-    parameter['links'] = links
     if request.method == 'POST':
         LOCAL_USER.remove_link(link_id)
-        user_links = LOCAL_USER.get_links(user_info['tenant_id'])
-        parameter['user_links'] = user_links
-        return render(request, 'admin/linkaccounts.html', parameter)
+        return HttpResponseRedirect('/Admin/LinkedAccounts')
     else:
+        links = settings.DEMO_HELPER.get_links(request.get_full_path())
+        user = get_current_user(request)
+        parameter = {}
+        parameter['links'] = links
+
         email, o365Email = LOCAL_USER.get_link(link_id)
         parameter['email'] = email
         parameter['o365Email'] = o365Email
         return render(request, 'admin/unlinkaccounts.html', parameter)
 
-@login_required
-@admin_only
-def consent(request):
-    scheme = request.scheme
-    host = request.get_host()
-    redirect_uri = '%s://%s/Admin/ProcessCode' % (scheme, host)
-    consent_url = constant.admin_consent_url + redirect_uri
-    return HttpResponseRedirect(consent_url)
+def consent(request):    
+    user = get_current_user(request)
+    extra_params = {
+        'scope': 'openid+profile',
+        'nonce': get_random_string(),
+        'prompt': 'admin_consent'
+    }
+    if user.o365_user:
+        extra_params['login_hint'] = user.o365_email    
+    o365_login_url = get_authorization_url(request, 'code+id_token', 'Admin/ProcessCode', get_random_string(), extra_params) 
+    return HttpResponseRedirect(o365_login_url)
 
 def process_code(request):
-    scheme = request.scheme
-    host = request.get_host()
-    redirect_uri = '%s://%s/Admin/ProcessCode' % (scheme, host)
-    code = request.GET.get('code', '')
+    validate_state(request)
+    id_token = get_id_token(request)    
+    tenant_id = id_token.get('tid')
 
-    aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
-    o365_user_id = aad_auth_result.get('oid')    
-    organzation_id = '64446b5c-6d85-4d16-9ff2-94eddc0c2439'
-    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)
-    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
+    LOCAL_USER.update_organization(tenant_id, True)
+    message = 'Admin consented successfully!'
 
-    ms_graph_service = MSGraphService(access_token=ms_token)
-    graph_user = ms_graph_service.get_me()
-    graph_org = ms_graph_service.get_organization(organzation_id)
-    
-    aad_graph_service = AADGraphService(graph_org['id'], aad_token)
-    admin_ids = aad_graph_service.get_admin_ids()
-    license_ids = aad_graph_service.get_license_ids()
-
-    o365_user_service = O365UserService()
-    user_info = o365_user_service.get_client_user(graph_user, graph_org, admin_ids, license_ids)
-
-    LOCAL_USER.update_organization(user_info, True)
-    LOCAL_USER.check_link_status(user_info)
-
-    request.session['Message'] = 'Admin consented successfully!'
-    return HttpResponseRedirect('/Admin')
+    user = get_current_user(request)
+    if user.is_authenticated:
+        request.session['Message'] = message
+        return HttpResponseRedirect('/Admin')
+    else:
+        return HttpResponseRedirect('/Admin/Consent?consented=true')
 
 @login_required
 @admin_only
 def unconsent(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-
-    LOCAL_USER.update_organization(user_info, False)
-    LOCAL_USER.remove_links(user_info['tenant_id'])
+    user = get_current_user(request)
     
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    aad_graph_service = AADGraphService(user_info['tenant_id'], token)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    aad_graph_service = AADGraphService(user.tenant_id, token)
     app_id = aad_graph_service.get_app_id()
     aad_graph_service.delete_app(app_id)
+    
+    LOCAL_USER.update_organization(user.tenant_id, False)
+    LOCAL_USER.remove_links(user.tenant_id)
 
-    parameter = {}
-    parameter['links'] = links
-    parameter['user'] = user_info
     request.session['Message'] = 'Admin unconsented successfully!'
     return HttpResponseRedirect('/Admin')
 
 def add_app_roles(request):
-    user_info = get_user()
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user_info['uid'])
-    aad_graph_service = AADGraphService(user_info['tenant_id'], token)
+    user = get_current_user(request)
+    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    aad_graph_service = AADGraphService(user.tenant_id, token)
     app_id = aad_graph_service.get_app_id()
     app_name = aad_graph_service.get_app_name()
 
@@ -135,22 +119,14 @@ def add_app_roles(request):
     aad_graph_service.add_app_users(app_id, app_name)
     count = 0
     request.session["Message"] = 'User access was successfully enabled for %d user(s).' % count if count > 0 else 'User access was enabled for all users.'
-    return HttpResponseRedirect("/Admin");
+    return HttpResponseRedirect("/Admin")
 
 def consent_alone(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user_info = get_user()
-    user_info['is_authenticated'] = False
     parameter = {}
     parameter['links'] = links
-    parameter['user'] = user_info
-    parameter['consented'] = True
+    if request.GET.get('consented') == 'true':
+        parameter['consented'] = True
     return render(request, 'admin/consent.html', parameter)
 
-def only_consent(request):
-    scheme = request.scheme
-    host = request.get_host()
-    redirect_uri = '%s://%s/Auth/O365/Callback' % (scheme, host)
-    consent_url = constant.admin_consent_url + redirect_uri
-    return HttpResponseRedirect(consent_url)
 

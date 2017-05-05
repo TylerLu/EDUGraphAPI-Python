@@ -61,5 +61,4 @@ urlpatterns = [
     url(r'^Consent', admin_views.consent, name='consent'),
     url(r'^Unconsent', admin_views.unconsent, name='unconsent'),
     url(r'^Admin/Consent', admin_views.consent_alone, name='consent_alone'),
-    url(r'^OnlyConsent', admin_views.only_consent, name='only_consent'),
 ]
