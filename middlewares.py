@@ -27,12 +27,12 @@ class HandleRefreshTokenExceptionMiddleware(MiddlewareMixin):
         signin_url = base_uri + 'response_type=code&client_id=%s&redirect_uri=%s' % (client_id, redirect_uri)
         return signin_url
 
-from services.auth_service import login, get_user
+# from services.auth_service import login, get_user
 
-class HandleUserAuthMiddleware(MiddlewareMixin):
+# class HandleUserAuthMiddleware(MiddlewareMixin):
 
-    def process_request(self, request):
-        if not isinstance(request.user, dict):
-            login(request)
-        else:
-            request.user = get_user()
+#     def process_request(self, request):
+#         if not isinstance(request.user, dict):
+#             login(request)
+#         else:
+#             request.user = get_user()

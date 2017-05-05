@@ -11,7 +11,7 @@ from django.conf import settings
 import constant
 from decorator import login_required
 from services.token_service import TokenService
-from services.auth_service import login, get_user, get_current_user, get_random_string, get_authorization_url, validate_state, get_id_token, get_redirect_uri
+from services.auth_service import get_current_user, get_random_string, get_authorization_url, validate_state, get_id_token, get_redirect_uri
 from services.ms_graph_service import MSGraphService
 from services.aad_graph_service import AADGraphService
 from services.o365_user_service import O365UserService

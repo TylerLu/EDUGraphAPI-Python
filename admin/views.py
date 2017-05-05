@@ -9,7 +9,7 @@ from django.conf import settings
 
 import constant
 from decorator import admin_only, login_required
-from services.auth_service import get_user, get_current_user, get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri, get_current_user
+from services.auth_service import get_current_user, get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri, get_current_user
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService
 from services.aad_graph_service import AADGraphService
