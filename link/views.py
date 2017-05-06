@@ -24,7 +24,7 @@ link_service = LinkService()
 
 @login_required
 def link(request):
-    user = AuthService.get_current_user(request)  
+    user = AuthService.get_current_user(request)
     context = {'user': user}
     if not user.are_linked and user.is_o365:
         local_user = user_service.get_user_by_o365_email(user.o365_email)
@@ -54,12 +54,12 @@ def create_local(request):
         if create_local_form.is_valid():
             data = create_local_form.clean()
         try:
-            local_user = user_service.create(user.o365_user)  
-        except Exception as e:
+            local_user = user_service.create(user.o365_user)
+        except:
             errors.append('Name %s is already taken.' % user.o365_email)
             errors.append("Email '%s' is already taken." % user.o365_email)
             context['errors'] = errors
-            return render(request, 'link/createlocal.html', context)                 
+            return render(request, 'link/createlocal.html', context)
         link_service.link(local_user, user.o365_user)
         user_service.update_favorite_color(data['FavoriteColor'], local_user.id)
         local_user = user_service.get_user(local_user.id) # reload local user
@@ -94,15 +94,6 @@ def login_local(request):
             return render(request, 'link/loginlocal.html', context)
     # GET /link/loginlocal
     else:
-        # if user_info['local_existed']:
-        #     data = {'Email': user_info['mail']}
-        #     user_service.link(user_info, data)
-        #     user_info['are_linked'] = True
-        #     user_info['email'] = user_info['mail']
-        #     user_info['o365Email'] = user_info['mail']
-        #     login(user_info)
-        #     return HttpResponseRedirect('/')
-        # else:
         return render(request, 'link/loginlocal.html', context)
 
 def login_o365(request):
@@ -111,14 +102,14 @@ def login_o365(request):
         'nonce': AuthService.get_random_string(),
         'prompt': 'login'
     }
-    o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'link/ProcessCode', AuthService.get_random_string(), extra_params) 
+    o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'link/ProcessCode', AuthService.get_random_string(), extra_params)
     return HttpResponseRedirect(o365_login_url)
 
-def process_code(request):    
+def process_code(request):
     AuthService.validate_state(request)
     code = request.POST.get('code')
     id_token = AuthService.get_id_token(request)
-    
+
     o365_user_id = id_token.get('oid')
     tenant_id = id_token.get('tid')
 
@@ -126,17 +117,17 @@ def process_code(request):
         request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % id_token.get('email')
         return HttpResponseRedirect('/link')
 
-    redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
+    redirect_uri = AuthService.get_redirect_uri(request, 'link/ProcessCode')
     auth_result = token_service.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
-    token_service.cache_tokens(auth_result, o365_user_id) 
-    
+    token_service.cache_tokens(auth_result, o365_user_id)
+
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
-    o365_user = ms_graph_service.get_o365_user(tenant_id)  
-    AuthService.set_o365_user(reqeust, o365_user)
+    o365_user = ms_graph_service.get_o365_user(tenant_id)
+    AuthService.set_o365_user(request, o365_user)
 
     user = AuthService.get_current_user(request)
-    link_service.link(user.local_user, o365_user, None)
- 
+    link_service.link(user.local_user, o365_user)
+
     response =  HttpResponseRedirect('/')
     response.set_cookie(constant.o365_username_cookie, o365_user.display_name)
     response.set_cookie(constant.o365_email_cookie, o365_user.email)
