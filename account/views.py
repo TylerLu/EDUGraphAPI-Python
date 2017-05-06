@@ -5,8 +5,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 
-from django.contrib.auth import login as auth_login 
-from django.contrib.auth import logout as auth_logout 
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import authenticate as auth_authenticate
 
 from django.conf import settings
@@ -29,7 +29,7 @@ def index(request):
     if not user.is_authenticated:
         return HttpResponseRedirect('/Account/Login')
     if not user.are_linked:
-        return HttpResponseRedirect('/link')    
+        return HttpResponseRedirect('/link')
     if user.is_admin:
         return HttpResponseRedirect('/Admin')
     else:
@@ -74,7 +74,7 @@ def login(request):
             parameter['username'] = o365_username
             parameter['email'] = o365_email
             return render(request, 'account/O365login.html', parameter)
-        else:    
+        else:
             user_form = UserInfo()
             parameter['user_form'] = user_form
             return render(request, 'account/login.html', parameter)
@@ -87,7 +87,7 @@ def o365_login(request):
     o365_email = request.COOKIES.get(constant.o365_email_cookie)
     if o365_email:
         extra_params['login_hint'] = o365_email
-    o365_login_url = get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', get_random_string(), extra_params) 
+    o365_login_url = get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', get_random_string(), extra_params)
     return HttpResponseRedirect(o365_login_url)
 
 def relogin(request):
@@ -100,7 +100,7 @@ def o365_auth_callback(request):
     validate_state(request)
     code = request.POST.get('code')
     id_token = get_id_token(request)
-    
+
     o365_user_id = id_token.get('oid')
     tenant_id = id_token.get('tid')
 
@@ -116,7 +116,7 @@ def o365_auth_callback(request):
     local_user = LOCAL_USER.get_user_by_o365_email(o365_user.email)
     if local_user:
         login(local_user)
- 
+
     response =  HttpResponseRedirect('/')
     response.set_cookie(constant.o365_username_cookie, o365_user.display_name)
     response.set_cookie(constant.o365_email_cookie, o365_user.email)
