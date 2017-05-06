@@ -11,14 +11,14 @@ class RefreshTokenException(Exception):
     pass
 
 class TokenService(object):
-    '''    
-    This class is responsible for cache and retrieve tokens to and from the backend database. 
+    '''
+    This class is responsible for cache and retrieve tokens to and from the backend database.
     In this sample, tokens are cached in clear text in database. For real projects, they should be encrypted.
     '''
     def __init__(self):
         pass
 
-    def get_token_with_code(self, code, redirect_uri, resource):        
+    def get_token_with_code(self, code, redirect_uri, resource):
         auth_context = adal.AuthenticationContext(constant.authorize_token_uri)
         result = auth_context.acquire_token_with_authorization_code(code, redirect_uri, resource, constant.client_id, constant.client_secret)
         return result
@@ -51,12 +51,12 @@ class TokenService(object):
     def _refresh_token(self, resource, o365_user_id):
         cache = TokenCache.objects.filter(o365UserId=o365_user_id).order_by('-expiresOn').first()
         if cache is None:
-            raise RefreshTokenException
+            raise RefreshTokenException('cache is None')
         try:
             auth_context = adal.AuthenticationContext(constant.authorize_token_uri)
             auth_result = auth_context.acquire_token_with_refresh_token(cache.refreshToken, constant.client_id, resource, constant.client_secret)
         except:
-            raise RefreshTokenException
+            raise RefreshTokenException('refresh is Error')
         return auth_result
 
     def _create_or_update_token(self, auth_result, o365UserId):
