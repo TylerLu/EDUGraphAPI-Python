@@ -17,13 +17,13 @@ class UserService(object):
             user = User.objects.create(username=email)
             user.set_password(password)
             user.email = email
-            user.profile.favoriteColor = favoriteColor
+            user.profile.favoriteColor = favorite_color
             user.save()
             return user
         except Exception as e:
             print(e)
             return None
-    
+
     def create(self, o365_user):  #favorite_color
         user = User.objects.get_or_create(email=o365_user.email)[0]
         user.set_password('')
@@ -76,7 +76,7 @@ class UserService(object):
          role = UserRoles.objects.get_or_create(o365UserId=uid)[0]
          role.name = role_name
          role.save()
-    
+
     def get_favorite_color(self, user_id):
         profile = Profile.objects.filter(user_id=user_id).first()
         if profile:
@@ -93,7 +93,7 @@ class UserService(object):
         profile = Profile.objects.filter(user_id=user_id).first()
         if profile:
             profile.favoriteColor = color
-            profile.save()        
+            profile.save()
 
     def get_positions(self, students, class_id):
         for student in students:

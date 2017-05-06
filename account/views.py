@@ -148,10 +148,10 @@ def register(request):
             else:
                 errors.append('Name %s is already taken.' % data['Email'])
                 errors.append("Email '%s' is already taken." % data['Email'])
-                return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'errors':errors, 'links':links})
+                return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'errors':errors})
     # get /Account/Register
     else:
-        return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'links':links})
+        return render(request, 'account/register.html', {'user_reg_form':user_reg_form})
 
 @login_required
 def logoff(request):
