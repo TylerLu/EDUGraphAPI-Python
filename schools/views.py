@@ -5,8 +5,7 @@
 
 import json
 import constant
-from django.conf import settings
-from django.shortcuts import render
+from utils.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from decorator import login_required
 from services.token_service import TokenService
@@ -20,7 +19,6 @@ token_service = TokenService()
 
 @login_required
 def schools(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
@@ -30,7 +28,6 @@ def schools(request):
     schools = education_service.get_schools(school_id)
 
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     parameter['schools'] = schools
     parameter['school_user_id'] = school_user_id
@@ -38,7 +35,6 @@ def schools(request):
 
 @login_required
 def classes(request, school_object_id):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
@@ -48,7 +44,6 @@ def classes(request, school_object_id):
     all_sections, sectionsnextlink = education_service.get_all_sections(school['id'], mysection_emails)
 
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     parameter['school'] = school
     parameter['sectionsnextlink'] = sectionsnextlink
@@ -77,7 +72,6 @@ def classnext(request, school_object_id):
 
 @login_required
 def classdetails(request, school_object_id, class_object_id):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
 
     # user_info['class_object_id'] = class_object_id
@@ -113,7 +107,6 @@ def classdetails(request, school_object_id, class_object_id):
 
     # set parameter for template
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     parameter['school'] = school_info
     parameter['section'] = section_info
@@ -138,7 +131,6 @@ def saveseat(request):
 
 @login_required
 def users(request, school_object_id):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
 
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -151,7 +143,6 @@ def users(request, school_object_id):
 
     # set parameter for template
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     parameter['school'] = school
     parameter['users'] = out_users

@@ -2,7 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
-from django.shortcuts import render
+from utils.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 
 from django.contrib.auth import login as auth_login
@@ -36,9 +36,7 @@ def index(request):
         return HttpResponseRedirect('/Schools')
 
 def login(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     parameter = {}
-    parameter['links'] = links
     # TODO: split the post to a new method
     # post /Account/Login
     if request.method == 'POST':
@@ -68,9 +66,7 @@ def login(request):
         o365_username = request.COOKIES.get(constant.o365_username_cookie)
         o365_email = request.COOKIES.get(constant.o365_email_cookie)
         if o365_username and o365_email:
-            links = settings.DEMO_HELPER.get_links(request.get_full_path())
             parameter = {}
-            parameter['links'] = links
             parameter['username'] = o365_username
             parameter['email'] = o365_email
             return render(request, 'account/O365login.html', parameter)
@@ -115,7 +111,7 @@ def o365_auth_callback(request):
     user_service.create_or_update_organization(tenant_id, o365_user._tenant_name)
     local_user = user_service.get_user_by_o365_email(o365_user.email)
     if local_user:
-        login(local_user)
+        auth_login(request, local_user)
 
     response =  HttpResponseRedirect('/')
     response.set_cookie(constant.o365_username_cookie, o365_user.display_name)
