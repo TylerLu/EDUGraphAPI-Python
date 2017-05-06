@@ -13,24 +13,25 @@ from decorator import login_required
 from services.token_service import TokenService
 from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
-from services.local_user_service import LocalUserService
+from services.user_service import UserService
+from services.link_service import LinkService
 
 from .forms import CreateLocalInfo, LoginLocalInfo
 
-LOCAL_USER = LocalUserService()
-TOKEN_SERVICE = TokenService()
+token_service = TokenService()
+user_service = UserService()
+link_service = LinkService()
 
 @login_required
 def link(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
   
-    # set parameter for template
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user
     if not user.are_linked and user.is_o365:
-        local_user = LOCAL_USER.get_user_by_o365_email(user.o365_email)
+        local_user = user_service.get_user_by_o365_email(user.o365_email)
         if local_user:
             parameter['local_existed'] = True
             parameter['local_message'] = 'There is a local account: %s matching your O365 account.' % user.o365_email
@@ -58,13 +59,14 @@ def create_local(request):
         if create_local_form.is_valid():
             data = create_local_form.clean()
         try:
-            local_user = LOCAL_USER.create(user.o365_user)  
+            local_user = user_service.create(user.o365_user)  
         except Exception as e:
             errors.append('Name %s is already taken.' % user.o365_email)
             errors.append("Email '%s' is already taken." % user.o365_email)
             parameter['errors'] = errors
             return render(request, 'link/createlocal.html', parameter)        
-        LOCAL_USER.link(local_user, user.o365_user, data['FavoriteColor'])
+        link_service.link(local_user, user.o365_user)
+        user_service.update_favorite_color(data['FavoriteColor'], user.user_id)
         auth_login(request, local_user)
         return HttpResponseRedirect('/')
     # GET /link/createlocal
@@ -91,7 +93,7 @@ def login_local(request):
             local_user = auth_authenticate(username=email, password=password)
             if local_user:
                 import pdb; pdb.set_trace()
-                LOCAL_USER.link(local_user, user.o365_user, None)
+                link_service.link(local_user, user.o365_user, None)
                 auth_login(request, local_user)
                 return HttpResponseRedirect('/')
             else:
@@ -102,7 +104,7 @@ def login_local(request):
     else:
         # if user_info['local_existed']:
         #     data = {'Email': user_info['mail']}
-        #     LOCAL_USER.link(user_info, data)
+        #     user_service.link(user_info, data)
         #     user_info['are_linked'] = True
         #     user_info['email'] = user_info['mail']
         #     user_info['o365Email'] = user_info['mail']
@@ -128,20 +130,20 @@ def process_code(request):
     o365_user_id = id_token.get('oid')
     tenant_id = id_token.get('tid')
 
-    if LOCAL_USER.is_o365_user_linked(o365_user_id):
+    if link_service.is_linked(o365_user_id):
         request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % id_token.get('email')
         return HttpResponseRedirect('/link')
 
     redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
-    auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
-    TOKEN_SERVICE.cache_tokens(auth_result, o365_user_id) 
+    auth_result = token_service.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
+    token_service.cache_tokens(auth_result, o365_user_id) 
     
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
     o365_user = ms_graph_service.get_o365_user(tenant_id)  
     AuthService.set_o365_user(reqeust, o365_user)
 
     user = AuthService.get_current_user(request)
-    LOCAL_USER.link(user.local_user, o365_user, None)
+    link_service.link(user.local_user, o365_user, None)
  
     response =  HttpResponseRedirect('/')
     response.set_cookie(constant.o365_username_cookie, o365_user.display_name)

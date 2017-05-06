@@ -80,7 +80,9 @@ class EducationService(object):
         mysection_list = []
         version = '?api-version=1.5'
         url = self.api_base_uri + 'me/memberOf' + version
+        
         section_list = self.rest_api_service.get_object_list(url, self.token, model=Section)
+        section_list = [s for s in section_list if s.get('object_type') == 'Group' and s.get('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType') == 'Section']
 
         for section in section_list:
             if load_members:

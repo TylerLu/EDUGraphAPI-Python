@@ -14,16 +14,16 @@ from services.token_service import TokenService
 from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
-from services.local_user_service import LocalUserService
+from services.user_service import UserService
 
-LOCAL_USER = LocalUserService()
-TOKEN_SERVICE = TokenService()
+user_service = UserService()
+token_service = TokenService()
 
 @login_required
 def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
     school_id = education_service.get_school_id()
@@ -41,7 +41,7 @@ def schools(request):
 def classes(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
@@ -62,7 +62,7 @@ def classes(request, school_object_id):
 def classnext(request, school_object_id):    
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
@@ -82,10 +82,10 @@ def classdetails(request, school_object_id, class_object_id):
     user = AuthService.get_current_user(request)
 
     # user_info['class_object_id'] = class_object_id
-    # user_info['color'] = LOCAL_USER.get_color(user_info)
+    # user_info['color'] = user_service.get_color(user_info)
     # login(user_info)
 
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
 
     school_info = education_service.get_school(school_object_id)
@@ -94,13 +94,17 @@ def classdetails(request, school_object_id, class_object_id):
     out_students = education_service.get_section_members(class_object_id, 'Student')
 
     # get students position from database
-    LOCAL_USER.get_positions(out_students, class_object_id)
+    user_service.get_positions(out_students, class_object_id)
     # get students colors from database
-    LOCAL_USER.get_colors(out_students)
+    for student in students:
+        favorite_color = user_service.get_favorite_color_by_o365_user_id(student['uid'])
+        if favorite_color:
+            student['color'] = favorite_color
+            
     # set seatrange
     seatrange = range(1, 37)
 
-    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+    ms_token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     ms_graph_service = MSGraphService(access_token=ms_token)
 
     out_documents = ms_graph_service.get_documents(class_object_id)
@@ -130,7 +134,7 @@ def classdetails(request, school_object_id, class_object_id):
 def saveseat(request):
     if request.is_ajax() and request.method == 'POST':
         seat_arrangements = json.loads(request.body.decode())
-        LOCAL_USER.update_positions(seat_arrangements)
+        user_service.update_positions(seat_arrangements)
     return HttpResponse(json.dumps({'save':'ok'}))
 
 @login_required
@@ -138,7 +142,7 @@ def users(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
 
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
 
     school = education_service.get_school(school_object_id)
@@ -164,7 +168,7 @@ def users(request, school_object_id):
 def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
     out_users, usersnextlink = education_service.get_members(school_object_id, nextlink=nextlink)
 
@@ -178,7 +182,7 @@ def usernext(request, school_object_id):
 def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)    
     school = education_service.get_school(school_object_id)
     out_students, studentsnextlink = education_service.get_students(school['id'], nextlink=nextlink)
@@ -193,7 +197,7 @@ def studentnext(request, school_object_id):
 def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)   
     school = education_service.get_school(school_object_id)
     out_teachers, teachersnextlink = education_service.get_students(school['id'], nextlink=nextlink)

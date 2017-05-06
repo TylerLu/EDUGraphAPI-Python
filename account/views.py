@@ -15,12 +15,12 @@ import constant
 from decorator import login_required
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService
-from services.local_user_service import LocalUserService
+from services.user_service import UserService
 from services.auth_service import AuthService
 from .forms import UserInfo, UserRegInfo
 
-LOCAL_USER = LocalUserService()
-TOKEN_SERVICE = TokenService()
+user_service = UserService()
+token_service = TokenService()
 
 def index(request):
     request.session['Error'] = ''
@@ -54,7 +54,7 @@ def login(request):
             user = auth_authenticate(username=email, password=password)
             if user is not None:
                 auth_login(request, user)
-                o365_user = LOCAL_USER.get_o365_user(user)
+                o365_user = user_service.get_o365_user(user)
                 if o365_user:
                     request.session[constant.o365_user_session_key] = o365_user.to_json()
                 return HttpResponseRedirect('/')
@@ -105,15 +105,15 @@ def o365_auth_callback(request):
     tenant_id = id_token.get('tid')
 
     redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
-    auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
-    TOKEN_SERVICE.cache_tokens(auth_result, o365_user_id) 
+    auth_result = token_service.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
+    token_service.cache_tokens(auth_result, o365_user_id) 
     
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
     o365_user = ms_graph_service.get_o365_user(tenant_id)    
     AuthService.set_o365_user(request, o365_user)
 
-    LOCAL_USER.create_organization(tenant_id, o365_user._tenant_name)
-    local_user = LOCAL_USER.get_user_by_o365_email(o365_user.email)
+    user_service.create_organization(tenant_id, o365_user._tenant_name)
+    local_user = user_service.get_user_by_o365_email(o365_user.email)
     if local_user:
         login(local_user)
 
@@ -125,7 +125,7 @@ def o365_auth_callback(request):
 @login_required
 def photo(request, user_object_id):
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     ms_graph_service = MSGraphService(access_token=token)
     user_photo = ms_graph_service.get_photo(user_object_id)
     if not user_photo:
@@ -143,7 +143,7 @@ def register(request):
         user_reg_form = UserRegInfo(request.POST)
         if user_reg_form.is_valid():
             data = user_reg_form.clean()
-            user = LOCAL_USER.register(data['Email'], data['Password'], data['FavoriteColor'])
+            user = user_service.register(data['Email'], data['Password'], data['FavoriteColor'])
             if user:
                 auth_login(request, user)
                 return HttpResponseRedirect('/')

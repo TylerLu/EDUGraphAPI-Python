@@ -11,10 +11,10 @@ from decorator import login_required
 from services.token_service import TokenService
 from services.auth_service import AuthService
 from services.education_service import EducationService
-from services.local_user_service import LocalUserService
+from services.user_service import UserService
 
-LOCAL_USER = LocalUserService()
-TOKEN_SERVICE = TokenService()
+user_service = UserService()
+token_service = TokenService()
 
 @login_required
 def aboutme(request):
@@ -26,9 +26,9 @@ def aboutme(request):
     if user.local_user.is_authenticated:
         parameter['show_color'] = user.local_user.is_authenticated
         parameter['colors'] = constant.FavoriteColors        
-        parameter['favorite_color'] = LOCAL_USER.get_favorite_color(user.user_id)
+        parameter['favorite_color'] = user_service.get_favorite_color(user.user_id)
     if not user.is_admin and user.o365_user is not None:
-        token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+        token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
         education_service = EducationService(user.tenant_id, token)
         school_id = education_service.get_school_id()
         parameter['groups'] = education_service.get_my_groups(school_id)
@@ -40,5 +40,5 @@ def aboutme(request):
 def updatecolor(request):
     user = AuthService.get_current_user(request)
     color = request.POST.get('favoritecolor')
-    LOCAL_USER.update_favorite_color(color, user.user_id)
+    user_service.update_favorite_color(color, user.user_id)
     return HttpResponseRedirect('/Manage/AboutMe')

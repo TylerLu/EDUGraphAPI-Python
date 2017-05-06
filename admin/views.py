@@ -12,10 +12,12 @@ from decorator import admin_only, login_required
 from services.auth_service import AuthService
 from services.token_service import TokenService
 from services.aad_graph_service import AADGraphService
-from services.local_user_service import LocalUserService
+from services.user_service import UserService
+from services.link_service import LinkService
 
-LOCAL_USER = LocalUserService()
-TOKEN_SERVICE = TokenService()
+token_service = TokenService()
+user_service = UserService()
+link_service = LinkService()
 
 @login_required
 @admin_only
@@ -25,7 +27,7 @@ def admin(request):
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user
-    parameter['is_admin_consented'] = LOCAL_USER.is_tenant_consented(user.tenant_id)
+    parameter['is_admin_consented'] = user_service.is_tenant_consented(user.tenant_id)
     if request.session['Message']:
         parameter['message'] = request.session['Message'].split('\r\n')
         request.session['Message'] = ''
@@ -36,9 +38,9 @@ def admin(request):
 def linked_accounts(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
-    user_links = LOCAL_USER.get_linked_accounts(user.tenant_id)
+    user_links = link_service.get_links(user.tenant_id)
     parameter = {}
-    parameter['user_links'] = user_links
+    parameter['user_links'] = linked_accounts
     parameter['links'] = links
     return render(request, 'admin/linkaccounts.html', parameter)
 
@@ -46,17 +48,16 @@ def linked_accounts(request):
 @admin_only
 def unlink_account(request, link_id):
     if request.method == 'POST':
-        LOCAL_USER.remove_link(link_id)
+        link_service.remove_link(link_id)
         return HttpResponseRedirect('/Admin/LinkedAccounts')
     else:
         links = settings.DEMO_HELPER.get_links(request.get_full_path())
         user = AuthService.get_current_user(request)
         parameter = {}
         parameter['links'] = links
-
-        email, o365Email = LOCAL_USER.get_link(link_id)
-        parameter['email'] = email
-        parameter['o365Email'] = o365Email
+        link = link_service.get_link(link_id)
+        parameter['email'] = link.email
+        parameter['o365Email'] = link.o365Email
         return render(request, 'admin/unlinkaccounts.html', parameter)
 
 def consent(request):    
@@ -76,7 +77,7 @@ def process_code(request):
     id_token = AuthService.get_id_token(request)    
     tenant_id = id_token.get('tid')
 
-    LOCAL_USER.update_organization(tenant_id, True)
+    user_service.update_organization(tenant_id, True)
     message = 'Admin consented successfully!'
 
     user = AuthService.get_current_user(request)
@@ -92,20 +93,20 @@ def unconsent(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     aad_graph_service = AADGraphService(user.tenant_id, token)
     app_id = aad_graph_service.get_app_id()
     aad_graph_service.delete_app(app_id)
     
-    LOCAL_USER.update_organization(user.tenant_id, False)
-    LOCAL_USER.remove_links(user.tenant_id)
+    user_service.update_organization(user.tenant_id, False)
+    link_service.remove_links(user.tenant_id)
 
     request.session['Message'] = 'Admin unconsented successfully!'
     return HttpResponseRedirect('/Admin')
 
 def add_app_roles(request):
     user = AuthService.get_current_user(request)
-    token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
+    token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     aad_graph_service = AADGraphService(user.tenant_id, token)
     app_id = aad_graph_service.get_app_id()
     app_name = aad_graph_service.get_app_name()
