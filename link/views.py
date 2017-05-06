@@ -2,14 +2,14 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
+import constant
 from utils.shortcuts import render
+from decorator import login_required
 from django.http import HttpResponseRedirect
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import authenticate as auth_authenticate
 from django.conf import settings
 
-import constant
-from decorator import login_required
 from services.token_service import TokenService
 from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
@@ -25,7 +25,7 @@ link_service = LinkService()
 @login_required
 def link(request):
     user = AuthService.get_current_user(request)  
-    context = { 'user': user}
+    context = {'user': user}
     if not user.are_linked and user.is_o365:
         local_user = user_service.get_user_by_o365_email(user.o365_email)
         if local_user:
@@ -76,7 +76,6 @@ def login_local(request):
         'user': user,
         'login_local_form': login_local_form
     }
-    errors = []
     # POST /link/loginlocal
     if request.method == 'POST':
         login_local_form = LoginLocalInfo(request.POST)
@@ -91,8 +90,7 @@ def login_local(request):
                 auth_login(request, local_user)
                 return HttpResponseRedirect('/')
             else:
-                errors.append('Invalid login attempt.')
-                context['errors'] = errors
+                context['errors'] = ['Invalid login attempt.']
             return render(request, 'link/loginlocal.html', context)
     # GET /link/loginlocal
     else:
