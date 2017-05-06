@@ -36,7 +36,6 @@ def index(request):
         return HttpResponseRedirect('/Schools')
 
 def login(request):
-    parameter = {}
     # TODO: split the post to a new method
     # post /Account/Login
     if request.method == 'POST':
@@ -58,22 +57,24 @@ def login(request):
                 return HttpResponseRedirect('/')
             else:
                 errors.append('Invalid login attempt.')
-                parameter['user_form'] = user_form
-                parameter['errors'] = errors
-                return render(request, 'account/login.html', parameter)
+                context = {
+                    'user_form': user_form,
+                    'errors': errors
+                }
+                return render(request, 'account/login.html', context)
     # get /Account/Login
     else:
         o365_username = request.COOKIES.get(constant.o365_username_cookie)
         o365_email = request.COOKIES.get(constant.o365_email_cookie)
         if o365_username and o365_email:
-            parameter = {}
-            parameter['username'] = o365_username
-            parameter['email'] = o365_email
-            return render(request, 'account/O365login.html', parameter)
+            context = {
+                'username': o365_username,
+                'email': o365_email
+            }
+            return render(request, 'account/O365login.html', context)
         else:
             user_form = UserInfo()
-            parameter['user_form'] = user_form
-            return render(request, 'account/login.html', parameter)
+            return render(request, 'account/login.html', { 'user_form': user_form })
 
 def o365_login(request):
     extra_params = {
@@ -122,7 +123,7 @@ def o365_auth_callback(request):
 def photo(request, user_object_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
-    ms_graph_service = MSGraphService(access_token=token)
+    ms_graph_service = MSGraphService(token)
     user_photo = ms_graph_service.get_photo(user_object_id)
     if not user_photo:
         local_photo_path = settings.STATICFILES_DIRS[0] + '/Images/DefaultUserPhoto.jpg'

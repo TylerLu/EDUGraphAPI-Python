@@ -24,29 +24,28 @@ link_service = LinkService()
 
 @login_required
 def link(request):
-    user = AuthService.get_current_user(request)
-  
-    parameter = {}
-    parameter['user'] = user
+    user = AuthService.get_current_user(request)  
+    context = { 'user': user}
     if not user.are_linked and user.is_o365:
         local_user = user_service.get_user_by_o365_email(user.o365_email)
         if local_user:
-            parameter['local_existed'] = True
-            parameter['local_message'] = 'There is a local account: %s matching your O365 account.' % user.o365_email
+            context['local_existed'] = True
+            context['local_message'] = 'There is a local account: %s matching your O365 account.' % user.o365_email
         else:
-            parameter['local_existed'] = False
+            context['local_existed'] = False
     if request.session['Error']:
-        parameter['error'] = request.session['Error']
+        context['error'] = request.session['Error']
         request.session['Error'] = ''
-    return render(request, 'link/index.html', parameter)
+    return render(request, 'link/index.html', context)
 
 @login_required
 def create_local(request):
     user = AuthService.get_current_user(request)
     create_local_form = CreateLocalInfo()
-    parameter = {}
-    parameter['user'] = user
-    parameter['create_local_form'] = create_local_form
+    context = {
+        'user': user,
+        'create_local_form': create_local_form
+    }
     errors = []
     # POST /link/createlocal
     if request.method == 'POST':
@@ -59,23 +58,24 @@ def create_local(request):
         except Exception as e:
             errors.append('Name %s is already taken.' % user.o365_email)
             errors.append("Email '%s' is already taken." % user.o365_email)
-            parameter['errors'] = errors
-            return render(request, 'link/createlocal.html', parameter)        
+            context['errors'] = errors
+            return render(request, 'link/createlocal.html', context)        
         link_service.link(local_user, user.o365_user)
         user_service.update_favorite_color(data['FavoriteColor'], user.user_id)
         auth_login(request, local_user)
         return HttpResponseRedirect('/')
     # GET /link/createlocal
     else:
-        return render(request, 'link/createlocal.html', parameter)
+        return render(request, 'link/createlocal.html', context)
 
 @login_required
 def login_local(request):
     user = AuthService.get_current_user(request)
     login_local_form = LoginLocalInfo()
-    parameter = {}
-    parameter['user'] = user
-    parameter['login_local_form'] = login_local_form
+    context = {
+        'user': user,
+        'login_local_form': login_local_form
+    }
     errors = []
     # POST /link/loginlocal
     if request.method == 'POST':
@@ -92,8 +92,8 @@ def login_local(request):
                 return HttpResponseRedirect('/')
             else:
                 errors.append('Invalid login attempt.')
-                parameter['errors'] = errors
-            return render(request, 'link/loginlocal.html', parameter)
+                context['errors'] = errors
+            return render(request, 'link/loginlocal.html', context)
     # GET /link/loginlocal
     else:
         # if user_info['local_existed']:
@@ -105,7 +105,7 @@ def login_local(request):
         #     login(user_info)
         #     return HttpResponseRedirect('/')
         # else:
-        return render(request, 'link/loginlocal.html', parameter)
+        return render(request, 'link/loginlocal.html', context)
 
 def login_o365(request):
     extra_params = {

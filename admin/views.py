@@ -23,22 +23,21 @@ link_service = LinkService()
 @admin_only
 def admin(request):
     user = AuthService.get_current_user(request)
-    parameter = {}
-    parameter['user'] = user
-    parameter['is_admin_consented'] = user_service.is_tenant_consented(user.tenant_id)
+    context = {
+        'user': user,
+        'is_admin_consented': user_service.is_tenant_consented(user.tenant_id)
+    }
     if request.session['Message']:
-        parameter['message'] = request.session['Message'].split('\r\n')
+        context['message'] = request.session['Message'].split('\r\n')
         request.session['Message'] = ''
-    return render(request, 'admin/index.html', parameter)
+    return render(request, 'admin/index.html', context)
 
 @login_required
 @admin_only
 def linked_accounts(request):
     user = AuthService.get_current_user(request)
     user_links = link_service.get_links(user.tenant_id)
-    parameter = {}
-    parameter['user_links'] = linked_accounts
-    return render(request, 'admin/linkaccounts.html', parameter)
+    return render(request, 'admin/linkaccounts.html', { 'user_links': linked_accounts })
 
 @login_required
 @admin_only
@@ -48,11 +47,12 @@ def unlink_account(request, link_id):
         return HttpResponseRedirect('/Admin/LinkedAccounts')
     else:
         user = AuthService.get_current_user(request)
-        parameter = {}
         link = link_service.get_link(link_id)
-        parameter['email'] = link.email
-        parameter['o365Email'] = link.o365Email
-        return render(request, 'admin/unlinkaccounts.html', parameter)
+        context = {
+            'email': link.email,
+            'o365Email': link.o365Email
+        }
+        return render(request, 'admin/unlinkaccounts.html', context)
 
 def consent(request):    
     user = AuthService.get_current_user(request)
@@ -114,9 +114,9 @@ def add_app_roles(request):
     return HttpResponseRedirect("/Admin")
 
 def consent_alone(request):
-    parameter = {}
+    context = {}
     if request.GET.get('consented') == 'true':
-        parameter['consented'] = True
-    return render(request, 'admin/consent.html', parameter)
+        context['consented'] = True
+    return render(request, 'admin/consent.html', context)
 
 

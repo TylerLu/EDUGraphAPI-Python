@@ -19,20 +19,19 @@ token_service = TokenService()
 @login_required
 def aboutme(request):
     user = AuthService.get_current_user(request)
-    parameter = {}
-    parameter['user'] = user
+    context = { 'user': user }
     if user.local_user.is_authenticated:
-        parameter['show_color'] = user.local_user.is_authenticated
-        parameter['colors'] = constant.FavoriteColors        
-        parameter['favorite_color'] = user_service.get_favorite_color(user.user_id)
+        context['show_color'] = user.local_user.is_authenticated
+        context['colors'] = constant.FavoriteColors        
+        context['favorite_color'] = user_service.get_favorite_color(user.user_id)
     if not user.is_admin and user.o365_user is not None:
         token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
         education_service = EducationService(user.tenant_id, token)
         school_id = education_service.get_school_id()
-        parameter['groups'] = education_service.get_my_groups(school_id)
+        context['groups'] = education_service.get_my_groups(school_id)
     else:
-        parameter['groups'] = []
-    return render(request, 'managements/aboutme.html', parameter)
+        context['groups'] = []
+    return render(request, 'managements/aboutme.html', context)
 
 @login_required
 def updatecolor(request):

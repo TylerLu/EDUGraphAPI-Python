@@ -17,7 +17,7 @@ class UserService(object):
             user = User.objects.create(username=email)
             user.set_password(password)
             user.email = email
-            user.profile.favoriteColor - favoriteColor
+            user.profile.favoriteColor = favoriteColor
             user.save()
             return user
         except Exception as e:
