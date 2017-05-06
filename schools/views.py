@@ -2,13 +2,12 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.conf import settings
 
 import json
-
 import constant
+from django.conf import settings
+from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from decorator import login_required
 from services.token_service import TokenService
 from services.auth_service import AuthService

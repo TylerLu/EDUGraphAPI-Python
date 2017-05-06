@@ -34,8 +34,9 @@ class UserService(object):
         user.save()
         return user
 
-    def create_organization(self, tenant_id, tenant_name):
+    def create_or_update_organization(self, tenant_id, tenant_name):
         organization = Organizations.objects.get_or_create(tenantId=tenant_id)[0]
+        organization.tenant_id = tenant_id
         organization.name = tenant_name
         organization.save()
 
