@@ -34,7 +34,7 @@ class Resources():
 
 class Roles():
     Admin = "Admin"
-    Faculty = "Faculty"
+    Faculty = "Teacher"
     Student = "Student"
 
 class O365ProductLicenses():
