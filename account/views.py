@@ -16,7 +16,7 @@ from decorator import login_required
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService
 from services.local_user_service import LocalUserService
-from services.auth_service import get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri, get_current_user
+from services.auth_service import AuthService
 from .forms import UserInfo, UserRegInfo
 
 LOCAL_USER = LocalUserService()
@@ -25,7 +25,7 @@ TOKEN_SERVICE = TokenService()
 def index(request):
     request.session['Error'] = ''
     request.session['Message'] = ''
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     if not user.is_authenticated:
         return HttpResponseRedirect('/Account/Login')
     if not user.are_linked:
@@ -82,12 +82,12 @@ def login(request):
 def o365_login(request):
     extra_params = {
         'scope': 'openid+profile',
-        'nonce': get_random_string()
+        'nonce': AuthService.get_random_string()
     }
     o365_email = request.COOKIES.get(constant.o365_email_cookie)
     if o365_email:
         extra_params['login_hint'] = o365_email
-    o365_login_url = get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', get_random_string(), extra_params)
+    o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', AuthService.get_random_string(), extra_params)
     return HttpResponseRedirect(o365_login_url)
 
 def relogin(request):
@@ -97,20 +97,20 @@ def relogin(request):
     return response
 
 def o365_auth_callback(request):
-    validate_state(request)
+    AuthService.validate_state(request)
     code = request.POST.get('code')
-    id_token = get_id_token(request)
+    id_token = AuthService.get_id_token(request)
 
     o365_user_id = id_token.get('oid')
     tenant_id = id_token.get('tid')
 
-    redirect_uri = get_redirect_uri(request, 'Auth/O365/Callback')
+    redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
     auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
     TOKEN_SERVICE.cache_tokens(auth_result, o365_user_id) 
     
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
-    o365_user = ms_graph_service.get_o365_user(tenant_id)
-    request.session[constant.o365_user_session_key] = o365_user.to_json()
+    o365_user = ms_graph_service.get_o365_user(tenant_id)    
+    AuthService.set_o365_user(request, o365_user)
 
     LOCAL_USER.create_organization(tenant_id, o365_user._tenant_name)
     local_user = LOCAL_USER.get_user_by_o365_email(o365_user.email)
@@ -124,7 +124,7 @@ def o365_auth_callback(request):
 
 @login_required
 def photo(request, user_object_id):
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     ms_graph_service = MSGraphService(access_token=token)
     user_photo = ms_graph_service.get_photo(user_object_id)
@@ -157,9 +157,8 @@ def register(request):
 
 @login_required
 def logoff(request):
-    user = get_current_user(request)
-    if constant.o365_user_session_key in request.session:
-        del request.session[constant.o365_user_session_key]
+    user = AuthService.get_current_user(request)
+    AuthService.clear_o365_user(request)
     auth_logout(request)
     if not user.are_linked:
         return HttpResponseRedirect('/')
