@@ -7,14 +7,23 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
+class Organizations(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(null=True, max_length=255)
+    tenantId = models.CharField(null=True, max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
+    isAdminConsented = models.BooleanField(default=False)
+    class Meta:
+        db_table = 'organizations'
+
 class Profile(models.Model):
     user = models.OneToOneField(User)
     o365UserId = models.CharField(null=True, max_length=255)
     o365Email = models.CharField(null=True, max_length=255)
     favoriteColor = models.CharField(null=True, max_length=255)
-    organization = models.OneToOneField('Organizations', null=True)
+    organization = models.ForeignKey(Organizations, models.SET_NULL, null=True)
     class Meta:
-        db_table = 'profile'
+        db_table = 'profiles'
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
@@ -47,12 +56,3 @@ class ClassroomSeatingArrangements(models.Model):
     classId = models.CharField(null=True, max_length=255)
     class Meta:
         db_table = 'classroom_seating_arranements'
-
-class Organizations(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(null=True, max_length=255)
-    tenantId = models.CharField(null=True, max_length=255)
-    created = models.DateTimeField(auto_now_add=True)
-    isAdminConsented = models.BooleanField(default=False)
-    class Meta:
-        db_table = 'organizations'

@@ -62,7 +62,7 @@
 		<th></th>
 	</tr>
 	{% for school in schools %}
-		{% if user.school_id == school.id %}
+		{% if my_school_id == school.id %}
 			<tr class="tr-content td-green">
 			{% set bingicon = "/static/Images/icon-map_30x28px-WHT.png" %}
 		{% else %}

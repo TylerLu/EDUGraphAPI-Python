@@ -28,9 +28,9 @@ def schools(request):
     schools = education_service.get_schools()
     # sort schools: my school will be put to the top
     schools.sort(key=lambda d:d['name'] if d['id'] == my_school_id else 'Z_' + d['name'])
-
     context = {
         'user': user,
+        'my_school_id': my_school_id,
         'schools': schools,
         'school_user_id': school_user_id
     }
