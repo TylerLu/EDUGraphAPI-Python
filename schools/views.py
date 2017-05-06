@@ -11,7 +11,7 @@ import json
 import constant
 from decorator import login_required
 from services.token_service import TokenService
-from services.auth_service import get_current_user
+from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
 from services.local_user_service import LocalUserService
@@ -22,7 +22,7 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def schools(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
@@ -40,7 +40,7 @@ def schools(request):
 @login_required
 def classes(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
@@ -61,7 +61,7 @@ def classes(request, school_object_id):
 @login_required
 def classnext(request, school_object_id):    
     nextlink = request.GET.get('nextLink')
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
@@ -79,7 +79,7 @@ def classnext(request, school_object_id):
 @login_required
 def classdetails(request, school_object_id, class_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
 
     # user_info['class_object_id'] = class_object_id
     # user_info['color'] = LOCAL_USER.get_color(user_info)
@@ -136,7 +136,7 @@ def saveseat(request):
 @login_required
 def users(request, school_object_id):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
 
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
@@ -163,7 +163,7 @@ def users(request, school_object_id):
 @login_required
 def usernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
     out_users, usersnextlink = education_service.get_members(school_object_id, nextlink=nextlink)
@@ -177,7 +177,7 @@ def usernext(request, school_object_id):
 @login_required
 def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)    
     school = education_service.get_school(school_object_id)
@@ -192,7 +192,7 @@ def studentnext(request, school_object_id):
 @login_required
 def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     token = TOKEN_SERVICE.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)   
     school = education_service.get_school(school_object_id)

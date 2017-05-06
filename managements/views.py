@@ -9,7 +9,7 @@ from django.conf import settings
 import constant
 from decorator import login_required
 from services.token_service import TokenService
-from services.auth_service import get_current_user
+from services.auth_service import AuthService
 from services.education_service import EducationService
 from services.local_user_service import LocalUserService
 
@@ -19,7 +19,7 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def aboutme(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     parameter = {}
     parameter['links'] = links
     parameter['user'] = user
@@ -38,7 +38,7 @@ def aboutme(request):
 
 @login_required
 def updatecolor(request):
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     color = request.POST.get('favoritecolor')
     LOCAL_USER.update_favorite_color(color, user.user_id)
     return HttpResponseRedirect('/Manage/AboutMe')

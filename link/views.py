@@ -11,7 +11,7 @@ from django.conf import settings
 import constant
 from decorator import login_required
 from services.token_service import TokenService
-from services.auth_service import get_current_user, get_random_string, get_authorization_url, validate_state, get_id_token, get_redirect_uri
+from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
 from services.local_user_service import LocalUserService
 
@@ -23,7 +23,7 @@ TOKEN_SERVICE = TokenService()
 @login_required
 def link(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
   
     # set parameter for template
     parameter = {}
@@ -44,7 +44,7 @@ def link(request):
 @login_required
 def create_local(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     create_local_form = CreateLocalInfo()
     parameter = {}
     parameter['links'] = links
@@ -74,7 +74,7 @@ def create_local(request):
 @login_required
 def login_local(request):
     links = settings.DEMO_HELPER.get_links(request.get_full_path())
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     login_local_form = LoginLocalInfo()
     parameter = {}
     parameter['links'] = links
@@ -114,16 +114,16 @@ def login_local(request):
 def login_o365(request):
     extra_params = {
         'scope': 'openid+profile',
-        'nonce': get_random_string(),
+        'nonce': AuthService.get_random_string(),
         'prompt': 'login'
     }
-    o365_login_url = get_authorization_url(request, 'code+id_token', 'link/ProcessCode', get_random_string(), extra_params) 
+    o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'link/ProcessCode', AuthService.get_random_string(), extra_params) 
     return HttpResponseRedirect(o365_login_url)
 
 def process_code(request):    
-    validate_state(request)
+    AuthService.validate_state(request)
     code = request.POST.get('code')
-    id_token = get_id_token(request)
+    id_token = AuthService.get_id_token(request)
     
     o365_user_id = id_token.get('oid')
     tenant_id = id_token.get('tid')
@@ -132,15 +132,15 @@ def process_code(request):
         request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % id_token.get('email')
         return HttpResponseRedirect('/link')
 
-    redirect_uri = get_redirect_uri(request, 'Auth/O365/Callback')
+    redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
     auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
     TOKEN_SERVICE.cache_tokens(auth_result, o365_user_id) 
     
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
-    o365_user = ms_graph_service.get_o365_user(tenant_id)    
-    request.session[constant.o365_user_session_key] = o365_user.to_json()
+    o365_user = ms_graph_service.get_o365_user(tenant_id)  
+    AuthService.set_o365_user(reqeust, o365_user)
 
-    user = get_current_user(request)
+    user = AuthService.get_current_user(request)
     LOCAL_USER.link(user.local_user, o365_user, None)
  
     response =  HttpResponseRedirect('/')
