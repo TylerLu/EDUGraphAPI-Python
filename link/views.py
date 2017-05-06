@@ -13,8 +13,6 @@ from decorator import login_required
 from services.token_service import TokenService
 from services.auth_service import get_current_user, get_random_string, get_authorization_url, validate_state, get_id_token, get_redirect_uri
 from services.ms_graph_service import MSGraphService
-from services.aad_graph_service import AADGraphService
-from services.o365_user_service import O365UserService
 from services.local_user_service import LocalUserService
 
 from .forms import CreateLocalInfo, LoginLocalInfo
@@ -134,13 +132,12 @@ def process_code(request):
         request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % id_token.get('email')
         return HttpResponseRedirect('/link')
 
-    redirect_uri = get_redirect_uri(request, 'link/ProcessCode')
-    aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
-    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)    
-    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
-
-    o365_user_service = O365UserService(tenant_id, ms_token, aad_token)
-    o365_user = o365_user_service.get_o365_user()    
+    redirect_uri = get_redirect_uri(request, 'Auth/O365/Callback')
+    auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
+    TOKEN_SERVICE.cache_tokens(auth_result, o365_user_id) 
+    
+    ms_graph_service = MSGraphService(auth_result.get('accessToken'))
+    o365_user = ms_graph_service.get_o365_user(tenant_id)    
     request.session[constant.o365_user_session_key] = o365_user.to_json()
 
     user = get_current_user(request)

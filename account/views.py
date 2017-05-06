@@ -15,9 +15,7 @@ import constant
 from decorator import login_required
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService
-from services.aad_graph_service import AADGraphService
 from services.local_user_service import LocalUserService
-from services.o365_user_service import O365UserService
 from services.auth_service import get_authorization_url, get_random_string, validate_state, get_id_token, get_redirect_uri, get_current_user
 from .forms import UserInfo, UserRegInfo
 
@@ -107,15 +105,14 @@ def o365_auth_callback(request):
     tenant_id = id_token.get('tid')
 
     redirect_uri = get_redirect_uri(request, 'Auth/O365/Callback')
-    aad_auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.AADGraph)
-    aad_token = TOKEN_SERVICE.cache_tokens(aad_auth_result, o365_user_id)    
-    ms_token = TOKEN_SERVICE.get_access_token(constant.Resources.MSGraph, o365_user_id)
-
-    o365_user_service = O365UserService(tenant_id, ms_token, aad_token)
-    o365_user = o365_user_service.get_o365_user()
+    auth_result = TOKEN_SERVICE.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
+    TOKEN_SERVICE.cache_tokens(auth_result, o365_user_id) 
+    
+    ms_graph_service = MSGraphService(auth_result.get('accessToken'))
+    o365_user = ms_graph_service.get_o365_user(tenant_id)
     request.session[constant.o365_user_session_key] = o365_user.to_json()
 
-    LOCAL_USER.create_organization(o365_user.tenant_id, o365_user._tenant_name)
+    LOCAL_USER.create_organization(tenant_id, o365_user._tenant_name)
     local_user = LOCAL_USER.get_user_by_o365_email(o365_user.email)
     if local_user:
         login(local_user)
