@@ -16,8 +16,8 @@
 			<ul class="nav navbar-nav">
 				<li><a href="/">Home</a></li>
 				{% if is_in_a_school %}
-				<li><a href="/Schools/{{ user.school_object_id }}/Classes">Classes</a></li>
-				<li><a href="/Schools/{{ user.school_object_id }}/Users">Teachers & Students</a></li>
+				<li><a href="/Schools/{{ school_object_id }}/Classes">Classes</a></li>
+				<li><a href="/Schools/{{ school_object_id }}/Users">Teachers & Students</a></li>
 				{% endif %}
 				{% if user.is_authenticated and user.is_admin %}
 				<li><a href="/Admin">Admin</a></li>
