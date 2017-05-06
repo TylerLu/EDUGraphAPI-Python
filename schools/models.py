@@ -129,6 +129,10 @@ class Section(GraphObjectBase):
         return self.mail
 
     @property
+    def education_object_type(self):
+        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType')
+
+    @property
     def display_name(self):
         return self.get_value('displayName')
 

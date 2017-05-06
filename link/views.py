@@ -86,7 +86,6 @@ def login_local(request):
             password = data['Password']
             local_user = auth_authenticate(username=email, password=password)
             if local_user:
-                import pdb; pdb.set_trace()
                 link_service.link(local_user, user.o365_user, None)
                 auth_login(request, local_user)
                 return HttpResponseRedirect('/')

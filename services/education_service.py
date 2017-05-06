@@ -64,41 +64,22 @@ class EducationService(object):
             member_list = members
         return member_list
 
-    def _get_my_sections(self, load_members=False):
-        '''
-        Get my sections
-        <param name="load_members">Include members or not.</param>
-        '''
-        mysection_list = []
-        url = self.api_base_uri + 'me/memberOf?api-version=1.5'
-        
-        section_list = self.rest_api_service.get_object_list(url, self.access_token, model=Section)
-        section_list = [s for s in section_list if s.get('object_type') == 'Group' and s.get('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType') == 'Section']
-
-        for section in section_list:
-            if load_members:
-                member_list = self.get_section_members(section['object_id'], 'Teacher')
-                section['teachers'] =  member_list
-            mysection_list.append(section)
-        return mysection_list
-
     def get_my_sections(self, school_id):
         '''
         Get my sections within a school
         <param name="school_id">The school id.</param>
         '''
-        section_list = self._get_my_sections(True)
-        mysection_list = []
-        mysection_emails = []
-
-        for section in section_list:
-            if section['school_id'] == school_id:
-                mysection_list.append(section)
-                mysection_emails.append(section['email'])
+        url = self.api_base_uri + 'me/memberOf?api-version=1.5'        
+        section_list = self.rest_api_service.get_object_list(url, self.access_token, model=Section)
+        mysection_list = [s for s in section_list if s.get('education_object_type') == 'Section' and s.get('school_id') == school_id ]
+      
+        for section in mysection_list:
+            section['teachers'] = self.get_section_members(section['object_id'], 'Teacher')
+                
         mysection_list.sort(key=lambda d:d['combined_course_number'])
-        return mysection_list, mysection_emails
+        return mysection_list
 
-    def get_all_sections(self, school_id, mysection_emails=[], top=12, nextlink=''):
+    def get_all_sections(self, school_id, top=12, nextlink=''):
         '''
         Get sections within a school
         <param name="school_id">The school id.</param>
@@ -115,9 +96,6 @@ class EducationService(object):
         next_link = ''
         url = self.api_base_uri + "groups?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
         section_list, next_link = self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='odata.nextLink')
-        
-        for section in section_list:
-            section['ismy'] = section['email'] in mysection_emails
         return section_list, next_link
 
     def get_section(self, object_id):

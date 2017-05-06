@@ -15,7 +15,7 @@
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
 				<li><a href="/">Home</a></li>
-				{% if user.is_in_a_school %}
+				{% if is_in_a_school %}
 				<li><a href="/Schools/{{ user.school_object_id }}/Classes">Classes</a></li>
 				<li><a href="/Schools/{{ user.school_object_id }}/Users">Teachers & Students</a></li>
 				{% endif %}

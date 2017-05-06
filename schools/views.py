@@ -43,8 +43,14 @@ def classes(request, school_object_id):
 
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
-    my_sections, mysection_emails = education_service.get_my_sections(school['id'])
-    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'], mysection_emails)
+    my_sections = education_service.get_my_sections(school['id'])
+    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'])
+
+    my_section_ids = []
+    for section in my_sections:
+        my_section_ids.append(section['object_id'])
+    for section in all_sections:
+        section['ismy'] = section['object_id'] in my_section_ids
 
     context = {
         'user': user,
@@ -52,7 +58,8 @@ def classes(request, school_object_id):
         'sectionsnextlink': sectionsnextlink,
         'sections': all_sections,
         'mysections': my_sections,
-        'school_object_id': school_object_id
+        'school_object_id': school_object_id,
+        'is_in_a_school': True
     }
     return render(request, 'schools/classes.html', context)
 
@@ -64,8 +71,14 @@ def classnext(request, school_object_id):
 
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
-    my_sections, mysection_emails = education_service.get_my_sections(school['id'])
-    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'], mysection_emails, nextlink=nextlink)
+    my_sections = education_service.get_my_sections(school['id'])
+    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'], nextlink=nextlink)
+
+    my_section_ids = []
+    for section in my_sections:
+        my_section_ids.append(section['object_id'])
+    for section in all_sections:
+        section['ismy'] = section['object_id'] in my_section_ids
 
     ajax_result = {}
     ajax_result['Sections'] = {}
@@ -117,7 +130,7 @@ def classdetails(request, school_object_id, class_object_id):
         'seatrange': seatrange,
         'school_object_id': school_object_id,
         'class_object_id': class_object_id,
-        'favoriate_color': '' #TODO
+        'is_in_a_school': True
     }
     return render(request, 'schools/classdetails.html', context)
 
@@ -149,7 +162,8 @@ def users(request, school_object_id):
         'usersnextlink': usersnextlink,
         'studentsnextlink': studentsnextlink,
         'teachersnextlink': teachersnextlink,
-        'school_object_id': school_object_id
+        'school_object_id': school_object_id,
+        'is_in_a_school': True
     }
     return render(request, 'schools/users.html', context)
 
