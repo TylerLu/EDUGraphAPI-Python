@@ -41,7 +41,7 @@ class AuthService(object):
 
     @staticmethod
     def validate_state(request):
-        if request.POST.get('state') != request.session['auth_state']:
+        if request.POST.get('state') != request.session.get('auth_state'):
             raise Exception('state does not match')
 
     @staticmethod
