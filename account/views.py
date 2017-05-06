@@ -111,7 +111,10 @@ def o365_auth_callback(request):
     o365_user = ms_graph_service.get_o365_user(tenant_id)
     AuthService.set_o365_user(request, o365_user)
 
-    user_service.create_or_update_organization(tenant_id, o365_user._tenant_name)
+    for role in o365_user.roles:
+        user_service.update_role(o365_user.id, role)
+
+    user_service.create_or_update_organization(tenant_id, o365_user.tenant_name)
     local_user = user_service.get_user_by_o365_email(o365_user.email)
     if local_user:
         auth_login(request, local_user)
