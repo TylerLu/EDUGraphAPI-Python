@@ -84,13 +84,15 @@ def o365_login(request):
     o365_email = request.COOKIES.get(constant.o365_email_cookie)
     if o365_email:
         extra_params['login_hint'] = o365_email
+    else:
+        extra_params['prompt'] = 'login'
     o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', AuthService.get_random_string(), extra_params)
     return HttpResponseRedirect(o365_login_url)
 
 def relogin(request):
     response = HttpResponseRedirect('/Account/Login')
-    response.set_cookie(constant.o365_username_cookie, '')
-    response.set_cookie(constant.o365_email_cookie, '')
+    response.set_cookie(constant.o365_username_cookie, '', expires=0)
+    response.set_cookie(constant.o365_email_cookie, '', expires=0)
     return response
 
 def o365_auth_callback(request):

@@ -9,24 +9,22 @@ from schools.models import School, Section, EduUser
 
 class EducationService(object):
 
-    def __init__(self, tenant_id, token):
+    def __init__(self, tenant_id, access_token):
         self.api_base_uri = constant.Resources.AADGraph + tenant_id + '/'
-        self.token = token
+        self.access_token = access_token
         self.rest_api_service = RestApiService()
-        self._token_re = re.compile('\$skiptoken=.*')
+        self.skip_token_re = re.compile('\$skiptoken=.*')
 
-    def get_school_id(self):
-        version = '?api-version=1.6'
-        url = self.api_base_uri + 'me' + version
-        user_content = self.rest_api_service.get_json(url, self.token)
+    def get_my_school_id(self):
+        url = self.api_base_uri + 'me?api-version=1.6'
+        user_content = self.rest_api_service.get_json(url, self.access_token)
         school_id = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId', '')
         return school_id
 
     def get_school_user_id(self):
         school_uid = ''
-        version = '?api-version=1.6'
-        url = self.api_base_uri + 'me' + version
-        user_content = self.rest_api_service.get_json(url, self.token)
+        url = self.api_base_uri + 'me?api-version=1.6'
+        user_content = self.rest_api_service.get_json(url, self.access_token)
         sid = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_StudentId', '')
         tid = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_TeacherId', '')
         if sid:
@@ -34,16 +32,12 @@ class EducationService(object):
         elif tid:
             return tid
 
-    def get_schools(self, school_uid=''):
+    def get_schools(self):
         '''
         Get all schools that exist in the Azure Active Directory tenant.
         '''
-        schools_list = []
-        version = '?api-version=beta'
-        url = self.api_base_uri + 'administrativeUnits' + version
-        school_list = self.rest_api_service.get_object_list(url, self.token, model=School)
-        out_schools = self._normalize_schools(school_list, school_uid)
-        return out_schools
+        url = self.api_base_uri + 'administrativeUnits?api-version=beta'
+        return self.rest_api_service.get_object_list(url, self.access_token, model=School)
 
     def get_school(self, object_id):
         '''
@@ -51,9 +45,8 @@ class EducationService(object):
         <param name="object_id">The Object ID of the school administrative unit in Azure Active Directory.</param>
         '''
         school_result = {}
-        version = '?api-version=beta'
-        url = self.api_base_uri + 'administrativeUnits/%s' % object_id + version
-        school_result = self.rest_api_service.get_object(url, self.token, model=School)
+        url = self.api_base_uri + 'administrativeUnits/%s?api-version=beta' % object_id
+        school_result = self.rest_api_service.get_object(url, self.access_token, model=School)
         return school_result
 
     def get_section_members(self, section_object_id, object_type=''):
@@ -63,9 +56,8 @@ class EducationService(object):
         <param name="object_type">The members type.</param>
         '''
         member_list = []
-        version = '?api-version=1.5'
-        url = self.api_base_uri + 'groups/%s/members' % section_object_id + version
-        members = self.rest_api_service.get_object_list(url, self.token, model=EduUser)
+        url = self.api_base_uri + 'groups/%s/members?api-version=1.5' % section_object_id
+        members = self.rest_api_service.get_object_list(url, self.access_token, model=EduUser)
         if object_type:
             member_list = [i for i in members if i['object_type'] == object_type]
         else:
@@ -78,10 +70,9 @@ class EducationService(object):
         <param name="load_members">Include members or not.</param>
         '''
         mysection_list = []
-        version = '?api-version=1.5'
-        url = self.api_base_uri + 'me/memberOf' + version
+        url = self.api_base_uri + 'me/memberOf?api-version=1.5'
         
-        section_list = self.rest_api_service.get_object_list(url, self.token, model=Section)
+        section_list = self.rest_api_service.get_object_list(url, self.access_token, model=Section)
         section_list = [s for s in section_list if s.get('object_type') == 'Group' and s.get('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType') == 'Section']
 
         for section in section_list:
@@ -117,14 +108,17 @@ class EducationService(object):
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self._token_re.findall(nextlink)[0]
+            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
             skiptoken = '&%s' % link_skiptoken
+
         sections_list = []
         next_link = ''
         url = self.api_base_uri + "groups?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
-        section_list, next_link = self.rest_api_service.get_object_list(url, self.token, model=Section, next_key='odata.nextLink')
-        out_sections = self._normalize_all_sections(section_list, mysection_emails)
-        return out_sections, next_link
+        section_list, next_link = self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='odata.nextLink')
+        
+        for section in section_list:
+            section['ismy'] = section['email'] in mysection_emails
+        return section_list, next_link
 
     def get_section(self, object_id):
         '''
@@ -134,7 +128,7 @@ class EducationService(object):
         section_result = {}
         version = '?api-version=1.5'
         url = self.api_base_uri + 'groups/%s' % object_id + version
-        section_result = self.rest_api_service.get_object(url, self.token, model=Section)
+        section_result = self.rest_api_service.get_object(url, self.access_token, model=Section)
         return section_result
 
     def get_members(self, object_id, top=12, nextlink=''):
@@ -146,12 +140,12 @@ class EducationService(object):
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self._token_re.findall(nextlink)[0]
+            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
             skiptoken = '&%s' % link_skiptoken
         members_list = []
         next_link = ''
         url = self.api_base_uri + 'administrativeUnits/%s/members?api-version=beta&$top=%s%s' % (object_id, top, skiptoken)
-        members_list, next_link = self.rest_api_service.get_object_list(url, self.token, model=EduUser, next_key='odata.nextLink')
+        members_list, next_link = self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
         return members_list, next_link
 
     def get_students(self, school_id, top=12, nextlink=''):
@@ -163,12 +157,12 @@ class EducationService(object):
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self._token_re.findall(nextlink)[0]
+            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
             skiptoken = '&%s' % link_skiptoken
         students_list = []
         next_link = ''
         url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Student'&$top=%s%s" % (school_id, top, skiptoken)
-        students_list, next_link = self.rest_api_service.get_object_list(url, self.token, model=EduUser, next_key='odata.nextLink')
+        students_list, next_link = self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
         return students_list, next_link
 
     def get_teachers(self, school_id, top=12, nextlink=''):
@@ -180,12 +174,12 @@ class EducationService(object):
         '''
         skiptoken = ''
         if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self._token_re.findall(nextlink)[0]
+            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
             skiptoken = '&%s' % link_skiptoken
         teachers_list = []
         next_link = ''
         url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Teacher'&$top=%s%s" % (school_id, top, skiptoken)
-        teachers_list, next_link = self.rest_api_service.get_object_list(url, self.token, model=EduUser, next_key='odata.nextLink')
+        teachers_list, next_link = self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
         return teachers_list, next_link
 
     def get_my_groups(self, school_id):
@@ -194,33 +188,9 @@ class EducationService(object):
         <param name="school_id">The school id.</param>
         '''
         groups_list = []
-        version = '?api-version=1.5'
-        url = self.api_base_uri + 'me/memberOf' + version
-        group_list = self.rest_api_service.get_object_list(url, self.token, model=Section)
+        url = self.api_base_uri + 'me/memberOf?api-version=1.5'
+        group_list = self.rest_api_service.get_object_list(url, self.access_token, model=Section)
         for section in group_list:
             if section['school_id'] == school_id:
                 groups_list.append(section['display_name'])
         return groups_list
-
-    def _normalize_schools(self, school_list, school_uid=''):
-        out_schools = []
-        temp_schools = []
-        for school in school_list:
-            if school_uid and school['id'] == school_uid:
-                out_schools.append(school)
-            else:
-                temp_schools.append(school)
-        temp_schools.sort(key=lambda d:d['name'])
-        out_schools.extend(temp_schools)
-        return out_schools
-
-    def _normalize_all_sections(self, section_list, mysection_emails):
-        out_sections = []
-        for section in section_list:
-            if section['email']  in mysection_emails:
-                section['ismy'] = True
-            else:
-                section['ismy'] = False
-            out_sections.append(section)
-        return out_sections
-

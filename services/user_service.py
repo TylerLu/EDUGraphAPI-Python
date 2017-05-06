@@ -69,26 +69,8 @@ class UserService(object):
     def get_user_by_email(email):
         return User.objects.filter(email=email).first()
 
-    def get_user(self, username):
-        user_info = {}
-        try:
-            user = User.objects.get(username=username)
-            user_info['is_authenticated'] = True
-            user_info['is_local'] = True
-            user_info['uid'] = user.profile.o365UserId
-            user_info['mail'] = user.profile.o365Email
-            user_info['first_name'] = user.first_name
-            user_info['last_name'] = user.last_name
-            user_info['display_name'] = user.profile.o365Email
-            role = UserRoles.objects.get(o365UserId=user.profile.o365UserId)
-            user_info['role'] = role.name
-            if user_info['role'] != 'Admin':
-                user_info['is_admin'] = False
-            if user_info['role'] != 'Student':
-                user_info['is_student'] = False
-        except:
-            pass
-        return user_info
+    def get_user(self, id):
+        return User.objects.filter(id=id).first()
 
     def update_role(self, uid, role_name):
          role = UserRoles.objects.get_or_create(o365UserId=uid)[0]

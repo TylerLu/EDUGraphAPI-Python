@@ -27,8 +27,8 @@ def aboutme(request):
     if not user.is_admin and user.o365_user is not None:
         token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
         education_service = EducationService(user.tenant_id, token)
-        school_id = education_service.get_school_id()
-        context['groups'] = education_service.get_my_groups(school_id)
+        my_school_id = education_service.get_my_school_id()
+        context['groups'] = education_service.get_my_groups(my_school_id)
     else:
         context['groups'] = []
     return render(request, 'managements/aboutme.html', context)

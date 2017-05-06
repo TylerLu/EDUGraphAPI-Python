@@ -59,9 +59,10 @@ def create_local(request):
             errors.append('Name %s is already taken.' % user.o365_email)
             errors.append("Email '%s' is already taken." % user.o365_email)
             context['errors'] = errors
-            return render(request, 'link/createlocal.html', context)        
+            return render(request, 'link/createlocal.html', context)                 
         link_service.link(local_user, user.o365_user)
-        user_service.update_favorite_color(data['FavoriteColor'], user.user_id)
+        user_service.update_favorite_color(data['FavoriteColor'], local_user.id)
+        local_user = user_service.get_user(local_user.id) # reload local user
         auth_login(request, local_user)
         return HttpResponseRedirect('/')
     # GET /link/createlocal

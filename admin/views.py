@@ -101,7 +101,7 @@ def add_app_roles(request):
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     aad_graph_service = AADGraphService(user.tenant_id, token)
 
-    service_principal = aad_graph_service.get_service_principal)
+    service_principal = aad_graph_service.get_service_principal()
     if not service_principal:
         request.session['Error'] = 'Could not found the service principal. Please provdie the admin consent.'
         return HttpResponseRedirect('/Admin')    

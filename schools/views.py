@@ -23,9 +23,11 @@ def schools(request):
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
-    school_id = education_service.get_school_id()
+    my_school_id = education_service.get_my_school_id()
     school_user_id = education_service.get_school_user_id()
-    schools = education_service.get_schools(school_id)
+    schools = education_service.get_schools()
+    # sort schools: my school will be put to the top
+    schools.sort(key=lambda d:d['name'] if d['id'] == my_school_id else 'Z_' + d['name'])
 
     context = {
         'user': user,
