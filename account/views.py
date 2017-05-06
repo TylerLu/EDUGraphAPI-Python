@@ -131,7 +131,6 @@ def photo(request, user_object_id):
     return HttpResponse(user_photo, content_type='image/jpeg')
 
 def register(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user_reg_form = UserRegInfo()
     # post /Account/Register
     if request.method == 'POST':

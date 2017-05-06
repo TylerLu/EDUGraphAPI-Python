@@ -22,10 +22,8 @@ link_service = LinkService()
 @login_required
 @admin_only
 def admin(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     parameter['is_admin_consented'] = user_service.is_tenant_consented(user.tenant_id)
     if request.session['Message']:
@@ -36,12 +34,10 @@ def admin(request):
 @login_required
 @admin_only
 def linked_accounts(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     user_links = link_service.get_links(user.tenant_id)
     parameter = {}
     parameter['user_links'] = linked_accounts
-    parameter['links'] = links
     return render(request, 'admin/linkaccounts.html', parameter)
 
 @login_required
@@ -51,10 +47,8 @@ def unlink_account(request, link_id):
         link_service.remove_link(link_id)
         return HttpResponseRedirect('/Admin/LinkedAccounts')
     else:
-        links = settings.DEMO_HELPER.get_links(request.get_full_path())
         user = AuthService.get_current_user(request)
         parameter = {}
-        parameter['links'] = links
         link = link_service.get_link(link_id)
         parameter['email'] = link.email
         parameter['o365Email'] = link.o365Email
@@ -90,7 +84,6 @@ def process_code(request):
 @login_required
 @admin_only
 def unconsent(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -121,9 +114,7 @@ def add_app_roles(request):
     return HttpResponseRedirect("/Admin")
 
 def consent_alone(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     parameter = {}
-    parameter['links'] = links
     if request.GET.get('consented') == 'true':
         parameter['consented'] = True
     return render(request, 'admin/consent.html', parameter)

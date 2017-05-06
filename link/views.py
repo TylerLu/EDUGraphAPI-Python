@@ -24,11 +24,9 @@ link_service = LinkService()
 
 @login_required
 def link(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
   
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     if not user.are_linked and user.is_o365:
         local_user = user_service.get_user_by_o365_email(user.o365_email)
@@ -44,11 +42,9 @@ def link(request):
 
 @login_required
 def create_local(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     create_local_form = CreateLocalInfo()
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     parameter['create_local_form'] = create_local_form
     errors = []
@@ -75,11 +71,9 @@ def create_local(request):
 
 @login_required
 def login_local(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     login_local_form = LoginLocalInfo()
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     parameter['login_local_form'] = login_local_form
     errors = []

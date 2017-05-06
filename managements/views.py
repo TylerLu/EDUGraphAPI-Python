@@ -18,10 +18,8 @@ token_service = TokenService()
 
 @login_required
 def aboutme(request):
-    links = settings.DEMO_HELPER.get_links(request.get_full_path())
     user = AuthService.get_current_user(request)
     parameter = {}
-    parameter['links'] = links
     parameter['user'] = user
     if user.local_user.is_authenticated:
         parameter['show_color'] = user.local_user.is_authenticated
