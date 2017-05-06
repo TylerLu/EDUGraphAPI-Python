@@ -14,34 +14,28 @@ class AADGraphService(object):
         self.access_token = access_token
         self.rest_api_service = RestApiService()
 
-    def get_app_id(self):
+    def get_service_principal(self):
         app_id = ''
         url = self.api_base_uri + "/servicePrincipals?api-version=1.6&$filter=appId eq '%s'" % constant.client_id
         app_content = self.rest_api_service.get_json(url, self.access_token)
-        app_id = app_content['value'][0]['objectId']
-        return app_id
+        return app_content['value'][0]
 
-    def delete_app(self, app_id):
+    def delete_service_principal(self, service_principal_id):
         version = '?api-version=1.6'
-        url = self.api_base_uri + '/servicePrincipals/%s' % app_id + version
+        url = self.api_base_uri + '/servicePrincipals/%s' % service_principal_id + version
         self.rest_api_service.delete(url, self.access_token)
 
-    def get_app_name(self):
-        app_name = ''
-        url = self.api_base_uri + "/servicePrincipals?api-version=1.6&$filter=appId eq '%s'" % constant.client_id
-        app_content = self.rest_api_service.get_json(url, self.access_token)
-        app_name = app_content['value'][0]['appDisplayName']
-        return app_name
-
-    def add_app_users(self, app_id, app_name):
+    def add_app_role_assignments(self, service_principal_id, service_principal_id_name):
         url = self.api_base_uri + '/users?api-version=1.6&$expand=appRoleAssignments'
         users_content = self.rest_api_service.get_json(url, self.access_token)
         users = users_content['value']
+
+        count = 0
         for user in users:
             exist_label = False
             roles = user['appRoleAssignments']
             for role in roles:
-                if role['resourceId'] == app_id:
+                if role['resourceId'] == service_principal_id:
                     exist_label = True
                     break
             if not exist_label:
@@ -50,8 +44,9 @@ class AADGraphService(object):
                     'principalDisplayName': user['displayName'],
                     'principalId': user['objectId'],
                     'principalType': 'User',
-                    'resourceId': app_id,
-                    'resourceDisplayName': app_name
+                    'resourceId': service_principal_id,
+                    'resourceDisplayName': service_principal_id_name
                 }
+                count = count+1
                 #post_url = self.api_base_uri + '/users/%s' % user['objectId'] + '/appRoleAssignments?api-version=1.6'
                 #self.rest_api_service.post_json(post_url, self.access_token, data=data)
