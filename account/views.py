@@ -36,32 +36,9 @@ def index(request):
         return HttpResponseRedirect('/Schools')
 
 def login(request):
-    # TODO: split the post to a new method
     # post /Account/Login
     if request.method == 'POST':
-        email = ''
-        password = ''
-        errors = []
-        user_form = UserInfo(request.POST)
-        if user_form.is_valid():
-            data = user_form.clean()
-            email = data['Email']
-            password = data['Password']
-        if email and password:
-            user = auth_authenticate(username=email, password=password)
-            if user is not None:
-                auth_login(request, user)
-                o365_user = user_service.get_o365_user(user)
-                if o365_user:
-                    request.session[constant.o365_user_session_key] = o365_user.to_json()
-                return HttpResponseRedirect('/')
-            else:
-                errors.append('Invalid login attempt.')
-                context = {
-                    'user_form': user_form,
-                    'errors': errors
-                }
-                return render(request, 'account/login.html', context)
+        return login_post(request)
     # get /Account/Login
     else:
         o365_username = request.COOKIES.get(constant.o365_username_cookie)
@@ -75,6 +52,29 @@ def login(request):
         else:
             user_form = UserInfo()
             return render(request, 'account/login.html', { 'user_form': user_form })
+
+def login_post(request):
+    email = ''
+    password = ''
+    errors = []
+    user_form = UserInfo(request.POST)
+    if user_form.is_valid():
+        data = user_form.clean()
+        email = data['Email']
+        password = data['Password']
+        user = auth_authenticate(username=email, password=password)
+        if user is not None:
+            auth_login(request, user)
+            o365_user = user_service.get_o365_user(user)
+            if o365_user:
+                request.session[constant.o365_user_session_key] = o365_user.to_json()
+            return HttpResponseRedirect('/')
+    errors.append('Invalid login attempt.')
+    context = {
+        'user_form': user_form,
+        'errors': errors
+    }
+    return render(request, 'account/login.html', context)
 
 def o365_login(request):
     extra_params = {
