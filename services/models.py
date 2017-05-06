@@ -2,15 +2,16 @@ import json
 import constant
 
 class O365User(object):
-    def __init__(self, id=None, email=None, first_name=None, last_name=None, display_name=None, tenant_id=None, tenant_name=None, roles=None):
+    def __init__(self, id=None, email=None, first_name=None, last_name=None, display_name=None, tenant_id=None, tenant_name=None, roles=None, photo=None):
         self._id = id
         self._email = email
         self._first_name = first_name
         self._last_name = last_name
         self._display_name = display_name
-        self._tenant_id = tenant_id        
+        self._tenant_id = tenant_id
         self._tenant_name = tenant_name
         self._roles = roles
+        self._photo = photo
 
     @property
     def id(self):
@@ -27,11 +28,11 @@ class O365User(object):
     @property
     def last_name(self):
         return self._last_name
-        
+
     @property
     def display_name(self):
         return self._display_name
-        
+
     @property
     def tenant_id(self):
         return self._tenant_id
@@ -44,10 +45,14 @@ class O365User(object):
     def roles(self):
         return self._roles
 
+    @property
+    def photo(self):
+        return self._photo
+
     def to_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
+        return json.dumps(self, default=lambda o: o.__dict__,
             sort_keys=True, indent=4)
-    
+
     @staticmethod
     def from_json(value):
         obj = O365User()
@@ -67,7 +72,7 @@ class UnifiedUser(object):
     @property
     def is_authenticated(self):
         return self.o365_user is not None or self.local_user.is_authenticated
-    
+
     @property
     def are_linked(self):
         return self.o365_user is not None and self.local_user.is_authenticated
@@ -91,19 +96,19 @@ class UnifiedUser(object):
     @property
     def o365_email(self):
         return self.o365_user.email
-        
+
     @property
     def o365_user_id(self):
         return self.o365_user.id
-        
+
     @property
     def user_id(self):
         return self.local_user.id
-        
+
     @property
     def tenant_id(self):
         return self.o365_user.tenant_id
-        
+
     @property
     def is_local(self):
         return self.o365_user is None
@@ -111,7 +116,7 @@ class UnifiedUser(object):
     @property
     def is_o365(self):
         return not self.local_user.is_authenticated
-  
+
     @property
     def display_name(self):
         user = self.o365_user
@@ -120,7 +125,7 @@ class UnifiedUser(object):
         if user:
             return "%s %s" % (user.first_name, user.last_name)
         return ''
-    
+
     @property
     def main_role(self):
         if not self.o365_user:

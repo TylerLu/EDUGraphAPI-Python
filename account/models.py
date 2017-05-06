@@ -1,19 +1,29 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 from django.db import models
-
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
-class LocalUser(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField(User)
     o365UserId = models.CharField(null=True, max_length=255)
     o365Email = models.CharField(null=True, max_length=255)
     favoriteColor = models.CharField(null=True, max_length=255)
-    organization = models.ForeignKey('Organizations', null=True)
+    organization = models.OneToOneField('Organizations', null=True)
     class Meta:
-        db_table = 'users'
+        db_table = 'profile'
+
+    @receiver(post_save, sender=User)
+    def create_user_profile(sender, instance, created, **kwargs):
+        if created:
+            Profile.objects.create(user=instance)
+
+    @receiver(post_save, sender=User)
+    def save_user_profile(sender, instance, **kwargs):
+        instance.profile.save()
 
 class UserRoles(models.Model):
     name = models.CharField(null=True, max_length=255)
@@ -25,7 +35,7 @@ class TokenCache(models.Model):
     o365UserId = models.CharField(null=True, max_length=255)
     refreshToken = models.TextField(null=True)
     accessToken = models.TextField(null=True)
-    expiresOn = models.DateTimeField()
+    expiresOn = models.DateTimeField(null=True)
     resource = models.CharField(null=True, max_length=255)
     class Meta:
         db_table = 'token_cache'
@@ -43,6 +53,6 @@ class Organizations(models.Model):
     name = models.CharField(null=True, max_length=255)
     tenantId = models.CharField(null=True, max_length=255)
     created = models.DateTimeField(auto_now_add=True)
-    isAdminConsented = models.BooleanField(default=True)
+    isAdminConsented = models.BooleanField(default=False)
     class Meta:
         db_table = 'organizations'

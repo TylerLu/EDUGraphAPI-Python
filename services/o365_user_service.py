@@ -16,7 +16,7 @@ class O365UserService(object):
         self._aad_graph_service = AADGraphService(self._tenant_id, aad_graph_service_access_token)
 
     def get_o365_user(self):
-        me = self._ms_graph_service.get_me().to_dict()    
+        me = self._ms_graph_service.get_me().to_dict()
         org = self._ms_graph_service.get_organization(self._tenant_id)
 
         id = me['id']
@@ -27,8 +27,9 @@ class O365UserService(object):
         if not email:
             email = me['userPrincipalName']
         tenant_name = org['displayName']
-        roles = self._get_roles(id) 
-        return O365User(id, email, first_name, last_name, display_name, self._tenant_id, tenant_name, roles)
+        roles = self._get_roles(id)
+        photo = '/Photo/UserPhoto/' + id
+        return O365User(id, email, first_name, last_name, display_name, self._tenant_id, tenant_name, roles, photo)
 
     def _get_roles(self, user_id):
         roles = []

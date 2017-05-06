@@ -15,7 +15,7 @@ class HttpRequestFailed(Exception):
     @property
     def response(self):
         return self._request
-        
+
     @property
     def response(self):
         return self._response
@@ -40,7 +40,7 @@ class RestApiService(object):
             s_headers.update(headers)
         response = self._send(method, url, s_headers)
         return json.loads(response.text)
-    
+
     def get_img(self, url, token, headers=None):
         method = 'GET'
         s_headers = {'content-type': 'image/jpeg'}
@@ -105,7 +105,6 @@ class RestApiService(object):
         prepped = request.prepare()
         response = session.send(prepped)
         if response.status_code < 200 or response.status_code > 299:
-            print(response.content)
             raise HttpRequestFailed(request, response)
         return response
 
