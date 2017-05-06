@@ -1,6 +1,6 @@
 '''
- *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
- *   * See LICENSE in the project root for license information.  
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
 '''
 import msgraph
 import constant
@@ -10,7 +10,7 @@ from services.models import O365User
 from schools.models import Document, Conversation
 
 class MSGraphService(object):
-        
+
     def __init__(self, access_token):
         self.access_token = access_token
         self.api_base_uri = constant.Resources.MSGraph + 'v1.0' + '/'
@@ -21,7 +21,7 @@ class MSGraphService(object):
         self.ms_graph_client = msgraph.GraphServiceClient(self.api_base_uri, auth_provider, msgraph.HttpProvider())
 
     def get_o365_user(self, tenant_id):
-        me = self._get_me().to_dict()    
+        me = self._get_me().to_dict()
         org = self._get_organization(tenant_id)
 
         id = me['id']
@@ -33,7 +33,8 @@ class MSGraphService(object):
             email = me['userPrincipalName']
         tenant_name = org['displayName']
         roles = self._get_roles(id)
-        return O365User(id, email, first_name, last_name, display_name, tenant_id, tenant_name, roles)
+        photo = '/Photo/UserPhoto/' + id
+        return O365User(id, email, first_name, last_name, display_name, tenant_id, tenant_name, roles, photo)
 
     def get_photo(self, object_id):
         url = self.api_base_uri + 'users/%s/photo/$value' % object_id
@@ -45,7 +46,7 @@ class MSGraphService(object):
     def get_documents(self, object_id):
         url = self.api_base_uri + 'groups/%s/drive/root/children' % object_id
         return self.rest_api_service.get_object_list(url, self.access_token, model=Document)
-    
+
     def get_documents_root(self, object_id):
         url = self.api_base_uri + 'groups/%s/drive/root' % object_id
         document = self.rest_api_service.get_object(url, self.access_token, model=Document)
@@ -57,22 +58,22 @@ class MSGraphService(object):
         for conversation in conversations_list:
             conversation['url'] = conversation['url'] % section_mail
         return conversations_list
-    
+
     def get_conversations_root(self, section_email):
         return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0' % section_email
 
-    
+
     def _get_roles(self, user_id):
         roles = []
         # check if the user is an admin
         directory_roles = self._get_directory_roles()
         admin_role = next(r for r in directory_roles if r.display_name == constant.company_admin_role_name)
         if admin_role:
-            members = admin_role.to_dict()['members']   
-            if any(m for m in members if m['id']==user_id): 
+            members = admin_role.to_dict()['members']
+            if any(m for m in members if m['id']==user_id):
                 roles.append(constant.Roles.Admin)
         # check if the user is a faculty or a student
-        assigned_licenses = self._get_assigned_licenses()        
+        assigned_licenses = self._get_assigned_licenses()
         for license in assigned_licenses:
             license_id = license['skuId']
             if license_id == constant.O365ProductLicenses.Faculty or license_id == constant.O365ProductLicenses.FacultyPro:
@@ -93,6 +94,6 @@ class MSGraphService(object):
         return self.rest_api_service.get_json(url, self.access_token)
 
 
-    def _get_directory_roles(self):        
+    def _get_directory_roles(self):
         expand_members = msgraph.options.QueryOption('$expand', 'members')
         return self.ms_graph_client.directory_roles.request(options=[expand_members]).get()

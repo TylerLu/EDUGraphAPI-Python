@@ -19,17 +19,17 @@ class AuthService(object):
         return '%s://%s/%s' % (scheme, host, relative_redirect_uri)
 
     @staticmethod
-    def get_authorization_url(request, response_type, relative_redirect_uri, state, extra_params = None):  
-        params  = { 
-            'client_id' : constant.client_id, 
+    def get_authorization_url(request, response_type, relative_redirect_uri, state, extra_params = None):
+        params  = {
+            'client_id' : constant.client_id,
             'response_type': response_type,
             'response_mode': 'form_post',
             'redirect_uri': AuthService.get_redirect_uri(request, relative_redirect_uri),
             'state': state
             }
         if extra_params:
-            params.update(extra_params)    
-        request.session['auth_state'] = state    
+            params.update(extra_params)
+        request.session['auth_state'] = state
         nonce = params.get('nonce')
         if nonce:
             request.session['auth_nonce'] = nonce
@@ -54,10 +54,9 @@ class AuthService(object):
         return UnifiedUser(request)
 
     @staticmethod
-    def set_o365_user(request, o365_user):      
+    def set_o365_user(request, o365_user):
         request.session[constant.o365_user_session_key] = o365_user.to_json()
 
-        
     @staticmethod
     def clear_o365_user(request):
         if constant.o365_user_session_key in request.session:

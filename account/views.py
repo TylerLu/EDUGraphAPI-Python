@@ -105,10 +105,10 @@ def o365_auth_callback(request):
 
     redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
     auth_result = token_service.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
-    token_service.cache_tokens(auth_result, o365_user_id) 
-    
+    token_service.cache_tokens(auth_result, o365_user_id)
+
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
-    o365_user = ms_graph_service.get_o365_user(tenant_id)    
+    o365_user = ms_graph_service.get_o365_user(tenant_id)
     AuthService.set_o365_user(request, o365_user)
 
     user_service.create_or_update_organization(tenant_id, o365_user._tenant_name)
