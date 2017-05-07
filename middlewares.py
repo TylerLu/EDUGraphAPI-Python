@@ -5,6 +5,7 @@
 from utils.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
+from services.auth_service import AuthService
 
 import os
 from services.token_service import RefreshTokenException
@@ -12,8 +13,9 @@ from services.token_service import RefreshTokenException
 class HandleRefreshTokenExceptionMiddleware(MiddlewareMixin):
 
     def process_exception(self, request, exception):
-        context = {}
-        context['reason'] = str(exception)
+        context = { 
+            'user': AuthService.get_current_user(request),
+            'reason': str(exception)
+        }
         if exception.__class__.__name__ == 'RefreshTokenException':
             return render(request, 'login0365required.html', context)
-        return render(request, 'error.html', context)

@@ -108,6 +108,7 @@ def classdetails(request, school_object_id, class_object_id):
         if seating_position:
             student.customer_data['position'] = favorite_color
 
+
     # set seatrange
     seatrange = range(1, 37)
 
