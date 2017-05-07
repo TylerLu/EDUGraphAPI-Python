@@ -44,7 +44,7 @@ class GraphObjectBase(object):
         return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType')
 
     @property
-    def customer_data(self):
+    def custom_data(self):
         return self._custom_data
 
 class School(GraphObjectBase):
@@ -341,7 +341,7 @@ class Conversation(GraphObjectBase):
 
     @property
     def id(self):
-        self.get_value('id')
+        return self.get_value('id')
 
     @property
     def mail(self):

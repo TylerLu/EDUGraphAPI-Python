@@ -50,7 +50,7 @@ def classes(request, school_object_id):
     for section in my_sections:
         my_section_ids.append(section.object_id)
     for section in all_sections:
-        section.customer_data['is_my'] = section.object_id in my_section_ids
+        section.custom_data['is_my'] = section.object_id in my_section_ids
 
     context = {
         'user': user,
@@ -78,7 +78,7 @@ def classnext(request, school_object_id):
     for section in my_sections:
         my_section_ids.append(section.object_id)
     for section in all_sections:
-        section.customer_data['is_my'] = section.object_id in my_section_ids
+        section.custom_data['is_my'] = section.object_id in my_section_ids
 
     ajax_result = {}
     ajax_result['Sections'] = {}
@@ -103,11 +103,11 @@ def classdetails(request, school_object_id, class_object_id):
     for student in students:
         favorite_color = user_service.get_favorite_color_by_o365_user_id(student.object_id)
         if favorite_color:
-            student.customer_data['favorite_color'] = favorite_color
-        seating_position = get_seating_position = user_service.get_seating_position(class_object_id, student.object_id)
-        if seating_position:
-            student.customer_data['position'] = seating_position
-
+            student.custom_data['favorite_color'] = favorite_color
+        seating_position = get_seating_position = user_service.get_seating_position(student.object_id, class_object_id)
+        if not seating_position:
+            seating_position = 0
+        student.custom_data['position'] = seating_position
 
     # set seatrange
     seatrange = range(1, 37)
@@ -119,8 +119,10 @@ def classdetails(request, school_object_id, class_object_id):
     documents_root = ms_graph_service.get_documents_root(class_object_id)
     conversations = ms_graph_service.get_conversations(class_object_id)
     for conversation in conversations:
-        conversation.customer_data['url'] = ms_graph_service.get_conversations_url(conversation.id, section.email)
+        conversation.custom_data['url'] = ms_graph_service.get_conversations_url(conversation.id, section.email)
     conversations_root = ms_graph_service.get_conversations_root(section.email)
+
+    favorite_color = user_service.get_favorite_color_by_o365_user_id(user.o365_user_id)
 
     context = {
         'user': user,
@@ -135,7 +137,8 @@ def classdetails(request, school_object_id, class_object_id):
         'seatrange': seatrange,
         'school_object_id': school_object_id,
         'class_object_id': class_object_id,
-        'is_in_a_school': True
+        'is_in_a_school': True,
+        'favorite_color': favorite_color
     }
     return render(request, 'schools/classdetails.html', context)
 

@@ -57,7 +57,7 @@ class MSGraphService(object):
         return self.rest_api_service.get_object_list(url, self.access_token, model=Conversation)
     
     def get_conversations_url(self, conversation_id, section_email):
-        return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0&ConvID=%s' % (conversation_id, section_email)
+        return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0&ConvID=%s' % (section_email, conversation_id, )
 
     def get_conversations_root(self, section_email):
         return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0' % section_email

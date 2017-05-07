@@ -65,7 +65,7 @@
 				<div class="content clearfix">
 					{% for section in sections %}
 					<div class="tile-container">
-						{% if section.customer_data.is_my %}
+						{% if section.custom_data.is_my %}
 						<a class="mysectionlink" href="Classes/{{ section.object_id }}">
 							<div class="tile">
 								<h5>{{ section.name }}</h5>

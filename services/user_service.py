@@ -106,7 +106,7 @@ class UserService(object):
     def get_seating_position(self, o365_user_id, class_id):
         arrangement = ClassroomSeatingArrangements.objects.filter(userId=o365_user_id, classId=class_id).first()
         if arrangement:
-               return seat_obj.position
+               return arrangement.position
         return None
 
     def update_positions(self, seat_arrangements):
