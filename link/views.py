@@ -84,7 +84,7 @@ def login_local(request):
             password = data['Password']
             local_user = auth_authenticate(username=email, password=password)
             if local_user:
-                link_service.link(local_user, user.o365_user, None)
+                link_service.link(local_user, user.o365_user)
                 auth_login(request, local_user)                
                 request.session['Message'] = 'Your local account has been successfully linked to your Office 365 account.'
                 return HttpResponseRedirect('/')

@@ -26,7 +26,9 @@
 		{% if user.is_authenticated %}
 		<form action="/Account/LogOff" class="navbar-right" id="logoutForm" method="post">{% csrf_token %}
         	<div class="userinfo">
-				<a href="javascript:void(0);" id="userinfolink">Logged in as: {{ user.main_role }}. Hello {{ user.display_name }}
+				<a href="javascript:void(0);" id="userinfolink">
+					{% if user.main_role %} Logged in as: {{ user.main_role }}. {% endif %}
+					Hello {{ user.display_name }}
 					{% if user.photo %}<img src="{{ user.photo }}" />{% endif %}</a>
             	<span class="caret" id="caret"></span>
         	</div>

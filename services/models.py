@@ -123,7 +123,10 @@ class UnifiedUser(object):
         if not user and self.local_user.is_authenticated:
             user = self.local_user
         if user:
-            return "%s %s" % (user.first_name, user.last_name)
+            if user.first_name and user.last_name:
+                return "%s %s" % (user.first_name, user.last_name)
+            else:
+                return user.email
         return ''
 
     @property
