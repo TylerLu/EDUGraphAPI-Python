@@ -5,7 +5,7 @@
 import adal
 import datetime
 import constant
-from account.models import TokenCache
+from models.db import TokenCache
 
 class RefreshTokenException(Exception):
     pass

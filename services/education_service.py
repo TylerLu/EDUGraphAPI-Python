@@ -5,7 +5,7 @@
 import re
 import constant
 from services.rest_api_service import RestApiService
-from schools.models import School, Section, EduUser
+from models.education import School, Section, EduUser
 
 class EducationService(object):
 

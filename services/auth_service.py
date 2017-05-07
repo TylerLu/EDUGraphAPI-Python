@@ -8,7 +8,7 @@ import constant
 import uuid
 import jwt
 import requests
-from services.models import O365User, UnifiedUser
+from models.auth import O365User, UnifiedUser
 
 class AuthService(object):
 

@@ -4,8 +4,8 @@
 '''
 from django.contrib.auth.models import User
 
-from services.models import O365User
-from account.models import Profile, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
+from models.auth import O365User
+from models.db import Profile, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
 
 class UserService(object):
 

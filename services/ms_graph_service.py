@@ -6,8 +6,8 @@ import msgraph
 import constant
 from utils.auth_provider import AuthProvider
 from services.rest_api_service import RestApiService
-from services.models import O365User
-from schools.models import Document, Conversation
+from models.auth import O365User
+from models.education import Document, Conversation
 
 class MSGraphService(object):
 
