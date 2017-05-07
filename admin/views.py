@@ -36,8 +36,8 @@ def admin(request):
 @admin_only
 def linked_accounts(request):
     user = AuthService.get_current_user(request)
-    user_links = link_service.get_links(user.tenant_id)
-    return render(request, 'admin/linkaccounts.html', { 'user_links': linked_accounts })
+    account_links = link_service.get_links(user.tenant_id)
+    return render(request, 'admin/linkaccounts.html', { 'account_links': account_links })
 
 @login_required
 @admin_only
@@ -49,8 +49,8 @@ def unlink_account(request, link_id):
         user = AuthService.get_current_user(request)
         link = link_service.get_link(link_id)
         context = {
-            'email': link.email,
-            'o365Email': link.o365Email
+            'email': link['email'],
+            'o365Email': link['o365Email']
         }
         return render(request, 'admin/unlinkaccounts.html', context)
 

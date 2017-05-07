@@ -58,8 +58,8 @@ class RestApiService(object):
             value_list = content[key]
             for value in value_list:
                 entity = model(value)
-                out_entity = dict((name, getattr(entity, name)) for name in dir(entity) if not name.startswith('__')  and not callable(getattr(entity, name)))
-                entity_list.append(out_entity)
+                # out_entity = dict((name, getattr(entity, name)) for name in dir(entity) if not name.startswith('__')  and not callable(getattr(entity, name)))
+                entity_list.append(entity)
             if next_key:
                 next_link = content.get(next_key, '')
         if next_key:
@@ -69,12 +69,11 @@ class RestApiService(object):
 
     def get_object(self, url, token, headers=None, model=None):
         content = self.get_raw(url, token, headers)
-        out_entity = None
         if content and model:
             value = json.loads(content)
-            entity = model(value)
-            out_entity = dict((name, getattr(entity, name)) for name in dir(entity) if not name.startswith('__')  and not callable(getattr(entity, name)))
-        return out_entity
+            return model(value)
+            # out_entity = dict((name, getattr(entity, name)) for name in dir(entity) if not name.startswith('__')  and not callable(getattr(entity, name)))
+        return None
 
     def delete(self, url, token, headers=None):
         method = 'DELETE'

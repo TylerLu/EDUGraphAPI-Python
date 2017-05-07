@@ -17,16 +17,16 @@
         <th>Office 365 Account</th>
         <th></th>
     </tr>
-	{% for user_link in user_links %}
+	{% for account_link in account_links %}
         <tr>
-			<td>{{ user_link.email }}</td>
-			<td>{{ user_link.o365Email }}</td>
+			<td>{{ account_link.email }}</td>
+			<td>{{ account_link.o365Email }}</td>
             <td>
-				<a href="/UnlinkAccount/{{ user_link.id }}">Unlink</a>
+				<a href="/UnlinkAccount/{{ account_link.id }}">Unlink</a>
             </td>
         </tr>
 	{% endfor %}
-	{% if user_links|length == 0 %}
+	{% if account_links|length == 0 %}
         <tr>
             <td class="empty-result" colspan="3">No linked accounts</td>
         </tr>

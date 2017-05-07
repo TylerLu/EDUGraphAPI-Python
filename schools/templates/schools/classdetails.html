@@ -127,7 +127,7 @@
 							<td class="border-holder"></td>
 							<td class="space-holder left"></td>
 							<td>
-								<a target="_blank" href="{{ conversation.url }}">{{ conversation.topic }}</a>
+								<a target="_blank" href="{{ conversation.custom_data.url }}">{{ conversation.topic }}</a>
 							</td>
 							<td class="space-holder right"></td>
 						</tr>
@@ -147,10 +147,10 @@
 					{% endif %}
                     <ul id="lstproducts">
 						{% for student in students %}
-							<li id="{{ student.uid }}">
+							<li id="{{ student.object_id }}">
 								<img src="/static/Images/header-default.jpg" realheader={{ student.photo }}/>
 								<span class="disname">{{ student.name }}</span>
-								{% if student.position == 0 %}
+								{% if student.custom_data.position == 0 %}
 								<span class="seated hideitem">
 								{% else %}
 								<span class="seated">
@@ -162,17 +162,17 @@
                     </ul>
                     <div id="hidtiles" class="hideitem">
 						{% for student in students %}
-							{% if student.position != 0 %}
-								{% if student.color %}
-								<div class="deskcontainer white green" style="background-color:{{ student.color }}" position="{{ student.position }}" userid="{{ student.uid }}">
+							{% if student.custom_data.position != 0 %}
+								{% if student.custom_data.color %}
+								<div class="deskcontainer white green" style="background-color:{{ student.custom_data.color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% else %}
-								<div class="deskcontainer white" style="" position="{{ student.position }}" userid="{{ student.uid }}">
+								<div class="deskcontainer white" style="" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% endif %}
 							{% else %}
-								{% if student.color %}
-								<div class="deskcontainer unsaved green" style="background-color:{{ student.color }}" position="{{ student.position }}" userid="{{ student.uid }}">
+								{% if student.custom_data.color %}
+								<div class="deskcontainer unsaved green" style="background-color:{{ student.custom_data.color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% else %}
-								<div class="deskcontainer unsaved" style="" position="{{ student.position }}" userid="{{ student.uid }}">
+								<div class="deskcontainer unsaved" style="" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% endif %}
 							{% endif %}
 									<div class="deskclose"><img src="/static/Images/close.png"></div>

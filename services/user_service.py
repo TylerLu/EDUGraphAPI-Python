@@ -72,8 +72,8 @@ class UserService(object):
     def get_user(self, id):
         return User.objects.filter(id=id).first()
 
-    def update_role(self, uid, role_name):
-         role = UserRoles.objects.get_or_create(o365UserId=uid)[0]
+    def update_role(self, o365_user_id, role_name):
+         role = UserRoles.objects.get_or_create(o365UserId=o365_user_id)[0]
          role.name = role_name
          role.save()
     
@@ -95,15 +95,11 @@ class UserService(object):
             profile.favoriteColor = color
             profile.save()        
 
-    def get_positions(self, students, class_id):
-        for student in students:
-            position = 0
-            try:
-                seat_obj = ClassroomSeatingArrangements.objects.get(userId=student['uid'], classId=class_id)
-                position = seat_obj.position
-            except:
-                pass
-            student['position'] = position
+    def get_seating_position(self, o365_user_id, class_id):
+        arrangement = ClassroomSeatingArrangements.objects.filter(userId=o365_user_id, classId=class_id).first()
+        if arrangement:
+               return seat_obj.position
+        return None
 
     def update_positions(self, seat_arrangements):
         for seat in seat_arrangements:

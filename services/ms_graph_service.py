@@ -49,18 +49,17 @@ class MSGraphService(object):
     def get_documents_root(self, object_id):
         url = self.api_base_uri + 'groups/%s/drive/root' % object_id
         document = self.rest_api_service.get_object(url, self.access_token, model=Document)
-        return document['web_url']
+        return document.web_url
 
-    def get_conversations(self, object_id, section_mail):
+    def get_conversations(self, object_id):
         url = self.api_base_uri + 'groups/%s/conversations' % object_id
-        conversations_list = self.rest_api_service.get_object_list(url, self.access_token, model=Conversation)
-        for conversation in conversations_list:
-            conversation['url'] = conversation['url'] % section_mail
-        return conversations_list
+        return self.rest_api_service.get_object_list(url, self.access_token, model=Conversation)
     
+    def get_conversations_url(self, conversation_id, section_email):
+        return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0&ConvID=%s' % (conversation_id, section_email)
+
     def get_conversations_root(self, section_email):
         return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0' % section_email
-
     
     def _get_roles(self, user_id):
         roles = []

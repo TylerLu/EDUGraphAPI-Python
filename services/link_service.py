@@ -38,9 +38,9 @@ class LinkService(object):
         return None
 
     def get_links(self, tenant_id):
-        organization_obj = Organizations.objects.get(tenantId=tenant_id)
+        org = Organizations.objects.get(tenantId=tenant_id)
         links = []
-        profiles = Profile.objects.filter(organization_id=organization_obj.id)
+        profiles = Profile.objects.filter(organization_id=org.id)
         for profile in profiles:
             if profile.o365Email:
                 link = {}

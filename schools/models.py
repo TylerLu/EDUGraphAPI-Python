@@ -10,6 +10,7 @@ class GraphObjectBase(object):
 
     def __init__(self, prop_dict={}):
         self._prop_dict = prop_dict
+        self._custom_data = {}
 
     def get_value(self, property_name):
          if property_name in self._prop_dict:
@@ -17,15 +18,40 @@ class GraphObjectBase(object):
          else:
             return ''
 
+    def set_value(self, property_name, value):
+        self._prop_dict[property_name] = value
+
+
+    @property
+    def object_id(self):
+        return self.get_value('objectId')
+    
+    @property
+    def ObjectId(self):
+        return self.object_id
+
+    
+    @property
+    def object_type(self):
+        return self.get_value('ObjectType')
+
+    @property
+    def ObjectType(self):
+        return self.object_type
+
+    @property
+    def education_object_type(self):
+        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType')
+
+    @property
+    def customer_data(self):
+        return self._custom_data
+
 class School(GraphObjectBase):
     def __init__(self, prop_dict={}):
         self._bing_map_server = BingMapService()
         super(School, self).__init__(prop_dict)
         self._lat, self._lon = self._get_lat_lon()
-
-    @property
-    def object_id(self):
-        return self.get_value('objectId')
 
     @property
     def id(self):
@@ -105,14 +131,6 @@ class Section(GraphObjectBase):
         super(Section, self).__init__(prop_dict)
 
     @property
-    def object_id(self):
-        return self.get_value('objectId')
-    
-    @property
-    def ObjectId(self):
-        return self.object_id
-        
-    @property
     def id(self):
         return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId')
     
@@ -127,10 +145,6 @@ class Section(GraphObjectBase):
     @property
     def Email(self):
         return self.mail
-
-    @property
-    def education_object_type(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType')
 
     @property
     def display_name(self):
@@ -208,14 +222,6 @@ class Section(GraphObjectBase):
         return self.period
 
     @property
-    def ObjectType(self):
-        return self.get_value('ObjectType')
-
-    @property
-    def EducationObjectType(self):
-        return self.get_value('EducationObjectType')
-
-    @property
     def school_id(self):
         return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId')
 
@@ -263,33 +269,23 @@ class Section(GraphObjectBase):
         return self.term_end_date
 
     @property
-    def Members(self):
-        return []
+    def members(self):
+        return self.get_value('members')
+
+    @members.setter
+    def members(self, value):
+        self.set_value('members', value)
+
+    @property
+    def teachers(self):
+        if self.members:
+            return [m for m in self.members if m.education_object_type == 'Teacher']
+        return None
 
 class EduUser(GraphObjectBase):
     def __init__(self, prop_dict={}):
         super(EduUser, self).__init__(prop_dict)
-
-    @property
-    def object_type(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType')
-
-    @property
-    def ObjectType(self):
-        return self.object_type
     
-    @property
-    def uid(self):
-        return self.get_value('objectId')
-
-    @property
-    def object_id(self):
-        return self.uid
-
-    @property
-    def O365UserId(self):
-        return self.uid
-
     @property
     def name(self):
         return self.get_value('displayName')
@@ -307,8 +303,12 @@ class EduUser(GraphObjectBase):
         return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_Grade')
 
     @property
+    def is_teacher(self):
+        return self.education_object_type == 'Student'
+
+    @property
     def photo(self):
-        photo = '/Photo/UserPhoto/%s' % self.uid
+        photo = '/Photo/UserPhoto/%s' % self.object_id
         return photo
 
 class Document(GraphObjectBase):
@@ -340,15 +340,13 @@ class Conversation(GraphObjectBase):
         super(Conversation, self).__init__(prop_dict)
 
     @property
+    def id(self):
+        self.get_value('id')
+
+    @property
     def mail(self):
         return self.get_value('mail')
 
     @property
     def topic(self):
         return self.get_value('topic')
-    
-    @property
-    def url(self):
-        cid = self.get_value('id')
-        url = 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0&ConvID=' + cid
-        return url

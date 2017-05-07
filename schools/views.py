@@ -27,7 +27,7 @@ def schools(request):
     school_user_id = education_service.get_school_user_id()
     schools = education_service.get_schools()
     # sort schools: my school will be put to the top
-    schools.sort(key=lambda d:d['name'] if d['id'] == my_school_id else 'Z_' + d['name'])
+    schools.sort(key=lambda d:d.name if d.object_id == my_school_id else 'Z_' + d.name)
     context = {
         'user': user,
         'my_school_id': my_school_id,
@@ -43,14 +43,14 @@ def classes(request, school_object_id):
 
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
-    my_sections = education_service.get_my_sections(school['id'])
-    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'])
+    my_sections = education_service.get_my_sections(school.id)
+    all_sections, sectionsnextlink = education_service.get_all_sections(school.id)
 
     my_section_ids = []
     for section in my_sections:
-        my_section_ids.append(section['object_id'])
+        my_section_ids.append(section.object_id)
     for section in all_sections:
-        section['ismy'] = section['object_id'] in my_section_ids
+        section.customer_data['is_my'] = section.object_id in my_section_ids
 
     context = {
         'user': user,
@@ -71,14 +71,14 @@ def classnext(request, school_object_id):
 
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
-    my_sections = education_service.get_my_sections(school['id'])
-    all_sections, sectionsnextlink = education_service.get_all_sections(school['id'], nextlink=nextlink)
+    my_sections = education_service.get_my_sections(school.id)
+    all_sections, sectionsnextlink = education_service.get_all_sections(school.id, nextlink=nextlink)
 
     my_section_ids = []
     for section in my_sections:
-        my_section_ids.append(section['object_id'])
+        my_section_ids.append(section.object_id)
     for section in all_sections:
-        section['ismy'] = section['object_id'] in my_section_ids
+        section.customer_data['is_my'] = section.object_id in my_section_ids
 
     ajax_result = {}
     ajax_result['Sections'] = {}
@@ -93,18 +93,20 @@ def classdetails(request, school_object_id, class_object_id):
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
 
-    school_info = education_service.get_school(school_object_id)
-    section_info = education_service.get_section(class_object_id)
-    teachers = education_service.get_section_members(class_object_id, 'Teacher')
-    students = education_service.get_section_members(class_object_id, 'Student')
+    school = education_service.get_school(school_object_id)
+    section = education_service.get_section(class_object_id)
+    members = education_service.get_section_members(class_object_id)
+    teachers = [m for m in members if m.education_object_type == 'Teacher']
+    students = [m for m in members if m.education_object_type == 'Student'] 
 
-    # get students position from database
-    user_service.get_positions(students, class_object_id)
-    # get students colors from database
+    # set favorite colors and seating positions
     for student in students:
-        favorite_color = user_service.get_favorite_color_by_o365_user_id(student['uid'])
+        favorite_color = user_service.get_favorite_color_by_o365_user_id(student.object_id)
         if favorite_color:
-            student['color'] = favorite_color
+            student.customer_data['favorite_color'] = favorite_color
+        seating_position = get_seating_position = user_service.get_seating_position(class_object_id, student.object_id)
+        if seating_position:
+            student.customer_data['position'] = favorite_color
             
     # set seatrange
     seatrange = range(1, 37)
@@ -114,13 +116,15 @@ def classdetails(request, school_object_id, class_object_id):
 
     documents = ms_graph_service.get_documents(class_object_id)
     documents_root = ms_graph_service.get_documents_root(class_object_id)
-    conversations = ms_graph_service.get_conversations(class_object_id, section_info['email'])
-    conversations_root = ms_graph_service.get_conversations_root(section_info['email'])
+    conversations = ms_graph_service.get_conversations(class_object_id)
+    for conversation in conversations:
+        conversation.customer_data['url'] = ms_graph_service.get_conversations_url(conversation.id, section.email)
+    conversations_root = ms_graph_service.get_conversations_root(section.email)
 
     context = {
         'user': user,
-        'school': school_info,
-        'section': section_info,
+        'school': school,
+        'section': section,
         'teachers': teachers,
         'students': students,
         'documents': documents,
@@ -150,8 +154,8 @@ def users(request, school_object_id):
 
     school = education_service.get_school(school_object_id)
     users, usersnextlink = education_service.get_members(school_object_id)
-    teachers, teachersnextlink = education_service.get_teachers(school['id'])
-    students, studentsnextlink = education_service.get_students(school['id'])
+    teachers, teachersnextlink = education_service.get_teachers(school.id)
+    students, studentsnextlink = education_service.get_students(school.id)
 
     context = {
         'user': user,
@@ -188,7 +192,7 @@ def studentnext(request, school_object_id):
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)    
     school = education_service.get_school(school_object_id)
-    students, studentsnextlink = education_service.get_students(school['id'], nextlink=nextlink)
+    students, studentsnextlink = education_service.get_students(school.id, nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Students'] = {}
@@ -203,7 +207,7 @@ def teachernext(request, school_object_id):
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)   
     school = education_service.get_school(school_object_id)
-    teachers, teachersnextlink = education_service.get_students(school['id'], nextlink=nextlink)
+    teachers, teachersnextlink = education_service.get_students(school.id, nextlink=nextlink)
 
     ajax_result = {}
     ajax_result['Teachers'] = {}
