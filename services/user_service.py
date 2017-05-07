@@ -65,7 +65,7 @@ class UserService(object):
             roles = self.get_roles(profile.o365UserId)
             tenant_id = profile.organization.tenantId
             tenant_name = profile.organization.name
-            return O365User(user.id, profile.o365Email, user.first_name, user.last_name, display_name, tenant_id, tenant_name, roles)
+            return O365User(profile.o365UserId, profile.o365Email, user.first_name, user.last_name, display_name, tenant_id, tenant_name, roles)
         return None
 
     def get_user(self, id):
