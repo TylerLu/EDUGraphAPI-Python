@@ -82,7 +82,7 @@ def classnext(request, school_object_id):
 
     ajax_result = {}
     ajax_result['Sections'] = {}
-    ajax_result['Sections']['Value'] = all_sections
+    ajax_result['Sections']['Value'] = [s.to_dict() for s in all_sections]
     ajax_result['Sections']['NextLink'] = sectionsnextlink
     ajax_result['MySections'] = my_sections
     return JsonResponse(ajax_result, safe=False)
@@ -185,7 +185,7 @@ def usernext(request, school_object_id):
 
     ajax_result = {}
     ajax_result['Users'] = {}
-    ajax_result['Users']['Value'] = users
+    ajax_result['Users']['Value'] = [u.to_dict() for u in users]
     ajax_result['Users']['NextLink'] = usersnextlink
     return JsonResponse(ajax_result, safe=False)
 
@@ -200,7 +200,7 @@ def studentnext(request, school_object_id):
 
     ajax_result = {}
     ajax_result['Students'] = {}
-    ajax_result['Students']['Value'] = students
+    ajax_result['Students']['Value'] = [s.to_dict() for s in students]
     ajax_result['Students']['NextLink'] = studentsnextlink
     return JsonResponse(ajax_result, safe=False)
 
@@ -215,6 +215,6 @@ def teachernext(request, school_object_id):
 
     ajax_result = {}
     ajax_result['Teachers'] = {}
-    ajax_result['Teachers']['Value'] = teachers
+    ajax_result['Teachers']['Value'] = [t.to_dict() for t in teachers]
     ajax_result['Teachers']['NextLink'] = teachersnextlink
     return JsonResponse(ajax_result, safe=False)

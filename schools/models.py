@@ -20,7 +20,9 @@ class GraphObjectBase(object):
 
     def set_value(self, property_name, value):
         self._prop_dict[property_name] = value
-
+        
+    def to_dict(self):
+        return dict((name, getattr(self, name)) for name in dir(self) if not name.startswith('__')  and not callable(getattr(self, name)))
 
     @property
     def object_id(self):
