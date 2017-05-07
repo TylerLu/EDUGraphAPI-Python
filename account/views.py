@@ -34,11 +34,8 @@ def index(request):
         return HttpResponseRedirect('/Schools')
 
 def login(request):
-    # post /Account/Login
-    if request.method == 'POST':
-        return login_post(request)
     # get /Account/Login
-    else:
+    if request.method == 'GET':
         o365_username = request.COOKIES.get(constant.o365_username_cookie)
         o365_email = request.COOKIES.get(constant.o365_email_cookie)
         if o365_username and o365_email:
@@ -49,8 +46,11 @@ def login(request):
             return render(request, 'account/O365login.html', context)
         else:
             user_form = UserInfo()
-            return render(request, 'account/login.html', { 'user_form': user_form })
-
+            return render(request, 'account/login.html', { 'user_form': user_form })    
+    # post /Account/Login
+    else:        
+        return login_post(request)
+        
 def login_post(request):
     email = ''
     password = ''
