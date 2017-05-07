@@ -24,7 +24,7 @@ from admin import views as admin_views
 urlpatterns = [
     url(r'^$', account_views.index, name='index'),
     url(r'^Account/Login', account_views.login, name='login'),
-    url(r'^Account/ReLogin', account_views.relogin, name='relogin'),
+    url(r'^Account/Reset', account_views.reset, name='reset'),
     url(r'^Account/O365Login', account_views.o365_login, name='o365_login'),
     url(r'^Account/Register', account_views.register, name='register'),
     url(r'^Account/LogOff', account_views.logoff, name='logoff'),

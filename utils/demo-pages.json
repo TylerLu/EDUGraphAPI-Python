@@ -21,7 +21,7 @@
 		]
 	},
 	{
-		"path": "/Account/ReLogin",
+		"path": "/Account/Reset",
 		"links": [
 			{
 				"title": "Controller",

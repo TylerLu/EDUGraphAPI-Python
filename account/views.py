@@ -87,7 +87,7 @@ def o365_login(request):
     o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', AuthService.get_random_string(), extra_params)
     return HttpResponseRedirect(o365_login_url)
 
-def relogin(request):
+def reset(request):
     response = HttpResponseRedirect('/Account/Login')
     response.set_cookie(constant.o365_username_cookie, '', expires=0)
     response.set_cookie(constant.o365_email_cookie, '', expires=0)
