@@ -106,7 +106,7 @@ def classdetails(request, school_object_id, class_object_id):
             student.customer_data['favorite_color'] = favorite_color
         seating_position = get_seating_position = user_service.get_seating_position(class_object_id, student.object_id)
         if seating_position:
-            student.customer_data['position'] = favorite_color
+            student.customer_data['position'] = seating_position
 
 
     # set seatrange
