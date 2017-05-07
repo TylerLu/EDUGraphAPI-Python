@@ -27,9 +27,6 @@ def admin(request):
         'user': user,
         'is_admin_consented': user_service.is_tenant_consented(user.tenant_id)
     }
-    if request.session['Message']:
-        context['message'] = request.session['Message'].split('\r\n')
-        request.session['Message'] = ''
     return render(request, 'admin/index.html', context)
 
 @login_required

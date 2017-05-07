@@ -55,6 +55,9 @@ class UserService(object):
             return None
         return User.objects.filter(id=profile.id).first()
 
+    def get_user_by_email(self, email):
+        return User.objects.filter(email=email).first()
+
     def get_o365_user(self, user):
         profile = Profile.objects.filter(id=user.id).first()
         if profile:
@@ -64,9 +67,6 @@ class UserService(object):
             tenant_name = profile.organization.name
             return O365User(user.id, profile.o365Email, user.first_name, user.last_name, display_name, tenant_id, tenant_name, roles)
         return None
-
-    def get_user_by_email(email):
-        return User.objects.filter(email=email).first()
 
     def get_user(self, id):
         return User.objects.filter(id=id).first()

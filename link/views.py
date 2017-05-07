@@ -27,15 +27,12 @@ def link(request):
     user = AuthService.get_current_user(request)
     context = {'user': user}
     if not user.are_linked and user.is_o365:
-        local_user = user_service.get_user_by_o365_email(user.o365_email)
+        local_user = user_service.get_user_by_email(user.o365_email)
         if local_user:
             context['local_existed'] = True
             context['local_message'] = 'There is a local account: %s matching your O365 account.' % user.o365_email
         else:
             context['local_existed'] = False
-    if request.session['Error']:
-        context['error'] = request.session['Error']
-        request.session['Error'] = ''
     return render(request, 'link/index.html', context)
 
 @login_required
@@ -64,6 +61,7 @@ def create_local(request):
         user_service.update_favorite_color(data['FavoriteColor'], local_user.id)
         local_user = user_service.get_user(local_user.id) # reload local user
         auth_login(request, local_user)
+        request.session['Message'] = 'Your local account has been successfully linked to your Office 365 account.'
         return HttpResponseRedirect('/')
     # GET /link/createlocal
     else:
@@ -87,14 +85,23 @@ def login_local(request):
             local_user = auth_authenticate(username=email, password=password)
             if local_user:
                 link_service.link(local_user, user.o365_user, None)
-                auth_login(request, local_user)
+                auth_login(request, local_user)                
+                request.session['Message'] = 'Your local account has been successfully linked to your Office 365 account.'
                 return HttpResponseRedirect('/')
             else:
                 context['errors'] = ['Invalid login attempt.']
             return render(request, 'link/loginlocal.html', context)
     # GET /link/loginlocal
     else:
-        return render(request, 'link/loginlocal.html', context)
+        local_user = user_service.get_user_by_email(user.o365_email)
+        if local_user:
+            link_service.link(local_user, user.o365_user)
+            local_user = user_service.get_user(local_user.id) # reload local user
+            auth_login(request, local_user)
+            request.session['Message'] = 'Your local account has been successfully linked to your Office 365 account.'
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, 'link/loginlocal.html', context)
 
 def login_o365(request):
     extra_params = {
@@ -128,6 +135,7 @@ def process_code(request):
     user = AuthService.get_current_user(request)
     link_service.link(user.local_user, o365_user)
 
+    request.session['Message'] = 'Your local account has been successfully linked to your Office 365 account.'
     response =  HttpResponseRedirect('/')
     response.set_cookie(constant.o365_username_cookie, o365_user.display_name)
     response.set_cookie(constant.o365_email_cookie, o365_user.email)

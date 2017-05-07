@@ -23,8 +23,6 @@ user_service = UserService()
 token_service = TokenService()
 
 def index(request):
-    request.session['Error'] = ''
-    request.session['Message'] = ''
     user = AuthService.get_current_user(request)
     if not user.is_authenticated:
         return HttpResponseRedirect('/Account/Login')
