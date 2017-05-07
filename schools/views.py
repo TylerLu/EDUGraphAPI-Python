@@ -64,7 +64,7 @@ def classes(request, school_object_id):
     return render(request, 'schools/classes.html', context)
 
 @login_required
-def classnext(request, school_object_id):    
+def classnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -107,7 +107,7 @@ def classdetails(request, school_object_id, class_object_id):
         seating_position = get_seating_position = user_service.get_seating_position(class_object_id, student.object_id)
         if seating_position:
             student.customer_data['position'] = favorite_color
-            
+
     # set seatrange
     seatrange = range(1, 37)
 
@@ -190,7 +190,7 @@ def studentnext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
-    education_service = EducationService(user.tenant_id, token)    
+    education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
     students, studentsnextlink = education_service.get_students(school.id, nextlink=nextlink)
 
@@ -205,7 +205,7 @@ def teachernext(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
-    education_service = EducationService(user.tenant_id, token)   
+    education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
     teachers, teachersnextlink = education_service.get_students(school.id, nextlink=nextlink)
 

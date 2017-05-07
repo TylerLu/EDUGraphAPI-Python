@@ -17,13 +17,13 @@ class UserService(object):
             user = User.objects.create(username=email)
             user.set_password(password)
             user.email = email
-            user.profile.favoriteColor = favoriteColor
+            user.profile.favoriteColor = favorite_color
             user.save()
             return user
         except Exception as e:
             print(e)
             return None
-    
+
     def create(self, o365_user):  #favorite_color
         user = User.objects.get_or_create(email=o365_user.email)[0]
         user.set_password('')
@@ -59,10 +59,9 @@ class UserService(object):
         profile = Profile.objects.filter(id=user.id).first()
         if profile:
             display_name = '%s %s' % (user.first_name, user.last_name)
-            # TODO: get roles
-            roles = [ 'Admin' ]
-            tenant_id =user.organization.tenantId
-            tenant_name = user.organization.name
+            roles = self.get_roles(profile.o365UserId)
+            tenant_id = profile.organization.tenantId
+            tenant_name = profile.organization.name
             return O365User(user.id, profile.o365Email, user.first_name, user.last_name, display_name, tenant_id, tenant_name, roles)
         return None
 
@@ -72,11 +71,20 @@ class UserService(object):
     def get_user(self, id):
         return User.objects.filter(id=id).first()
 
-    def update_role(self, o365_user_id, role_name):
-         role = UserRoles.objects.get_or_create(o365UserId=o365_user_id)[0]
+    def get_roles(self, uid):
+        users = UserRoles.objects.filter(o365UserId=uid)
+        if users:
+            roles = []
+            for user in users:
+                roles.append(user.name)
+            return roles
+        return None
+
+    def update_role(self, uid, role_name):
+         role = UserRoles.objects.get_or_create(o365UserId=uid)[0]
          role.name = role_name
          role.save()
-    
+
     def get_favorite_color(self, user_id):
         profile = Profile.objects.filter(user_id=user_id).first()
         if profile:
@@ -93,7 +101,7 @@ class UserService(object):
         profile = Profile.objects.filter(user_id=user_id).first()
         if profile:
             profile.favoriteColor = color
-            profile.save()        
+            profile.save()
 
     def get_seating_position(self, o365_user_id, class_id):
         arrangement = ClassroomSeatingArrangements.objects.filter(userId=o365_user_id, classId=class_id).first()

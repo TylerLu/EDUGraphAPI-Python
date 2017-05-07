@@ -137,6 +137,12 @@ class UnifiedUser(object):
         return None
 
     @property
+    def photo(self):
+        if not self.o365_user:
+            return None
+        return self.o365_user.photo
+
+    @property
     def local_user(self):
         return self._request.user
 

@@ -36,32 +36,9 @@ def index(request):
         return HttpResponseRedirect('/Schools')
 
 def login(request):
-    # TODO: split the post to a new method
     # post /Account/Login
     if request.method == 'POST':
-        email = ''
-        password = ''
-        errors = []
-        user_form = UserInfo(request.POST)
-        if user_form.is_valid():
-            data = user_form.clean()
-            email = data['Email']
-            password = data['Password']
-        if email and password:
-            user = auth_authenticate(username=email, password=password)
-            if user is not None:
-                auth_login(request, user)
-                o365_user = user_service.get_o365_user(user)
-                if o365_user:
-                    request.session[constant.o365_user_session_key] = o365_user.to_json()
-                return HttpResponseRedirect('/')
-            else:
-                errors.append('Invalid login attempt.')
-                context = {
-                    'user_form': user_form,
-                    'errors': errors
-                }
-                return render(request, 'account/login.html', context)
+        return login_post(request)
     # get /Account/Login
     else:
         o365_username = request.COOKIES.get(constant.o365_username_cookie)
@@ -75,6 +52,29 @@ def login(request):
         else:
             user_form = UserInfo()
             return render(request, 'account/login.html', { 'user_form': user_form })
+
+def login_post(request):
+    email = ''
+    password = ''
+    errors = []
+    user_form = UserInfo(request.POST)
+    if user_form.is_valid():
+        data = user_form.clean()
+        email = data['Email']
+        password = data['Password']
+        user = auth_authenticate(username=email, password=password)
+        if user is not None:
+            auth_login(request, user)
+            o365_user = user_service.get_o365_user(user)
+            if o365_user:
+                request.session[constant.o365_user_session_key] = o365_user.to_json()
+            return HttpResponseRedirect('/')
+    errors.append('Invalid login attempt.')
+    context = {
+        'user_form': user_form,
+        'errors': errors
+    }
+    return render(request, 'account/login.html', context)
 
 def o365_login(request):
     extra_params = {
@@ -105,13 +105,16 @@ def o365_auth_callback(request):
 
     redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
     auth_result = token_service.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
-    token_service.cache_tokens(auth_result, o365_user_id) 
-    
+    token_service.cache_tokens(auth_result, o365_user_id)
+
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
-    o365_user = ms_graph_service.get_o365_user(tenant_id)    
+    o365_user = ms_graph_service.get_o365_user(tenant_id)
     AuthService.set_o365_user(request, o365_user)
 
-    user_service.create_or_update_organization(tenant_id, o365_user._tenant_name)
+    for role in o365_user.roles:
+        user_service.update_role(o365_user.id, role)
+
+    user_service.create_or_update_organization(tenant_id, o365_user.tenant_name)
     local_user = user_service.get_user_by_o365_email(o365_user.email)
     if local_user:
         auth_login(request, local_user)
@@ -148,10 +151,10 @@ def register(request):
             else:
                 errors.append('Name %s is already taken.' % data['Email'])
                 errors.append("Email '%s' is already taken." % data['Email'])
-                return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'errors':errors, 'links':links})
+                return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'errors':errors})
     # get /Account/Register
     else:
-        return render(request, 'account/register.html', {'user_reg_form':user_reg_form, 'links':links})
+        return render(request, 'account/register.html', {'user_reg_form':user_reg_form})
 
 @login_required
 def logoff(request):

@@ -11,7 +11,7 @@ class LinkService(object):
 
     def __init__(self):
         pass
- 
+
     def is_linked(self, o365_user_id):
         link = Profile.objects.filter(o365UserId=o365_user_id).first()
         return link is not None
@@ -28,9 +28,9 @@ class LinkService(object):
         profile.organization_id = org.id
         profile.save()
 
-    def get_link(self, link_id):        
+    def get_link(self, link_id):
         profile = Profile.objects.filter(id=link_id).first()
-        if profile:            
+        if profile:
             link = {}
             link['email'] = profile.user.username
             link['o365Email'] = profile.o365Email
