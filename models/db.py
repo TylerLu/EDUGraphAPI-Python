@@ -8,7 +8,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 
-class Organizations(models.Model):
+class Organization(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(null=True, max_length=255)
     tenantId = models.CharField(null=True, max_length=255)
@@ -22,7 +22,7 @@ class Profile(models.Model):
     o365UserId = models.CharField(null=True, max_length=255)
     o365Email = models.CharField(null=True, max_length=255)
     favoriteColor = models.CharField(null=True, max_length=255)
-    organization = models.ForeignKey(Organizations, models.SET_NULL, null=True)
+    organization = models.ForeignKey(Organization, models.SET_NULL, null=True)
     class Meta:
         db_table = 'profiles'
 
@@ -35,7 +35,7 @@ class Profile(models.Model):
     def save_user_profile(sender, instance, **kwargs):
         instance.profile.save()
 
-class UserRoles(models.Model):
+class UserRole(models.Model):
     name = models.CharField(null=True, max_length=255)
     o365UserId = models.CharField(null=True, max_length=255)
     class Meta:
@@ -50,7 +50,7 @@ class TokenCache(models.Model):
     class Meta:
         db_table = 'token_cache'
 
-class ClassroomSeatingArrangements(models.Model):
+class ClassroomSeatingArrangement(models.Model):
     id = models.AutoField(primary_key=True)
     position = models.IntegerField()
     userId = models.CharField(null=True, max_length=255)

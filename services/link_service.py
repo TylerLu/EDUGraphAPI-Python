@@ -5,7 +5,7 @@
 
 from django.contrib.auth.models import User
 from models.auth import O365User
-from models.db import Profile, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
+from models.db import Profile, ClassroomSeatingArrangement, UserRole, Organization, TokenCache
 
 class LinkService(object):
 
@@ -17,7 +17,7 @@ class LinkService(object):
         return link is not None
 
     def link(self, local_user, o365_user):
-        org = Organizations.objects.get_or_create(tenantId=o365_user.tenant_id)[0]
+        org = Organization.objects.get_or_create(tenantId=o365_user.tenant_id)[0]
         org.tenantId = o365_user.tenant_id
         org.name = o365_user.tenant_name
         org.save()
@@ -38,7 +38,7 @@ class LinkService(object):
         return None
 
     def get_links(self, tenant_id):
-        org = Organizations.objects.get(tenantId=tenant_id)
+        org = Organization.objects.get(tenantId=tenant_id)
         links = []
         profiles = Profile.objects.filter(organization_id=org.id)
         for profile in profiles:
@@ -55,14 +55,14 @@ class LinkService(object):
         if profile:
             o365_user_id = profile[0].o365UserId
             profile.update(o365UserId='', o365Email='', organization_id='')
-            UserRoles.objects.filter(o365UserId=o365_user_id).delete()
+            UserRole.objects.filter(o365UserId=o365_user_id).delete()
 
     def remove_links(self, tenant_id):
-        org_obj = Organizations.objects.filter(tenantId=tenant_id)
+        org_obj = Organization.objects.filter(tenantId=tenant_id)
         if org_obj:
             org = org_obj[0]
             profiles = Profile.objects.filter(organization_id=org.id)
             for item in profiles:
                 o365_user_id = item.o365UserId
-                UserRoles.objects.filter(o365UserId=o365_user_id).delete()
+                UserRole.objects.filter(o365UserId=o365_user_id).delete()
             profiles.update(o365UserId='', o365Email='', organization_id='')

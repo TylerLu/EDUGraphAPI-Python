@@ -5,7 +5,7 @@
 
 from django.contrib.auth.models import User
 from models.auth import O365User
-from models.db import Profile, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
+from models.db import Profile, ClassroomSeatingArrangement, UserRole, Organization, TokenCache
 
 class UserService(object):
 
@@ -35,18 +35,18 @@ class UserService(object):
         return user
 
     def create_or_update_organization(self, tenant_id, tenant_name):
-        organization = Organizations.objects.get_or_create(tenantId=tenant_id)[0]
+        organization = Organization.objects.get_or_create(tenantId=tenant_id)[0]
         organization.tenant_id = tenant_id
         organization.name = tenant_name
         organization.save()
 
     def update_organization(self, tenant_id, is_admin_consented):
-        organization = Organizations.objects.filter(tenantId=tenant_id)
+        organization = Organization.objects.filter(tenantId=tenant_id)
         if organization:
             organization.update(isAdminConsented=is_admin_consented)
 
     def is_tenant_consented(self, tenant_id):
-        org = Organizations.objects.filter(tenantId=tenant_id).first()
+        org = Organization.objects.filter(tenantId=tenant_id).first()
         return org is not None and org.isAdminConsented
 
     def get_user_by_o365_email(self, o365_email):
@@ -72,7 +72,7 @@ class UserService(object):
         return User.objects.filter(id=id).first()
 
     def get_roles(self, uid):
-        users = UserRoles.objects.filter(o365UserId=uid)
+        users = UserRole.objects.filter(o365UserId=uid)
         if users:
             roles = []
             for user in users:
@@ -81,7 +81,7 @@ class UserService(object):
         return None
 
     def update_role(self, uid, role_name):
-         role = UserRoles.objects.get_or_create(o365UserId=uid)[0]
+         role = UserRole.objects.get_or_create(o365UserId=uid)[0]
          role.name = role_name
          role.save()
 
@@ -104,7 +104,7 @@ class UserService(object):
             profile.save()
 
     def get_seating_position(self, o365_user_id, class_id):
-        arrangement = ClassroomSeatingArrangements.objects.filter(userId=o365_user_id, classId=class_id).first()
+        arrangement = ClassroomSeatingArrangement.objects.filter(userId=o365_user_id, classId=class_id).first()
         if arrangement:
                return arrangement.position
         return None
@@ -114,7 +114,7 @@ class UserService(object):
             user_id = seat['O365UserId']
             position = seat['Position']
             class_id = seat['ClassId']
-            seat_obj = ClassroomSeatingArrangements.objects.filter(userId=user_id, classId=class_id)
+            seat_obj = ClassroomSeatingArrangement.objects.filter(userId=user_id, classId=class_id)
             if seat_obj:
                 if int(position) != 0:
                     seat_obj.update(position=position)
@@ -122,4 +122,4 @@ class UserService(object):
                     seat_obj.delete()
             else:
                 if int(position) != 0:
-                    ClassroomSeatingArrangements.objects.create(userId=user_id, classId=class_id, position=position)
+                    ClassroomSeatingArrangement.objects.create(userId=user_id, classId=class_id, position=position)
