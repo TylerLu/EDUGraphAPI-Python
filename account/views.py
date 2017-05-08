@@ -60,6 +60,8 @@ def login_post(request):
         data = user_form.clean()
         email = data['Email']
         password = data['Password']
+        rememberme = data['RememberMe']
+        settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = not rememberme
         user = auth_authenticate(username=email, password=password)
         if user is not None:
             auth_login(request, user)

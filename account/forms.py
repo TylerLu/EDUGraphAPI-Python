@@ -11,6 +11,7 @@ class UserInfo(forms.Form):
     '''
     Email = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control logincontrol', 'data-val':'true', 'data-val-email':'The Email field is not a valid e-mail address.', 'data-val-required':'The Email field is required.', 'id':'Email', 'placeholder':'Email', 'value':''}), required=False)
     Password = forms.CharField(label='', widget=forms.TextInput(attrs={'class':'form-control logincontrol', 'data-val':'true', 'data-val-required':'The Password field is required.', 'id':'Password', 'placeholder':'Password', 'type':'password'}), required=False)
+    RememberMe = forms.BooleanField(label='', widget=forms.CheckboxInput(), required=False)
 
 class UserRegInfo(forms.Form):
     '''
