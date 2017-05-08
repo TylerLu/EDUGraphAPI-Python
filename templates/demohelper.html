@@ -14,7 +14,7 @@
 			{% for link in demo_helper_links %}
 				<li>
 					<p class="title">{{ link.title }}</p>
-					<p><a href="@link.Url" target="_blank">{{ link.url }}</a></p>
+					<p><a href="{{ source_code_repository_url }}blob/master/{{ link.url }}" target="_blank">{{ link.url }}</a></p>
 				</li>
 			{% endfor %}
 		</ul>
