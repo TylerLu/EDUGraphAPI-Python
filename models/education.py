@@ -307,7 +307,7 @@ class EduUser(GraphObjectBase):
 
     @property
     def is_teacher(self):
-        return self.education_object_type == 'Student'
+        return self.education_object_type == 'Teacher'
 
     @property
     def photo(self):

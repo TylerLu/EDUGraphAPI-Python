@@ -28,7 +28,7 @@ def index(request):
         return HttpResponseRedirect('/Account/Login')
     if not user.are_linked:
         return HttpResponseRedirect('/link')
-    if user.is_admin:
+    if user.is_admin and not user_service.is_tenant_consented(user.tenant_id):
         return HttpResponseRedirect('/Admin')
     else:
         return HttpResponseRedirect('/Schools')
@@ -65,7 +65,7 @@ def login_post(request):
             auth_login(request, user)
             o365_user = user_service.get_o365_user(user)
             if o365_user:
-                request.session[constant.o365_user_session_key] = o365_user.to_json()
+                AuthService.set_o365_user(request, o365_user)
             return HttpResponseRedirect('/')
     errors.append('Invalid login attempt.')
     context = {

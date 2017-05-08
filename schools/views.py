@@ -65,7 +65,7 @@ def classes(request, school_object_id):
     return render(request, 'schools/classes.html', context)
 
 @login_required
-def classnext(request, school_object_id):
+def classes_next(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -94,7 +94,7 @@ def classnext(request, school_object_id):
     return JsonResponse(ajax_result, safe=False)
 
 @login_required
-def classdetails(request, school_object_id, class_object_id):
+def class_details(request, school_object_id, class_object_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
@@ -149,7 +149,7 @@ def classdetails(request, school_object_id, class_object_id):
     return render(request, 'schools/classdetails.html', context)
 
 @login_required
-def saveseat(request):
+def save_seating_arrangements(request):
     if request.is_ajax() and request.method == 'POST':
         seat_arrangements = json.loads(request.body.decode())
         user_service.update_positions(seat_arrangements)
@@ -181,7 +181,7 @@ def users(request, school_object_id):
     return render(request, 'schools/users.html', context)
 
 @login_required
-def usernext(request, school_object_id):
+def users_next(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -195,7 +195,7 @@ def usernext(request, school_object_id):
     return JsonResponse(ajax_result, safe=False)
 
 @login_required
-def studentnext(request, school_object_id):
+def students_next(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -210,7 +210,7 @@ def studentnext(request, school_object_id):
     return JsonResponse(ajax_result, safe=False)
 
 @login_required
-def teachernext(request, school_object_id):
+def teachers_next(request, school_object_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)

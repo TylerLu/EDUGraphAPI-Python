@@ -9,6 +9,10 @@ client_id = os.environ['ClientId']
 
 client_secret = os.environ['ClientSecret']
 
+bing_map_key = os.environ['BingMapKey']
+
+source_code_repository_url = os.environ["SourceCodeRepositoryUrl"]
+
 authority = 'https://login.microsoftonline.com/common/'
 
 login_base_uri = 'https://login.microsoftonline.com/common/oauth2/authorize?'
@@ -19,7 +23,6 @@ microsoft_certs_uri = 'https://login.microsoftonline.com/common/discovery/v2.0/k
 
 company_admin_role_name = "Company Administrator"
 
-bing_map_key = os.environ['BingMapKey']
 
 o365_username_cookie = "O365CookieUsername"
 

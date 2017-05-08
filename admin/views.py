@@ -86,7 +86,7 @@ def linked_accounts(request):
         'user': user,
         'account_links': account_links
     }
-    return render(request, 'admin/linkaccounts.html', context)
+    return render(request, 'admin/linkedaccounts.html', context)
 
 @login_required
 @admin_only
@@ -102,7 +102,7 @@ def unlink_account(request, link_id):
             'email': link['email'],
             'o365Email': link['o365Email']
         }
-        return render(request, 'admin/unlinkaccounts.html', context)
+        return render(request, 'admin/unlinkaccount.html', context)
 
 @login_required
 @admin_only

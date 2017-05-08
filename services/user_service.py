@@ -60,7 +60,7 @@ class UserService(object):
 
     def get_o365_user(self, user):
         profile = Profile.objects.filter(id=user.id).first()
-        if profile:
+        if profile and profile.o365UserId:
             display_name = '%s %s' % (user.first_name, user.last_name)
             roles = self.get_roles(profile.o365UserId)
             tenant_id = profile.organization.tenantId

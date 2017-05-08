@@ -3,55 +3,29 @@
 		"path": "/Account/Login",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "UserService",
 				"url": "services/user_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},
+			{
+				"title": "MSGraphService",
+				"url": "services/ms_graph_service.py"
 			},
 			{
 				"title": "View",
         		"url": "account/views.py"
-			},
-			{
-				"title": "Model",
-        		"url": "account/models.py"
 			},
       		{
         		"title": "Template",
         		"url": "account/templates/account/index.html"
-      		}
-		]
-	},
-	{
-		"path": "/Account/Reset",
-		"links": [
-			{
-				"title": "Controller",
-				"url": "services/user_service.py"
-			},
-			{
-				"title": "View",
-				"url": "account/views.py"
-			},
-			{
-				"title": "Model",
-        		"url": "account/models.py"
-			},
-			{
-				"title": "Template",
-				"url": "account/templates/account/index.html"
-			}
-		]
-	},
-	{
-		"path": "/Account/O365Login",
-		"links": [
-			{
-				"title": "Controller",
-				"url": "services/o365_user_service.py"
-			},
-			{
-				"title": "View",
-        		"url": "account/views.py"
-			},
+      		},
       		{
         		"title": "Template",
         		"url": "account/templates/account/O365login.html"
@@ -62,16 +36,12 @@
 		"path": "/Account/Register",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "UserService",
 				"url": "services/user_service.py"
 			},
 			{
 				"title": "View",
         		"url": "account/views.py"
-			},
-			{
-				"title": "Model",
-        		"url": "account/models.py"
 			},
       		{
         		"title": "Template",
@@ -82,6 +52,30 @@
 	{
 		"path": "/link",
 		"links": [
+			{
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "UserService",
+				"url": "services/user_service.py"
+			},			
+			{
+				"title": "LinkService",
+				"url": "services/link_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},
+			{
+				"title": "MSGraphService",
+				"url": "services/ms_graph_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},
 			{
 				"title": "View",
         		"url": "link/views.py"
@@ -96,8 +90,16 @@
 		"path": "/link/createlocal",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "UserService",
 				"url": "services/user_service.py"
+			},
+			{
+				"title": "LinkService",
+				"url": "services/link_service.py"
 			},
 			{
 				"title": "View",
@@ -113,8 +115,16 @@
 		"path": "/link/loginlocal",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "UserService",
 				"url": "services/user_service.py"
+			},
+			{
+				"title": "LinkService",
+				"url": "services/link_service.py"
 			},
 			{
 				"title": "View",
@@ -130,6 +140,26 @@
 		"path": "/Admin",
 		"links": [
 			{
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},			
+			{
+				"title": "UserService",
+				"url": "services/user_service.py"
+			},			
+			{
+				"title": "LinkService",
+				"url": "services/link_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},
+			{
+				"title": "AADGraphService",
+				"url": "services/aad_graph_service.py"
+			},
+			{
 				"title": "View",
         		"url": "admin/views.py"
 			},
@@ -143,16 +173,16 @@
 		"path": "/Admin/LinkedAccounts",
 		"links": [
 			{
-				"title": "Controller",
-				"url": "services/user_service.py"
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "LinkService",
+				"url": "services/link_service.py"
 			},
 			{
 				"title": "View",
         		"url": "admin/views.py"
-			},
-			{
-				"title": "Model",
-				"url": "account/models.py"
 			},
       		{
         		"title": "Template",
@@ -164,29 +194,12 @@
 		"path": "/UnlinkAccount/",
 		"links": [
 			{
-				"title": "Controller",
-				"url": "services/user_service.py"
+				"title": "AuthService",
+				"url": "services/auth_service.py"
 			},
 			{
-				"title": "View",
-        		"url": "admin/views.py"
-			},
-			{
-				"title": "Model",
-				"url": "account/models.py"
-			},
-      		{
-        		"title": "Template",
-        		"url": "admin/templates/admin/unlinkaccounts.html"
-      		}
-		]
-	},
-	{
-		"path": "/Admin/Consent",
-		"links": [
-			{
-				"title": "Controller",
-				"url": "services/user_service.py"
+				"title": "LinkService",
+				"url": "services/link_service.py"
 			},
 			{
 				"title": "View",
@@ -194,7 +207,7 @@
 			},
       		{
         		"title": "Template",
-        		"url": "admin/templates/admin/consent.html"
+        		"url": "admin/templates/admin/unlinkaccount.html"
       		}
 		]
 	},
@@ -202,16 +215,20 @@
 		"path": "/Schools",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},		
+			{
+				"title": "EducationService",
 				"url": "services/education_service.py"
 			},
 			{
 				"title": "View",
         		"url": "schools/views.py"
-			},
-			{
-				"title": "Model",
-        		"url": "schools/models.py"
 			},
       		{
         		"title": "Template",
@@ -223,16 +240,24 @@
 		"path": "/Schools//Classes",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "MSGraphService",
+				"url": "services/ms_graph_service.py"
+			},	
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},		
+			{
+				"title": "EducationService",
 				"url": "services/education_service.py"
 			},
 			{
 				"title": "View",
         		"url": "schools/views.py"
-			},
-			{
-				"title": "Model",
-        		"url": "schools/models.py"
 			},
       		{
         		"title": "Template",
@@ -244,20 +269,28 @@
 		"path": "/Schools//Classes/",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},
+			{
+				"title": "EducationService",
 				"url": "services/education_service.py"
+			},
+			{
+				"title": "MSGraphService",
+				"url": "services/ms_graph_service.py"
 			},
 			{
 				"title": "View",
         		"url": "schools/views.py"
 			},
-			{
-				"title": "Model",
-        		"url": "schools/models.py"
-			},
       		{
         		"title": "Template",
-        		"url": "schools/templates/schools/classdetails.html"
+        		"url": "schools/templates/schools/class_details.html"
       		}
 		]
 	},
@@ -265,16 +298,20 @@
 		"path": "/Schools//Users",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},		
+			{
+				"title": "EducationService",
 				"url": "services/education_service.py"
 			},
 			{
 				"title": "View",
         		"url": "schools/views.py"
-			},
-			{
-				"title": "Model",
-        		"url": "schools/models.py"
 			},
       		{
         		"title": "Template",
@@ -286,16 +323,24 @@
 		"path": "/Manage/AboutMe",
 		"links": [
 			{
-				"title": "Controller",
+				"title": "AuthService",
+				"url": "services/auth_service.py"
+			},
+			{
+				"title": "UserService",
 				"url": "services/user_service.py"
+			},
+			{
+				"title": "TokenService",
+				"url": "services/token_service.py"
+			},
+			{
+				"title": "EducationService",
+				"url": "services/education_service.py"
 			},
 			{
 				"title": "View",
         		"url": "managements/views.py"
-			},
-			{
-				"title": "Model",
-        		"url": "account/models.py"
 			},
       		{
         		"title": "Template",
