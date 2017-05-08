@@ -15,7 +15,6 @@ class AADGraphService(object):
         self.rest_api_service = RestApiService()
 
     def get_service_principal(self):
-        app_id = ''
         url = self.api_base_uri + "servicePrincipals?api-version=1.6&$filter=appId eq '%s'" % constant.client_id
         app_content = self.rest_api_service.get_json(url, self.access_token)
         return app_content['value'][0]
