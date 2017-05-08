@@ -39,4 +39,5 @@ def updatecolor(request):
     user = AuthService.get_current_user(request)
     color = request.POST.get('favoritecolor')
     user_service.update_favorite_color(color, user.user_id)
+    request.session["Message"] = "Favorite color has been updated!"
     return HttpResponseRedirect('/Manage/AboutMe')
