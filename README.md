@@ -252,11 +252,7 @@ Run the app:
 
 ![](Images/solution-component-diagram.png)
 
-
-
 ### **EDUGraphAPI**
-
-The server side app is based on Node.js and implemented with Typescript.
 
 **Authentication**
 
@@ -268,28 +264,28 @@ Local users authentication is based on the built-in API:
 * [login](https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.login)
 * [logout](https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.logout)
 
-O365 users authentication is implemented with Open ID Connect package: 
+O365 users authentication is implemented with Open ID Connect. 
 
 **Data Access**
 
 In this sample, [Django's built-in ORM](https://docs.djangoproject.com/en/1.11/topics/db/) is used to access data from the backend SQLite database.
 
-Below are are tables:
+Below are the tables:
 
 | Table                          | Description                              |
 | ------------------------------ | ---------------------------------------- |
 | auth_user                      | Django built-in user table which contains users' authentication information: username, email, password... |
-| users                          | Contains users' extra information: *favoriteColor*, *organization_id*,  *o365UserId*, and *o365Email*. The later two are used to connect the local user with an O365 user. |
 | user_roles                     | Contains users' roles. Three roles are used in this sample: admin, teacher, and student. |
+| profiles                       | Contains users' extra information: *favoriteColor*, *organization_id*,  *o365UserId*, and *o365Email*. The later two are used to connect the local user with an O365 user. |
 | organizations                  | A row in this table represents a tenant in AAD.<br>*isAdminConsented* column records if the tenant consented by an administrator. |
 | token_cache                    | Contains the users' access/refresh tokens. |
 | classroom_seating_arrangements | Contains the classroom seating arrangements data. |
 
-You will find the **DbContext** class and related model interfaces in the **/data/dbContext.ts** file.
+Models are defined in **/models/db.py**.
 
 **Views**
 
-The server app exposes several Web APIs:
+Below are the views:
 
 | Path                 | Description                              |
 | -------------------- | ---------------------------------------- |
@@ -297,31 +293,31 @@ The server app exposes several Web APIs:
 | /admin/views.py      | Contains administrative views like consent tenant, manage linked accounts. |
 | /link/views.py       | Contains views used for link user accounts. |
 | /management/views.py | Contains views of the about me page.     |
-| /schools/view        | Contains education views, like schools, classes, and class details. |
-
-These APIs are defined in the **/routes** folder.
+| /schools/view.py     | Contains education views, like schools, classes, and class details. |
 
 **Decorators**
 
-Several decorators were used for authorization:
+The below decorators were used in this app:
 
-| Decorator |      |
-| --------- | ---- |
-|           |      |
-|           |      |
-|           |      |
+| Decorator         | Description                              |
+| ----------------- | ---------------------------------------- |
+| login_required    | Only allow logged in users to access the protected resources. |
+| admin_only        | Only allow admins to access the protected resources. |
+| linked_users_only | Only allow linked users to access the protected resources. |
 
 **Services**
 
 The services used by the server side app:
 
-| Service           | Description                              |
-| ----------------- | ---------------------------------------- |
-| MSGraphClient     | Contains methods used to access MS Graph APIs |
-| SchoolService     | Contains two methods: get/update seating arrangements |
-| TenantService     | Contains methods that operate tenants in the database |
-| TokenCacheService | Contains method used to get and update cache from the database |
-| UserService       | Contains method used to manipulate users in the database |
+| Service          | Description                              |
+| ---------------- | ---------------------------------------- |
+| UserService      | Contains method used to manipulate users in the database. |
+| LinkService      | Contains method used to link user accounts. |
+| AuthService      | Contains methods used for authorization and authentication. |
+| AADGraphService  | Contains methods used to access AAD Graph APIs. |
+| MSGraphService   | Contains methods used to access MS Graph APIs. |
+| EducationService | Contains two methods to access Education REST APIs. |
+| TokenService     | Contains method used to get and update tokens from the database |
 
 The services are in the **/services** folder.
 
@@ -348,40 +344,38 @@ The **EducationServiceClient** is the core class of the library. It is used to e
 **Get schools**
 
 ~~~typescript
-getSchools(): Observable<any[]> {
-    return this.dataService.getArray<any>(this.urlBase + "/administrativeUnits?api-version=beta");
-}
+def get_schools(self):
+    url = self.api_base_uri + 'administrativeUnits?api-version=beta'
+    return self.rest_api_service.get_object_list(url, self.access_token, model=School)
 ~~~
 
 ~~~typescript
-getSchoolById(id: string): Observable<any> {
-    return this.dataService.getObject(this.urlBase + '/administrativeUnits/' + id + '?api-version=beta');
-}
+def get_school(self, object_id):
+    url = self.api_base_uri + 'administrativeUnits/%s?api-version=beta' % object_id
+    return self.rest_api_service.get_object(url, self.access_token, model=School)
 ~~~
 
 **Get classes**
 
 ~~~typescript
-getClasses(schoolId: string, nextLink: string): Observable<PagedCollection<any>> {
-    let url: string = this.urlBase + "/groups?api-version=beta&$top=12&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType%20eq%20'Section'%20and%20extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId%20eq%20'" + schoolId + "'" +
-        (nextLink ? "&" + GraphHelper.getSkipToken(nextLink) : '');
-    return this.dataService.getPagedCollection<any>(url);
-}
+def get_sections(self, school_id, top=12, nextlink=''):
+    skiptoken = self._get_skip_token(nextlink)
+    url = self.api_base_uri + "groups?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
+    return self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='odata.nextLink')
 ~~~
 
 ```typescript
-getClassById(classId: string): Observable<any> {
-    return this.dataService.getObject<any>(this.urlBase + "/groups/" + classId + "?api-version=beta&$expand=members");
-}
+def get_section(self, object_id):
+    url = self.api_base_uri + 'groups/%s?api-version=1.5' % object_id
+    return self.rest_api_service.get_object(url, self.access_token, model=Section)
 ```
 **Get users**
 
 ```typescript
-getUsers(schoolId: string, nextLink: string): Observable<PagedCollection<any>> {
-    var url = this.urlBase + "/administrativeUnits/" + schoolId + "/members?api-version=beta&$top=12" +
-        (nextLink ? "&" + GraphHelper.getSkipToken(nextLink) : '');
-    return this.dataService.getPagedCollection<any>(url);
-}
+def get_members(self, object_id, top=12, nextlink=''):
+    skiptoken = self._get_skip_token(nextlink)
+    url = self.api_base_uri + 'administrativeUnits/%s/members?api-version=beta&$top=%s%s' % (object_id, top, skiptoken)
+    return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
 ```
 Below are some screenshots of the sample app that show the education data.
 
@@ -392,14 +386,6 @@ Below are some screenshots of the sample app that show the education data.
 ![](Images/edu-classes.png)
 
 ![](Images/edu-class.png)
-
-In **/app/services/dataService.ts**, three generic methods simplify the invoking of REST APIs.
-
-* **getObject<T>**: sends a http GET request to the target endpoint, and deserializes the JSON response string to T, and return the result object.  
-* **getPagedCollection<T>**:  sends a http GET request to the target endpoint, and deserializes the JSON response string to PagedCollection<T>, and return the result object. 
-* **getArray<T>**: sends a http GET request to the target endpoint, and deserializes the JSON response string to array, and return the array.
-
-For http GET request sent by the 3 methods above, an access token is included in the bearer authentication header.
 
 ### Authentication Flows
 
@@ -442,20 +428,12 @@ There are two distinct Graph APIs used in this sample:
 
 > Therefore, please use the new Microsoft Graph API as much as possible and minimize how much you use the Azure AD Graph API.
 
-Below is a piece of code shows how to get "me" from the Microsoft Graph API.
+Below is a piece of code shows how to get group documents from the Microsoft Graph API.
 
 ```typescript
-public getMe(): Promise<any> {
-    return new Promise((resolve, reject) => {
-        request
-            .get(Constants.MSGraphResource + "/v1.0/me/?$select=id,givenName,surname,userPrincipalName,assignedLicenses")
-            .set('Authorization', 'Bearer ' + this.accessToken)
-            .end((err, res) => {
-                if (err) { return reject(err) }
-                resolve(res.body);
-            })
-    })
-}
+def get_documents(self, object_id):
+    url = self.api_base_uri + 'groups/%s/drive/root/children' % object_id
+    return self.rest_api_service.get_object_list(url, self.access_token, model=Document)
 ```
 
 Note that in the AAD Application settings, permissions for each Graph API are configured separately:
