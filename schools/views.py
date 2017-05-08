@@ -47,7 +47,7 @@ def classes(request, school_object_id):
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
     my_sections = education_service.get_my_sections(school.id)
-    all_sections, sectionsnextlink = education_service.get_all_sections(school.id)
+    all_sections, sectionsnextlink = education_service.get_sections(school.id)
 
     my_section_ids = []
     for section in my_sections:
@@ -75,7 +75,7 @@ def classes_next(request, school_object_id):
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
     my_sections = education_service.get_my_sections(school.id)
-    all_sections, sectionsnextlink = education_service.get_all_sections(school.id, nextlink=nextlink)
+    all_sections, sectionsnextlink = education_service.get_sections(school.id, nextlink=nextlink)
 
     my_section_ids = []
     for section in my_sections:

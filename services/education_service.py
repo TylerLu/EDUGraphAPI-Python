@@ -44,10 +44,8 @@ class EducationService(object):
         Get a school by using the object_id.
         <param name="object_id">The Object ID of the school administrative unit in Azure Active Directory.</param>
         '''
-        school_result = {}
         url = self.api_base_uri + 'administrativeUnits/%s?api-version=beta' % object_id
-        school_result = self.rest_api_service.get_object(url, self.access_token, model=School)
-        return school_result
+        return self.rest_api_service.get_object(url, self.access_token, model=School)
 
     def get_section_members(self, section_object_id):
         '''
@@ -73,7 +71,7 @@ class EducationService(object):
         mysection_list.sort(key=lambda d:d.combined_course_number)
         return mysection_list
 
-    def get_all_sections(self, school_id, top=12, nextlink=''):
+    def get_sections(self, school_id, top=12, nextlink=''):
         '''
         Get sections within a school
         <param name="school_id">The school id.</param>
@@ -90,9 +88,7 @@ class EducationService(object):
         Get a section by using the object_id.
         <param name="object_id">The Object ID of the section.</param>
         '''
-        section_result = {}
-        version = '?api-version=1.5'
-        url = self.api_base_uri + 'groups/%s' % object_id + version
+        url = self.api_base_uri + 'groups/%s?api-version=1.5' % object_id
         return self.rest_api_service.get_object(url, self.access_token, model=Section)
 
     def get_members(self, object_id, top=12, nextlink=''):
