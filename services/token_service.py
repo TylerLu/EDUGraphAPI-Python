@@ -3,7 +3,7 @@
  *   * See LICENSE in the project root for license information.
 '''
 import adal
-import datetime
+import datetime, time
 import constant
 from models.db import TokenCache
 
@@ -60,13 +60,11 @@ class TokenService(object):
         return auth_result
 
     def _create_or_update_token(self, auth_result, o365UserId):
-        accessToken = auth_result.get('accessToken', '')
-        expiresOn =  auth_result.get('expiresOn', '')
-        refreshToken = auth_result.get('refreshToken', '')
-        resource = auth_result.get('resource', '')
-        if accessToken and expiresOn and refreshToken and resource:
-            token = TokenCache.objects.get_or_create(o365UserId=o365UserId, resource=resource)[0]
-            token.accessToken = accessToken
-            token.refreshToken = refreshToken
-            token.expiresOn = expiresOn
-            token.save()
+        resource = auth_result.get('resource')
+        expiresOnLocal = datetime.datetime.strptime(auth_result.get('expiresOn'), "%Y-%m-%d %H:%M:%S.%f")  
+        expiresOnUTC = (expiresOnLocal + datetime.timedelta(seconds=time.timezone)).replace(tzinfo=datetime.timezone.utc)
+        token = TokenCache.objects.get_or_create(o365UserId=o365UserId, resource=resource)[0]
+        token.accessToken = auth_result.get('accessToken')
+        token.refreshToken = auth_result.get('refreshToken')
+        token.expiresOn = expiresOnUTC
+        token.save()
