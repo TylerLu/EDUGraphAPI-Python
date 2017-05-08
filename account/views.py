@@ -27,7 +27,7 @@ def index(request):
     if not user.is_authenticated:
         return HttpResponseRedirect('/Account/Login')
     if not user.are_linked:
-        return HttpResponseRedirect('/link')
+        return HttpResponseRedirect('/Link')
     if user.is_admin and not user_service.is_tenant_consented(user.tenant_id):
         return HttpResponseRedirect('/Admin')
     else:

@@ -7,7 +7,7 @@ import json
 import constant
 from utils.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from decorator import login_required
+from decorator import login_required, linked_users_only
 
 from services.token_service import TokenService
 from services.auth_service import AuthService
@@ -19,6 +19,7 @@ user_service = UserService()
 token_service = TokenService()
 
 @login_required
+@linked_users_only
 def schools(request):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -38,6 +39,7 @@ def schools(request):
     return render(request, 'schools/index.html', context)
 
 @login_required
+@linked_users_only
 def classes(request, school_object_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -94,6 +96,7 @@ def classes_next(request, school_object_id):
     return JsonResponse(ajax_result, safe=False)
 
 @login_required
+@linked_users_only
 def class_details(request, school_object_id, class_object_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
@@ -156,6 +159,7 @@ def save_seating_arrangements(request):
     return HttpResponse(json.dumps({'save':'ok'}))
 
 @login_required
+@linked_users_only
 def users(request, school_object_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)

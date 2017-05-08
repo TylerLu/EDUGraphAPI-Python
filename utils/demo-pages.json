@@ -50,7 +50,7 @@
 		]
 	},
 	{
-		"path": "/link",
+		"path": "/Link",
 		"links": [
 			{
 				"title": "AuthService",
@@ -87,7 +87,7 @@
 		]
 	},
 	{
-		"path": "/link/createlocal",
+		"path": "/Link/CreateLocal",
 		"links": [
 			{
 				"title": "AuthService",
@@ -112,7 +112,7 @@
 		]
 	},
 	{
-		"path": "/link/loginlocal",
+		"path": "/Link/LoginLocal",
 		"links": [
 			{
 				"title": "AuthService",

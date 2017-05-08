@@ -20,3 +20,12 @@ def admin_only(func):
             return HttpResponseRedirect('/Account/Login')
         return func(request, *args, **kwargs)
     return decorator
+
+def linked_users_only(func):
+    def decorator(request, *args, **kwargs):
+        user = AuthService.get_current_user(request)
+        if not user.are_linked:
+            return HttpResponseRedirect('/Link')
+        return func(request, *args, **kwargs)
+    return decorator
+

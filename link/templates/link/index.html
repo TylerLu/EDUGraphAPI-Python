@@ -13,7 +13,7 @@
 	{% if user.is_local %}
         <div class="form-horizontal" id="linkAccountPrompt">
             <hr />
-			<form action="/link/LoginO365" method="post">{% csrf_token %}
+			<form action="/Link/LoginO365" method="post">{% csrf_token %}
                 <p>
                     <input type="submit" value="Link to existing O365 account" class="btn btn-primary" /> &nbsp; &nbsp;
                 </p>
@@ -29,10 +29,10 @@
 			{% if local_existed %}
 			<a class="btn btn-primary disabled" href="javascript:void(0)">Continue with new Local Account</a>
 			{% else %}
-			<a class="btn btn-primary" href="link/createlocal">Continue with new Local Account</a>
+			<a class="btn btn-primary" href="Link/CreateLocal">Continue with new Local Account</a>
 			{% endif %}
           	&nbsp; &nbsp;
-			<a class="btn btn-primary" href="link/loginlocal">Link with existing Local Account</a>
+			<a class="btn btn-primary" href="Link/LoginLocal">Link with existing Local Account</a>
          	&nbsp; &nbsp;
             </p>
         </div>

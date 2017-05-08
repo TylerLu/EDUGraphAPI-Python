@@ -54,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'middlewares.HandleRefreshTokenExceptionMiddleware',
+    'middlewares.UserUnlinkMonitorMiddleware',
 ]
 
 ROOT_URLCONF = 'app.urls'

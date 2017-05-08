@@ -47,11 +47,11 @@ urlpatterns = [
     url(r'^Manage/AboutMe', manage_views.aboutme, name='aboutme'),
     url(r'^Manage/UpdateFavoriteColor', manage_views.updatecolor, name='updatecolor'),
 
-    url(r'^link$', link_views.link, name='link'),
-    url(r'^link/createlocal', link_views.create_local, name='create_local'),
-    url(r'^link/loginlocal', link_views.login_local, name='login_local'),
-    url(r'^link/LoginO365', link_views.login_o365, name='login_o365'),
-    url(r'^link/ProcessCode', link_views.process_code, name='link_process_code'),
+    url(r'^Link$', link_views.link, name='link'),
+    url(r'^Link/CreateLocal', link_views.create_local, name='create_local'),
+    url(r'^Link/LoginLocal', link_views.login_local, name='login_local'),
+    url(r'^Link/LoginO365', link_views.login_o365, name='login_o365'),
+    url(r'^Link/ProcessCode', link_views.process_code, name='link_process_code'),
 
     url(r'^Admin$', admin_views.admin, name='admin'),
     url(r'^Admin/LinkedAccounts', admin_views.linked_accounts, name='linked_accounts'),

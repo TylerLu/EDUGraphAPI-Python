@@ -44,7 +44,7 @@ def create_local(request):
         'user': user,
         'create_local_form': create_local_form
     }
-    # POST /link/createlocal
+    # POST /Link/CreateLocal
     if request.method == 'POST':
         create_local_form = CreateLocalInfo(request.POST)
         data = ''
@@ -64,7 +64,7 @@ def create_local(request):
         auth_login(request, local_user)
         request.session['Message'] = 'Your local account has been successfully linked to your Office 365 account.'
         return HttpResponseRedirect('/')
-    # GET /link/createlocal
+    # GET /Link/CreateLocal
     else:
         return render(request, 'link/createlocal.html', context)
 
@@ -76,7 +76,7 @@ def login_local(request):
         'user': user,
         'login_local_form': login_local_form
     }
-    # POST /link/loginlocal
+    # POST /Link/LoginLocal
     if request.method == 'POST':
         login_local_form = LoginLocalInfo(request.POST)
         if login_local_form.is_valid():
@@ -92,7 +92,7 @@ def login_local(request):
             else:
                 context['errors'] = ['Invalid login attempt.']
             return render(request, 'link/loginlocal.html', context)
-    # GET /link/loginlocal
+    # GET /Link/LoginLocal
     else:
         local_user = user_service.get_user_by_email(user.o365_email)
         if local_user:
@@ -110,7 +110,7 @@ def login_o365(request):
         'nonce': AuthService.get_random_string(),
         'prompt': 'login'
     }
-    o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'link/ProcessCode', AuthService.get_random_string(), extra_params)
+    o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'Link/ProcessCode', AuthService.get_random_string(), extra_params)
     return HttpResponseRedirect(o365_login_url)
 
 def process_code(request):
@@ -123,9 +123,9 @@ def process_code(request):
 
     if link_service.is_linked(o365_user_id):
         request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % id_token.get('upn')
-        return HttpResponseRedirect('/link')
+        return HttpResponseRedirect('/Link')
 
-    redirect_uri = AuthService.get_redirect_uri(request, 'link/ProcessCode')
+    redirect_uri = AuthService.get_redirect_uri(request, 'Link/ProcessCode')
     auth_result = token_service.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
     token_service.cache_tokens(auth_result, o365_user_id)
 
