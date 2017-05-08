@@ -82,7 +82,7 @@
 				{{ school.state }} {{ school.zip }}
 			</div>
 			<div class="schoolmap">
-				{% if school.latitude and school.longitude %}
+				{% if school.address != '-' %} 
 					<a class="bingMapLink" lat="{{ school.latitude }}" lon="{{ school.longitude }}" href="javascript:void(0)"><img src="{{ bingicon }}" /></a>
 				{% endif %}
 			</div>
