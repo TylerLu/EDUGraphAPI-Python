@@ -24,7 +24,7 @@
 			},
       		{
         		"title": "Template",
-        		"url": "account/templates/account/index.html"
+        		"url": "account/templates/account/login.html"
       		},
       		{
         		"title": "Template",
@@ -290,7 +290,7 @@
 			},
       		{
         		"title": "Template",
-        		"url": "schools/templates/schools/class_details.html"
+        		"url": "schools/templates/schools/classdetails.html"
       		}
 		]
 	},
