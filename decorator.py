@@ -17,7 +17,7 @@ def admin_only(func):
     def decorator(request, *args, **kwargs):
         user = AuthService.get_current_user(request)
         if not user.is_admin:
-            return HttpResponseRedirect('/Account/Login')
+            return HttpResponseRedirect('/Account/LogOff')
         return func(request, *args, **kwargs)
     return decorator
 
