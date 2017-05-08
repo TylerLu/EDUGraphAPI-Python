@@ -68,7 +68,7 @@ $(document).ready(function () {
                     }
                     content.html("");
                     $.each(value, function (i, user) {
-                        var userHtml = '<div class="element ' + (user.ObjectType == "Teacher" ? "teacher-bg" : "student-bg") + '">' +
+                        var userHtml = '<div class="element ' + (user.is_teacher ? "teacher-bg" : "student-bg") + '">' +
                                            '<div class="userimg">' +
                                                '<img src="/static/Images/header-default.jpg" realheader="' + '/Photo/UserPhoto/' + user.O365UserId + '" />' +
                                            '</div>' +
