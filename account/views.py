@@ -87,6 +87,7 @@ def o365_login(request):
     else:
         extra_params['prompt'] = 'login'
     o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', AuthService.get_random_string(), extra_params)
+    settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     return HttpResponseRedirect(o365_login_url)
 
 def reset(request):
