@@ -122,7 +122,7 @@ def process_code(request):
     tenant_id = id_token.get('tid')
 
     if link_service.is_linked(o365_user_id):
-        request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % id_token.get('email')
+        request.session['Error'] = 'Failed to link accounts. The Office 365 account %s is already linked to another local account.' % id_token.get('upn')
         return HttpResponseRedirect('/link')
 
     redirect_uri = AuthService.get_redirect_uri(request, 'link/ProcessCode')

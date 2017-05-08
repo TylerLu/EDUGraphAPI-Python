@@ -22,7 +22,9 @@
 <div class="container body-content">
 {% if error %}
 	<div class="message-container bg-danger">
-		<p>{{ error }}</p>
+		{% for line in error %}
+			<p>{{ line }}</p>
+		{% endfor %}
 	</div>
 {% endif %}
 {% if message %}
