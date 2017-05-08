@@ -163,14 +163,14 @@
                     <div id="hidtiles" class="hideitem">
 						{% for student in students %}
 							{% if student.custom_data.position != 0 %}
-								{% if student.custom_data.color %}
-								<div class="deskcontainer white green" style="background-color:{{ student.custom_data.color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
+								{% if student.custom_data.favorite_color %}
+								<div class="deskcontainer white green" style="background-color:{{ student.custom_data.favorite_color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% else %}
 								<div class="deskcontainer white" style="" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% endif %}
 							{% else %}
-								{% if student.custom_data.color %}
-								<div class="deskcontainer unsaved green" style="background-color:{{ student.custom_data.color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
+								{% if student.custom_data.favorite_color %}
+								<div class="deskcontainer unsaved green" style="background-color:{{ student.custom_data.favorite_color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% else %}
 								<div class="deskcontainer unsaved" style="" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
 								{% endif %}
