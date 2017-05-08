@@ -81,11 +81,16 @@ def classnext(request, school_object_id):
     for section in all_sections:
         section.custom_data['is_my'] = section.object_id in my_section_ids
 
+    my_section_list = [m.to_dict() for m in my_sections]
+    for my_section in my_section_list:
+        my_section['members'] = [member.to_dict() for member in my_section['members']]
+        my_section['teachers'] = [teacher.to_dict() for teacher in my_section['teachers']]
+
     ajax_result = {}
     ajax_result['Sections'] = {}
     ajax_result['Sections']['Value'] = [s.to_dict() for s in all_sections]
     ajax_result['Sections']['NextLink'] = sectionsnextlink
-    ajax_result['MySections'] = my_sections
+    ajax_result['MySections'] = my_section_list
     return JsonResponse(ajax_result, safe=False)
 
 @login_required

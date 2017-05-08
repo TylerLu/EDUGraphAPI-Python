@@ -23,7 +23,7 @@ class GraphObjectBase(object):
         self._prop_dict[property_name] = value
         
     def to_dict(self):
-        return dict((name, getattr(self, name)) for name in dir(self) if not name.startswith('__')  and not callable(getattr(self, name)))
+        return dict((name, getattr(self, name)) for name in dir(self) if not name.startswith('_')  and not callable(getattr(self, name)))
 
     @property
     def object_id(self):
