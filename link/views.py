@@ -2,6 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
+
 import constant
 from utils.shortcuts import render
 from decorator import login_required
@@ -43,7 +44,6 @@ def create_local(request):
         'user': user,
         'create_local_form': create_local_form
     }
-    errors = []
     # POST /link/createlocal
     if request.method == 'POST':
         create_local_form = CreateLocalInfo(request.POST)
@@ -52,7 +52,8 @@ def create_local(request):
             data = create_local_form.clean()
         try:
             local_user = user_service.create(user.o365_user)
-        except:
+        except:            
+            errors = []
             errors.append('Name %s is already taken.' % user.o365_email)
             errors.append("Email '%s' is already taken." % user.o365_email)
             context['errors'] = errors
@@ -140,6 +141,3 @@ def process_code(request):
     response.set_cookie(constant.o365_username_cookie, o365_user.display_name)
     response.set_cookie(constant.o365_email_cookie, o365_user.email)
     return response
-
-
-

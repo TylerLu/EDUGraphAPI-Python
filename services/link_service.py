@@ -2,8 +2,8 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
-from django.contrib.auth.models import User
 
+from django.contrib.auth.models import User
 from models.auth import O365User
 from models.db import Profile, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
 
@@ -66,4 +66,3 @@ class LinkService(object):
                 o365_user_id = item.o365UserId
                 UserRoles.objects.filter(o365UserId=o365_user_id).delete()
             profiles.update(o365UserId='', o365Email='', organization_id='')
-

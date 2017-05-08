@@ -48,4 +48,3 @@ class AADGraphService(object):
         }
         post_url = self.api_base_uri + 'users/%s' % user['objectId'] + '/appRoleAssignments?api-version=1.6'
         self.rest_api_service.post_json(post_url, self.access_token, data=app_role_assignment)
-        

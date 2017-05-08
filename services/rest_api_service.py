@@ -2,6 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
+
 import re
 import json
 import requests
@@ -104,6 +105,3 @@ class RestApiService(object):
         if response.status_code < 200 or response.status_code > 299:
             raise HttpRequestFailed(request, response)
         return response
-
-
-

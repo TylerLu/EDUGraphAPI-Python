@@ -2,6 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
+
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save

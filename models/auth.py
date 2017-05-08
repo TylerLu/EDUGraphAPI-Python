@@ -83,15 +83,15 @@ class UnifiedUser(object):
 
     @property
     def is_admin(self):
-        return self.o365_user is not None and 'Admin' in self.o365_user.roles
+        return self.o365_user is not None and constant.Roles.Admin in self.o365_user.roles
 
     @property
     def is_teacher(self):
-        return self.o365_user is not None and 'Teacher' in self.o365_user.roles
+        return self.o365_user is not None and constant.Roles.Faculty in self.o365_user.roles
 
     @property
     def is_student(self):
-        return self.o365_user is not None and 'Student' in self.o365_user.roles
+        return self.o365_user is not None and constant.Roles.Student in self.o365_user.roles
 
     @property
     def email(self):
@@ -138,7 +138,7 @@ class UnifiedUser(object):
         if not self.o365_user:
             return None
         roles = self.o365_user.roles
-        for role in ['Admin', 'Teacher', 'Student']:
+        for role in [constant.Roles.Admin, constant.Roles.Faculty, constant.Roles.Student]:
             if role in roles:
                 return role
         return None

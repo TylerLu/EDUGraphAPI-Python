@@ -8,6 +8,7 @@ import constant
 from utils.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from decorator import login_required
+
 from services.token_service import TokenService
 from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
@@ -152,10 +153,9 @@ def saveseat(request):
 @login_required
 def users(request, school_object_id):
     user = AuthService.get_current_user(request)
-
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
-    education_service = EducationService(user.tenant_id, token)
 
+    education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_object_id)
     users, usersnextlink = education_service.get_members(school_object_id)
     teachers, teachersnextlink = education_service.get_teachers(school.id)

@@ -2,6 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
+
 import adal
 import datetime, time
 import constant
@@ -19,7 +20,7 @@ class TokenService(object):
         pass
 
     def get_token_with_code(self, code, redirect_uri, resource):
-        auth_context = adal.AuthenticationContext(constant.authorize_token_uri)
+        auth_context = adal.AuthenticationContext(constant.authority)
         result = auth_context.acquire_token_with_authorization_code(code, redirect_uri, resource, constant.client_id, constant.client_secret)
         return result
 
@@ -53,7 +54,7 @@ class TokenService(object):
         if cache is None:
             raise RefreshTokenException('cache is None')
         try:
-            auth_context = adal.AuthenticationContext(constant.authorize_token_uri)
+            auth_context = adal.AuthenticationContext(constant.authority)
             auth_result = auth_context.acquire_token_with_refresh_token(cache.refreshToken, constant.client_id, resource, constant.client_secret)
         except:
             raise RefreshTokenException('refresh is Error')

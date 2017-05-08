@@ -2,16 +2,16 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
-from utils.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
 
+import constant
+from utils.shortcuts import render
+
+from django.conf import settings
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth import authenticate as auth_authenticate
+from django.http import HttpResponse, HttpResponseRedirect
 
-from django.conf import settings
-
-import constant
 from decorator import login_required
 from services.token_service import TokenService
 from services.ms_graph_service import MSGraphService

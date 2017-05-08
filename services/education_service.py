@@ -2,6 +2,7 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
+
 import re
 import constant
 from services.rest_api_service import RestApiService
@@ -80,11 +81,7 @@ class EducationService(object):
         <param name="top">Get record number from API</param>
         <param name="nextlink">Get skiptoken from nextlink</param>
         '''
-        skiptoken = ''
-        if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
-            skiptoken = '&%s' % link_skiptoken
-
+        skiptoken = self._get_skip_token(nextlink)
         url = self.api_base_uri + "groups?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
         return self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='odata.nextLink')
 
@@ -105,11 +102,7 @@ class EducationService(object):
         <param name="top">Get record number from API</param>
         <param name="nextlink">Get skiptoken from nextlink</param>
         '''
-        skiptoken = ''
-        if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
-            skiptoken = '&%s' % link_skiptoken
- 
+        skiptoken = self._get_skip_token(nextlink)
         url = self.api_base_uri + 'administrativeUnits/%s/members?api-version=beta&$top=%s%s' % (object_id, top, skiptoken)
         return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
 
@@ -120,10 +113,7 @@ class EducationService(object):
         <param name="top">Get record number from API</param>
         <param name="nextlink">Get skiptoken from nextlink</param>
         '''
-        skiptoken = ''
-        if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
-            skiptoken = '&%s' % link_skiptoken
+        skiptoken = self._get_skip_token(nextlink)
         url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Student'&$top=%s%s" % (school_id, top, skiptoken)
         return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
     
@@ -134,10 +124,12 @@ class EducationService(object):
         <param name="top">Get record number from API</param>
         <param name="nextlink">Get skiptoken from nextlink</param>
         '''
-        skiptoken = ''
-        if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
-            skiptoken = '&%s' % link_skiptoken
-
+        skiptoken = self._get_skip_token(nextlink)
         url = self.api_base_uri + "users?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Teacher'&$top=%s%s" % (school_id, top, skiptoken)
         return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
+
+    def _get_skip_token(self, nextlink):
+        if nextlink and nextlink.find('skiptoken') != -1:
+            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
+            return '&%s' % link_skiptoken
+        return ''

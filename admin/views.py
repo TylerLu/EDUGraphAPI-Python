@@ -2,13 +2,13 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
+
+import constant
+from decorator import admin_only, login_required
 from utils.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 
-
-import constant
-from decorator import admin_only, login_required
 from services.auth_service import AuthService
 from services.token_service import TokenService
 from services.aad_graph_service import AADGraphService
@@ -29,33 +29,6 @@ def admin(request):
     }
     return render(request, 'admin/index.html', context)
 
-@login_required
-@admin_only
-def linked_accounts(request):
-    user = AuthService.get_current_user(request)
-    account_links = link_service.get_links(user.tenant_id)
-    context = {
-        'user': user,
-        'account_links': account_links
-    }
-    return render(request, 'admin/linkaccounts.html', context)
-
-@login_required
-@admin_only
-def unlink_account(request, link_id):
-    if request.method == 'POST':
-        link_service.remove_link(link_id)
-        return HttpResponseRedirect('/Admin/LinkedAccounts')
-    else:
-        user = AuthService.get_current_user(request)
-        link = link_service.get_link(link_id)
-        context = {
-            'user': user,
-            'email': link['email'],
-            'o365Email': link['o365Email']
-        }
-        return render(request, 'admin/unlinkaccounts.html', context)
-
 def consent(request):    
     user = AuthService.get_current_user(request)
     extra_params = {
@@ -67,6 +40,12 @@ def consent(request):
         extra_params['login_hint'] = user.o365_email    
     o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'Admin/ProcessCode', AuthService.get_random_string(), extra_params) 
     return HttpResponseRedirect(o365_login_url)
+
+def consent_alone(request):
+    context = {}
+    if request.GET.get('consented') == 'true':
+        context['consented'] = True
+    return render(request, 'admin/consent.html', context)
 
 def process_code(request):
     AuthService.validate_state(request)
@@ -98,7 +77,36 @@ def unconsent(request):
     request.session['Message'] = 'Admin unconsented successfully!'
     return HttpResponseRedirect('/Admin')
 
-def add_app_roles(request):
+@login_required
+@admin_only
+def linked_accounts(request):
+    user = AuthService.get_current_user(request)
+    account_links = link_service.get_links(user.tenant_id)
+    context = {
+        'user': user,
+        'account_links': account_links
+    }
+    return render(request, 'admin/linkaccounts.html', context)
+
+@login_required
+@admin_only
+def unlink_account(request, link_id):
+    if request.method == 'POST':
+        link_service.remove_link(link_id)
+        return HttpResponseRedirect('/Admin/LinkedAccounts')
+    else:
+        user = AuthService.get_current_user(request)
+        link = link_service.get_link(link_id)
+        context = {
+            'user': user,
+            'email': link['email'],
+            'o365Email': link['o365Email']
+        }
+        return render(request, 'admin/unlinkaccounts.html', context)
+
+@login_required
+@admin_only
+def add_app_role_assignments(request):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.AADGraph, user.o365_user_id)
     aad_graph_service = AADGraphService(user.tenant_id, token)
@@ -110,11 +118,3 @@ def add_app_roles(request):
     count = aad_graph_service.add_app_role_assignments(service_principal['objectId'], service_principal['appDisplayName'])
     request.session["Message"] = 'User access was successfully enabled for %d user(s).' % count if count > 0 else 'User access was enabled for all users.'
     return HttpResponseRedirect("/Admin")
-
-def consent_alone(request):
-    context = {}
-    if request.GET.get('consented') == 'true':
-        context['consented'] = True
-    return render(request, 'admin/consent.html', context)
-
-

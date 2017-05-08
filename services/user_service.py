@@ -2,8 +2,8 @@
  *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  *   * See LICENSE in the project root for license information.
 '''
-from django.contrib.auth.models import User
 
+from django.contrib.auth.models import User
 from models.auth import O365User
 from models.db import Profile, ClassroomSeatingArrangements, UserRoles, Organizations, TokenCache
 
