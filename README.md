@@ -190,7 +190,7 @@ Run the app:
 
 3. Click the Deploy to Azure Button:
 
-   [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FTylerLu%2FEDUGraphAPI-Python%2Fmaster%2Fazuredeploy.json)
+   [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOfficeDev%2FO365-EDU-Python-Samples%2Fmaster%2Fazuredeploy.json)
 
 4. Fill in the values in the deployment page and select the **I agree to the terms and conditions stated above** checkbox.
 
