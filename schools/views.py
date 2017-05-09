@@ -14,6 +14,7 @@ from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
 from services.user_service import UserService
+from services.bingmap_service import BingMapService
 
 user_service = UserService()
 token_service = TokenService()
@@ -30,6 +31,15 @@ def schools(request):
     schools = education_service.get_schools()
     # sort schools: my school will be put to the top
     schools.sort(key=lambda d:d.name if d.id == my_school_id else 'Z_' + d.name)
+    # get shools' latitude and longitude
+    if constant.bing_map_key:
+        bing_map_server = BingMapService(constant.bing_map_key)
+        for school in schools:
+            latitude, longitude = bing_map_server.get_lat_lon(school.state, school.city, school.address)
+            if latitude and longitude:
+                school.custom_data['latitude'] = latitude
+                school.custom_data['longitude'] = longitude            
+
     context = {
         'user': user,
         'my_school_id': my_school_id,

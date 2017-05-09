@@ -5,7 +5,6 @@
 
 import re
 import datetime
-from services.bingmap_service import BingMapService
 
 class GraphObjectBase(object):
 
@@ -52,9 +51,7 @@ class GraphObjectBase(object):
 
 class School(GraphObjectBase):
     def __init__(self, prop_dict={}):
-        self._bing_map_server = BingMapService()
         super(School, self).__init__(prop_dict)
-        self._lat, self._lon = self._get_lat_lon()
 
     @property
     def id(self):
@@ -109,25 +106,6 @@ class School(GraphObjectBase):
     @property
     def state(self):
         return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_State')
-
-    @property
-    def latitude(self):
-        return self._lat
-
-    @property
-    def longitude(self):
-        return self._lon
-
-    def _get_lat_lon(self):
-        state = self.state
-        city = self.city
-        address = self.address
-        zip = self.zip
-        if address or zip:
-            lat, lon = self._bing_map_server.get_lat_lon(state, city, address)
-            return lat, lon
-        else:
-            return None, None
 
 class Section(GraphObjectBase):
     def __init__(self, prop_dict={}):
