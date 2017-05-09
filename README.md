@@ -321,6 +321,10 @@ The services used by the server side app:
 
 The services are in the **/services** folder.
 
+**Middleware**
+
+**`HandleRefreshTokenExceptionMiddleware`** catches `RefreshTokenException` thrown by `TokenService` when refresh token does not exist or expired. Then it redirects the user to a page to let the user re-login.
+
 **Multi-tenant app**
 
 This web application is a **multi-tenant app**. In the AAD, we enabled the option:
