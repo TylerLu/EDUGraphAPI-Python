@@ -9,7 +9,6 @@ import msgraph
 from msgraph.options import HeaderOption
 from msgraph.auth_provider_base import AuthProviderBase
 
-
 class AuthProvider(AuthProviderBase):
     
     def __init__(self):

@@ -1,3 +1,8 @@
+'''
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
+'''
+
 """app URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
