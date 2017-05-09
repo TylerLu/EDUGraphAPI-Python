@@ -8,6 +8,7 @@ from utils.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
 from services.auth_service import AuthService
+from django.contrib.auth import logout as auth_logout
 
 import os
 from services.token_service import RefreshTokenException
@@ -34,5 +35,6 @@ class UserUnlinkMonitorMiddleware(MiddlewareMixin):
         user = AuthService.get_current_user(request)
         if user.are_linked:
             if not Profile.objects.filter(id=user.user_id, o365UserId=user.o365_user_id):
-                AuthService.clear_o365_user(request)
+                auth_logout(request)
+                AuthService.set_o365_user(request, user.o365_user)
         return self.get_response(request)
