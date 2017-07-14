@@ -451,7 +451,7 @@ Note that in the AAD Application settings, permissions for each Graph API are co
 
 ## Contributing
 
-We encourage you to contribute to our samples. For guidelines on how to proceed, see [our contribution guide](/Contributing.md).
+We encourage you to contribute to our samples. For guidelines on how to proceed, see [our contribution guide](/CONTRIBUTING.md).
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 
