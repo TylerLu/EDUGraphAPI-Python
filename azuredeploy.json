@@ -50,13 +50,6 @@
       "metadata": {
         "description": ""
       }
-    },
-    "bingMapKey": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": ""
-      }
     }
   },
   "variables": {
@@ -113,7 +106,6 @@
           "properties": {
             "ClientId": "[parameters('clientId')]",
             "ClientSecret": "[parameters('clientSecret')]",
-            "BingMapKey": "[parameters('bingMapKey')]",
             "SourceCodeRepositoryUrl": "[parameters('SourceCodeRepositoryUrl')]",
             "command": "deploy.cmd"
           }

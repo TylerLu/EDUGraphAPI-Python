@@ -11,7 +11,6 @@ client_secret = os.environ['ClientSecret']
 
 source_code_repository_url = os.environ["SourceCodeRepositoryUrl"]
 
-bing_map_key = os.environ.get('BingMapKey')
 
 authority = 'https://login.microsoftonline.com/common/'
 
