@@ -45,6 +45,9 @@ class TokenService(object):
         self._create_or_update_token(auth_result, o365_user_id)
         return auth_result.get('accessToken')
 
+    def clear_token_cache(self):
+         TokenCache.objects.all().delete()
+
     def _is_valid(self, expires_on):
         now = datetime.datetime.now(expires_on.tzinfo)
         return now < expires_on - datetime.timedelta(minutes=5)
@@ -69,3 +72,5 @@ class TokenService(object):
         token.refreshToken = auth_result.get('refreshToken')
         token.expiresOn = expiresOnUTC
         token.save()
+
+

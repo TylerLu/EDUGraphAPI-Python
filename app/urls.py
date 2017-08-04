@@ -66,4 +66,5 @@ urlpatterns = [
     url(r'^Consent', admin_views.consent, name='consent'),
     url(r'^Unconsent', admin_views.unconsent, name='unconsent'),
     url(r'^Admin/Consent', admin_views.consent_alone, name='consent_alone'),
+    url(r'^Admin/ClearLoginCache',admin_views.clear_login_cache,name='clear_login_cache'),
 ]

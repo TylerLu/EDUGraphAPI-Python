@@ -57,6 +57,15 @@
         <p>Note: The App will take a while to effect.</p>
     </div>
     <hr />
+    <p>
+    In some cases, your supplier may make changes that require them to ask you to reset a login cache. Click the button below to reset the cache.
+    </p>
+		<form action="/Admin/ClearLoginCache" method="POST">{% csrf_token %}
+            <p class="form-group">
+                <input type="submit" value="Clear Login Cache" class="btn btn-default" />
+            </p>
+		</form>
+    <hr/>
 	<p><a href="/" class="btn btn-default">Return to home</a></p>
 {% endif %}
 {% endblock %}

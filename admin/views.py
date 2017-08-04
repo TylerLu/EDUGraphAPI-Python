@@ -118,3 +118,10 @@ def add_app_role_assignments(request):
     count = aad_graph_service.add_app_role_assignments(service_principal['objectId'], service_principal['appDisplayName'])
     request.session["Message"] = 'User access was successfully enabled for %d user(s).' % count if count > 0 else 'User access was enabled for all users.'
     return HttpResponseRedirect("/Admin")
+
+@login_required
+@admin_only
+def clear_login_cache(request):
+    token_service.clear_token_cache()
+    request.session["Message"] = 'Login cache cleared successfully!'
+    return HttpResponseRedirect("/Admin")
