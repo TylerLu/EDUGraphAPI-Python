@@ -61,8 +61,10 @@
 		</th>
 		<th></th>
 	</tr>
+	
 	{% for school in schools %}
-		{% if my_school_id == school.id %}
+
+		{% if my_school_id == school.school_id %}
 			<tr class="tr-content td-green">			
 		{% else %}
 			<tr class="tr-content">			
@@ -82,8 +84,8 @@
 
 		</td>
 		<td>
-			<a href="Schools/{{ school.object_id }}/Classes" class="btnlink">Classes</a>
-			<a href="Schools/{{ school.object_id }}/Users" class="btnlink">Teachers/students</a>
+			<a href="Schools/{{ school.id }}/Classes" class="btnlink">Classes</a>
+			<a href="Schools/{{ school.id }}/Users" class="btnlink">Teachers/students</a>
 		</td>
 	</tr>
 	{% endfor %}

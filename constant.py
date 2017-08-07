@@ -39,6 +39,7 @@ favorite_colors = [
 class Resources():
     AADGraph = "https://graph.windows.net/"
     MSGraph = "https://graph.microsoft.com/"
+    MSGraph_VERSION  ='beta'
 
 class Roles():
     Admin = "Admin"

@@ -64,9 +64,10 @@
 				{% else %}
 				<div class="content clearfix">
 					{% for section in sections %}
+					
 					<div class="tile-container">
 						{% if section.custom_data.is_my %}
-						<a class="mysectionlink" href="Classes/{{ section.object_id }}">
+						<a class="mysectionlink" href="Classes/{{ section.id }}">
 							<div class="tile">
 								<h5>{{ section.name }}</h5>
 								<h2>{{ section.combined_course_number }}</h2>
@@ -127,7 +128,7 @@
 			<div class="content clearfix">
 			{% for mysection in mysections %}
 				<div class="tile-container">
-					<a class="mysectionlink" href="Classes/{{mysection.object_id }}">
+					<a class="mysectionlink" href="Classes/{{mysection.id }}">
 						<div class="tile">
 							<h5>{{ mysection.name }}</h5>
 							<h2>{{ mysection.combined_course_number }}</h2>

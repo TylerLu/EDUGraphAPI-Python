@@ -104,6 +104,7 @@ class UserService(object):
             profile.save()
 
     def get_seating_position(self, o365_user_id, class_id):
+        
         arrangement = ClassroomSeatingArrangement.objects.filter(userId=o365_user_id, classId=class_id).first()
         if arrangement:
                return arrangement.position

@@ -55,6 +55,10 @@ class School(GraphObjectBase):
 
     @property
     def id(self):
+        return self.get_value('id')
+
+    @property
+    def school_id (self):
         return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId')
     
     @property
@@ -113,7 +117,7 @@ class Section(GraphObjectBase):
 
     @property
     def id(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId')
+        return self.get_value('id')
     
     @property
     def mail(self):
@@ -268,6 +272,10 @@ class EduUser(GraphObjectBase):
         super(EduUser, self).__init__(prop_dict)
     
     @property
+    def id(self):
+        return self.get_value('id')
+
+    @property
     def name(self):
         return self.get_value('displayName')
 
@@ -289,7 +297,7 @@ class EduUser(GraphObjectBase):
 
     @property
     def photo(self):
-        photo = '/Photo/UserPhoto/%s' % self.object_id
+        photo = '/Photo/UserPhoto/%s' % self.id
         return photo
 
 class Document(GraphObjectBase):

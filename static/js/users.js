@@ -67,7 +67,7 @@ $(document).ready(function () {
                     $.each(value, function (i, user) {
                         var userHtml = '<div class="element ' + (user.is_teacher ? "teacher-bg" : "student-bg") + '">' +
                                            '<div class="userimg">' +
-                                               '<img src="/static/Images/header-default.jpg" realheader="' + '/Photo/UserPhoto/' + user.object_id + '" />' +
+                                               '<img src="/static/Images/header-default.jpg" realheader="' + '/Photo/UserPhoto/' + user.id + '" />' +
                                            '</div>' +
                                            '<div class="username">' + user.DisplayName + '</div>' +
                                        '</div>';

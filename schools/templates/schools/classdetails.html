@@ -147,7 +147,7 @@
 					{% endif %}
                     <ul id="lstproducts">
 						{% for student in students %}
-							<li id="{{ student.object_id }}">
+							<li id="{{ student.id }}">
 								<img src="/static/Images/header-default.jpg" realheader={{ student.photo }}/>
 								<span class="disname">{{ student.name }}</span>
 								{% if student.custom_data.position == 0 %}
@@ -164,15 +164,15 @@
 						{% for student in students %}
 							{% if student.custom_data.position != 0 %}
 								{% if student.custom_data.favorite_color %}
-								<div class="deskcontainer white green" style="background-color:{{ student.custom_data.favorite_color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
+								<div class="deskcontainer white green" style="background-color:{{ student.custom_data.favorite_color }}" position="{{ student.custom_data.position }}" userid="{{ student.id }}">
 								{% else %}
-								<div class="deskcontainer white" style="" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
+								<div class="deskcontainer white" style="" position="{{ student.custom_data.position }}" userid="{{ student.id }}">
 								{% endif %}
 							{% else %}
 								{% if student.custom_data.favorite_color %}
-								<div class="deskcontainer unsaved green" style="background-color:{{ student.custom_data.favorite_color }}" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
+								<div class="deskcontainer unsaved green" style="background-color:{{ student.custom_data.favorite_color }}" position="{{ student.custom_data.position }}" userid="{{ student.id }}">
 								{% else %}
-								<div class="deskcontainer unsaved" style="" position="{{ student.custom_data.position }}" userid="{{ student.object_id }}">
+								<div class="deskcontainer unsaved" style="" position="{{ student.custom_data.position }}" userid="{{ student.id }}">
 								{% endif %}
 							{% endif %}
 									<div class="deskclose"><img src="/static/Images/close.png"></div>
