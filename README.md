@@ -329,13 +329,13 @@ The **EducationServiceClient** is the core class of the library. It is used to e
 
 ~~~typescript
 def get_schools(self):
-    url = self.api_base_uri + 'administrativeUnits?api-version=beta'
+    url = self.api_base_uri + 'administrativeUnits'
     return self.rest_api_service.get_object_list(url, self.access_token, model=School)
 ~~~
 
 ~~~typescript
 def get_school(self, object_id):
-    url = self.api_base_uri + 'administrativeUnits/%s?api-version=beta' % object_id
+    url = self.api_base_uri + 'administrativeUnits/%s' % object_id
     return self.rest_api_service.get_object(url, self.access_token, model=School)
 ~~~
 
@@ -344,13 +344,13 @@ def get_school(self, object_id):
 ~~~typescript
 def get_sections(self, school_id, top=12, nextlink=''):
     skiptoken = self._get_skip_token(nextlink)
-    url = self.api_base_uri + "groups?api-version=1.5&$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
+    url = self.api_base_uri + "groups?$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
     return self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='odata.nextLink')
 ~~~
 
 ```typescript
 def get_section(self, object_id):
-    url = self.api_base_uri + 'groups/%s?api-version=1.5' % object_id
+    url = self.api_base_uri + 'groups/%s' % object_id
     return self.rest_api_service.get_object(url, self.access_token, model=Section)
 ```
 **Get users**
@@ -358,7 +358,7 @@ def get_section(self, object_id):
 ```typescript
 def get_members(self, object_id, top=12, nextlink=''):
     skiptoken = self._get_skip_token(nextlink)
-    url = self.api_base_uri + 'administrativeUnits/%s/members?api-version=beta&$top=%s%s' % (object_id, top, skiptoken)
+    url = self.api_base_uri + 'administrativeUnits/%s/members?$top=%s%s' % (object_id, top, skiptoken)
     return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
 ```
 Below are some screenshots of the sample app that show the education data.
