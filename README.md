@@ -52,23 +52,6 @@ This sample is implemented with the Python language and [Django](https://www.dja
   - [Django](https://www.djangoproject.com/download/) 1.11 or above
   - [SQLite](https://www.sqlite.org/)
 
-**Optional configuration**:
-
-A feature in this sample demonstrates calling the Bing Maps API which requires a key to enable the Bing Maps feature. 
-
-Create a key to enable Bing Maps API features in the app:
-
-1. Open [https://www.bingmapsportal.com/](https://www.bingmapsportal.com/) in your web browser and sign in.
-
-2. Click  **My account** -> **My keys**.
-
-3. Create a **Basic** key, select **Public website** as the application type.
-
-4. Copy the **Key** and save it. 
-
-   ![](Images/bing-maps-key.png)
-
-   > **Note:** The key is used in the app configuration steps for debug and deploy.
 
 
 ## Register the application in Azure Active Directory
@@ -138,7 +121,6 @@ Run the app:
 
    - **clientId**: use the Client Id of the app registration you created earlier.
    - **clientSecret**: use the Key value of the app registration you created earlier.
-   - **BingMapKey**: use the key of Bing Map you got earlier. This setting is optional.
    - **SourceCodeRepositoryURL**: use the URL of this repository.
 
 2. Open terminal and navigate to the source code folder. Execute the command below:
@@ -215,8 +197,6 @@ Run the app:
    - **Client Id**: use the Client Id of the app registration you created earlier.
 
    - **Client Secret**: use the Key value of the app registration you created earlier.
-
-   - **Bing Map Key**: use the key of Bing Map you got earlier. This setting is optional. It will hide Bing map icon on schools page if this field is empty.
 
    - Check **I agree to the terms and conditions stated above**.
 
