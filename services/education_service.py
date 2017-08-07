@@ -11,13 +11,14 @@ from models.education import School, Section, EduUser
 class EducationService(object):
 
     def __init__(self, tenant_id, access_token):
-        self.api_base_uri = constant.Resources.MSGraph + '/' + constant.Resources.MSGraph_VERSION + '/'
+        self.api_base_uri = constant.Resources.MSGraph  + constant.Resources.MSGraph_VERSION + '/'
         self.access_token = access_token
         self.rest_api_service = RestApiService()
         self.skip_token_re = re.compile('\$skiptoken=.*')
 
     def get_my_school_id(self):
         url = self.api_base_uri + 'me'
+          
         user_content = self.rest_api_service.get_json(url, self.access_token)
         school_id = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId', '')
         return school_id
@@ -62,14 +63,15 @@ class EducationService(object):
         Get my sections within a school
         <param name="school_id">The school id.</param>
         '''
-        url = self.api_base_uri + 'me/memberOf'        
+        url = self.api_base_uri + 'me/memberOf'           
         section_list = self.rest_api_service.get_object_list(url, self.access_token, model=Section)
         mysection_list = [s for s in section_list if s.education_object_type == 'Section' and s.school_id == school_id ]
       
         for section in mysection_list:
-            section.members = self.get_section_members(section.object_id)
+            section.members = self.get_section_members(section.id)
                 
         mysection_list.sort(key=lambda d:d.combined_course_number)
+        
         return mysection_list
 
     def get_sections(self, school_id, top=12, nextlink=''):
