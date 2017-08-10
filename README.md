@@ -94,7 +94,7 @@ This sample is implemented with the Python language and [Django](https://www.dja
 
      | API                            | Application Permissions | Delegated Permissions                    |
      | ------------------------------ | ----------------------- | ---------------------------------------- |
-     | Microsoft Graph                |                         | Read all users' full profiles<br>Read all groups<br>Read directory data<br>Access directory as the signed in user<br>Sign users in |
+     | Microsoft Graph                | Read directory data     | Read all users' full profiles<br>Read directory data<br>Read directory data<br>Access directory as the signed in user<br>Sign users in |
      | Windows Azure Active Directory |                         | Sign in and read user profile<br>Read and write directory data |
 
      ![](/Images/aad-create-app-06.png)
