@@ -1,140 +1,225 @@
 [
 	{
-		"path": "/Account/Login",
-		"links": [
+		"path": "/Account/Login",		
+		"functions": [
 			{
-				"title": "AuthService",
-				"url": "services/auth_service.py"
-			},
-			{
-				"title": "UserService",
-				"url": "services/user_service.py"
-			},
-			{
-				"title": "TokenService",
-				"url": "services/token_service.py"
-			},
-			{
-				"title": "MSGraphService",
-				"url": "services/ms_graph_service.py"
-			},
-			{
-				"title": "View",
-        		"url": "account/views.py"
-			},
-      		{
-        		"title": "Template",
-        		"url": "account/templates/account/login.html"
-      		},
-      		{
-        		"title": "Template",
-        		"url": "account/templates/account/O365login.html"
-      		}
-		]
+			  "title": "Login for local user or O365 user",
+			  "tab": "",
+			  "files": [
+				{
+				  "url": "account/views.py",
+				  "methods": [
+					{
+					  "title": "login",
+					  "description": "Login page."
+					},
+					{
+						"title": "login_post",
+						"description": "Post to server after click login button."
+					  }
+				  ]
+				},
+				{
+					"url": "services/user_service.py",
+					"methods": [
+					  {
+						"title": "get_o365_user",
+						"description": "Get the current logged in user information from database."
+					  }
+					]
+				  },
+				  {
+					"url": "services/auth_service.py",
+					  "methods": [
+						{
+						  "title": "set_o365_user",
+						  "description": "Add O365 user information to session."
+						}
+					  ]
+					}
+	  
+	  
+			  ]
+			}
+	  
+		  ]
 	},
 	{
 		"path": "/Account/Register",
-		"links": [
+		"functions": [
 			{
-				"title": "UserService",
-				"url": "services/user_service.py"
-			},
-			{
-				"title": "View",
-        		"url": "account/views.py"
-			},
-      		{
-        		"title": "Template",
-        		"url": "account/templates/account/register.html"
-      		}
-		]
+			  "title": "New user register",
+			  "tab": "",
+			  "files": [
+				{
+				  "url": "account/views.py",
+				  "methods": [
+					{
+					  "title": "register",
+					  "description": "New user register page."
+					}
+				  ]
+				},
+				{
+					"url": "services/user_service.py",
+					"methods": [
+					  {
+						"title": "register",
+						"description": "Add a new user to database."
+					  }
+					]
+				  }
+	  
+	  
+			  ]
+			}
+	  
+		  ]
+		  
 	},
 	{
-		"path": "/Link",
-		"links": [
+		"path": "/Link",		
+		"functions": [
 			{
-				"title": "AuthService",
-				"url": "services/auth_service.py"
-			},
-			{
-				"title": "UserService",
-				"url": "services/user_service.py"
-			},			
-			{
-				"title": "LinkService",
-				"url": "services/link_service.py"
-			},
-			{
-				"title": "TokenService",
-				"url": "services/token_service.py"
-			},
-			{
-				"title": "MSGraphService",
-				"url": "services/ms_graph_service.py"
-			},
-			{
-				"title": "TokenService",
-				"url": "services/token_service.py"
-			},
-			{
-				"title": "View",
-        		"url": "link/views.py"
-			},
-      		{
-        		"title": "Template",
-        		"url": "link/templates/link/index.html"
-      		}
-		]
+			  "title": "Get user information and check link status",
+			  "tab": "",
+			  "files": [
+				{
+				  "url": "link/views.py",
+				  "methods": [
+					{
+					  "title": "link",
+					  "description": "Index action."
+					}
+				  ]
+				},
+				{
+					"url": "services/auth_service.py",
+					"methods": [
+					  {
+						"title": "get_current_user",
+						"description": "Get current login user information."
+					  }
+					]
+				  },
+				  {
+					"url": "services/user_service.py",
+					"methods": [
+					  {
+						"title": "get_user_by_email",
+						"description": "Get a user from database by email."
+					  }
+					]
+				  }
+	  
+			  ]
+			}
+	  
+		  ]
 	},
 	{
-		"path": "/Link/CreateLocal",
-		"links": [
+		"path": "/Link/CreateLocal",		
+		"functions": [
 			{
-				"title": "AuthService",
-				"url": "services/auth_service.py"
-			},
-			{
-				"title": "UserService",
-				"url": "services/user_service.py"
-			},
-			{
-				"title": "LinkService",
-				"url": "services/link_service.py"
-			},
-			{
-				"title": "View",
-        		"url": "link/views.py"
-			},
-      		{
-        		"title": "Template",
-        		"url": "link/templates/link/createlocal.html"
-      		}
-		]
+			  "title": "Create local account and then link with O365 account",
+			  "tab": "",
+			  "files": [
+				{
+				 "url": "link/views.py",
+				  "methods": [
+					{
+					  "title": "create_local",
+					  "description": "Page action."
+					}
+				  ]
+				},
+				{
+					"url": "services/user_service.py",
+					"methods": [
+					  {
+						"title": "create",
+						"description": "Create a new local user on database."
+					  },
+					  {
+						"title": "update_favorite_color",
+						"description": "Update current user's favorite color on database."
+					  },
+					  {
+						"title": "get_user",
+						"description": "Get a user by id from database."
+					  }
+					]
+				  },
+				  {
+					"url": "services/link_service.py",
+					"methods": [
+					  {
+						"title": "link",
+						"description": "Link local user with O365 user."
+					  }
+					]
+				  }
+	  
+	  
+			  ]
+			}
+	  
+		  ]
 	},
 	{
-		"path": "/Link/LoginLocal",
-		"links": [
+		"path": "/Link/LoginLocal",		
+		"functions": [
 			{
-				"title": "AuthService",
-				"url": "services/auth_service.py"
-			},
-			{
-				"title": "UserService",
-				"url": "services/user_service.py"
-			},
-			{
-				"title": "LinkService",
-				"url": "services/link_service.py"
-			},
-			{
-				"title": "View",
-        		"url": "link/views.py"
-			},
-      		{
-        		"title": "Template",
-        		"url": "link/templates/link/loginlocal.html"
-      		}
-		]
+			  "title": "Login a local user and then link with O365 user",
+			  "tab": "",
+			  "files": [
+				{
+					"url": "link/views.py",
+				  "methods": [
+					{
+					  "title": "login_local",
+					  "description": "Page action."
+					}
+				  ]
+				},
+				{
+				  "url": "services/auth_service.py",
+				  "methods": [
+					{
+					  "title": "get_current_user",
+					  "description": "Get current logined user information."
+					}
+				  ]
+				},
+				{
+					"url": "services/link_service.py",
+					"methods": [
+					  {
+						"title": "link",
+						"description": "Link local user with O365 user."
+					  }
+					]
+				  },
+				  {
+					"url": "services/user_service.py",
+					"methods": [
+					  {
+						"title": "get_user_by_email",
+						"description": "Get user by email from database."
+					  },
+					  
+					  {
+						"title": "get_user",
+						"description": "Get user by id from database."
+					  }
+					]
+				  }
+	  
+	  
+			  ]
+			}
+	  
+		  ]
 	},
 	{
 		"path": "/Admin",

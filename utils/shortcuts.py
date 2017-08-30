@@ -19,5 +19,5 @@ def render(request, template_name, context=None, content_type=None, status=None,
         if not source_code_repository_url.endswith('/'):
             source_code_repository_url = source_code_repository_url + '/'
         context['source_code_repository_url'] = source_code_repository_url        
-        context['demo_helper_links'] = settings.DEMO_HELPER.get_links(request.get_full_path())
+        context['demo_helper_functions'] = settings.DEMO_HELPER.get_functions(request.get_full_path())
     return django_render(request, template_name, context, content_type, status, using)

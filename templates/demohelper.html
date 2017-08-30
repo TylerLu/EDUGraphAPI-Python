@@ -9,12 +9,29 @@
     <div class="header-right-shadow-mask"></div>
     <div class="body">
         <p class="desc">Code sample links for this page:</p>
-		{% if demo_helper_links %}
-		<ul>
-			{% for link in demo_helper_links %}
+		{% if demo_helper_functions %}		
+		<ul class="functions">
+			{% for function in demo_helper_functions %}
 				<li>
-					<p class="title">{{ link.title }}</p>
-					<p><a href="{{ source_code_repository_url }}blob/master/{{ link.url }}" target="_blank">{{ link.url }}</a></p>
+					<p class="title">{{ function.title }}</p>
+					<p class="tab">{{ function.tab }}</p>
+					<ul class="files">
+						
+						{% for file in function.files %}
+						<li> 
+							<p class="title"><a href="{{ source_code_repository_url }}blob/master/{{ file.url }}" target="_blank">
+								{{ source_code_repository_url }}blob/master/{{ file.url }}</a></p>	
+								<ul class="methods">
+									{% for method in file.methods %}
+									<li>
+										<p class="title">{{method.title}}	</p>
+										<p class="desc">{{method.description}}	</p>	
+									</li>
+									{% endfor %}	
+								</ul>
+						</li>
+						{% endfor %}
+					</ul>
 				</li>
 			{% endfor %}
 		</ul>

@@ -14,11 +14,11 @@ class DemoHelper(object):
         self._object_id_filter = re.compile('\w+-\w+-\w+-\w+-\w+')
         self._number_filter = re.compile('\d+')
         
-    def get_links(self, path):
+    def get_functions(self, path):
         links = []
-        if path not in self.path_links:
+        if path not in self.path_links:           
             path = self._filter_path(path)
-        if path in self.path_links:
+        if path in self.path_links:           
             links = self.path_links[path]
         return links
 
@@ -26,7 +26,7 @@ class DemoHelper(object):
         result = {}
         if self.data:
             for item in self.data:
-                result[item['path']] = item['links']
+                result[item['path']] = item.get('functions')
         return result
 
     def _filter_path(self, path):
