@@ -8,6 +8,15 @@ $(document).ready(function () {
     formatDateTime();
     loadImages();
     iniTableSort();
+    var tabname = '';
+    if ($(".nav-tabs li.active").length > 0) {
+        tabname = $(".nav-tabs li.active").find("a").attr("href");
+    }
+    showDemoHelper(tabname);
+    $('.nav-tabs li').click(function (e) {
+        tabname = $(this).find("a").attr("href");
+        showDemoHelper(tabname);
+    });
 });
 
 function iniTiles(){

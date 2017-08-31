@@ -4,8 +4,14 @@
  */
 $(document).ready(function () {
     loadImages();
-
+    var tabname = '';
+    if ($(".filterlink-container .selected").length > 0) {
+        tabname = $(".filterlink-container .selected").attr("id");
+    }
+    showDemoHelper(tabname);
     $(".teacher-student .filterlink-container .filterlink").click(function () {
+        tabname = $(this).attr("id");
+        showDemoHelper(tabname);
         var element = $(this);
         element.addClass("selected").siblings("a").removeClass("selected");
         var filterType = element.data("type");

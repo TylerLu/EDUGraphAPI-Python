@@ -293,44 +293,10 @@
 					{
 					  "title": "admin",
 					  "description": "Admin index page action."
-					},
-					{
-						"title": "process_code",
-						"description": "Handle consent result after return from AAD."
-					  }
+					}
 				  ]
-				},
-				{
-					"url": "services/auth_service.py",
-					"methods": [
-					  {
-						"title": "get_current_user",
-						"description": "Get current login user information."
-					  },
-					  {
-						"title": "get_authorization_url",
-						"description": "Get authorization URL for consent app."
-					  },
-					  {
-						"title": "validate_state",
-						"description": "Validate state code that returned from AAD."
-					  },
-					  {
-						"title": "get_id_token",
-						"description": "Get id token from returned code."
-					  }
-					]
-				  },
-				  {
-					"url": "services/user_service.py",
-					"methods": [
-					  {
-						"title": "update_organization",
-						"description": "Update current tenant's organization on database."
-					  }
-					]
-				  }
-				   
+				}
+				
 			  ]
 			}
 	  

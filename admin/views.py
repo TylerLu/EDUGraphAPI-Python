@@ -29,7 +29,8 @@ def admin(request):
     }
     return render(request, 'admin/index.html', context)
 
-def consent(request):    
+def consent(request): 
+      
     user = AuthService.get_current_user(request)
     extra_params = {
         'scope': 'openid+profile',
@@ -43,6 +44,7 @@ def consent(request):
 
 def consent_alone(request):
     context = {}
+    
     if request.GET.get('consented') == 'true':
         context['consented'] = True
     return render(request, 'admin/consent.html', context)

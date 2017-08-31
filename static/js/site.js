@@ -15,8 +15,6 @@ $(document).ready(function () {
     });
 
     $('.demo-helper-control .header').on('click', function () {
-        console.log(12321);
-        console.log($(this).closest('.demo-helper-control').html());
         $(this).closest('.demo-helper-control').toggleClass('collapsed');
     });
 
@@ -26,4 +24,14 @@ $(document).ready(function () {
             $(this).parent().toggleClass("collapse");
         }
     });
+
 });
+function showDemoHelper(tabName) {
+    $("ul.functions > li").hide();
+    $("ul.functions > li").each(function () {
+        var text = $(this).find(".tab").text();
+        if (text.indexOf(tabName) >= 0 || text == "") {
+            $(this).show();
+        }
+    });
+}

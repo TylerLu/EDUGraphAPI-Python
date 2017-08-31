@@ -31,8 +31,16 @@ $(document).ready(function () {
     }
 
     bindShowDetail($(".section-tiles .tile-container"));
+    var tabname = '';
+    if ($(".sections .filterlink-container .selected").length > 0) {
+        tabname = $(".sections .filterlink-container .selected").attr("id");
+    }
+    showDemoHelper(tabname);
+
 
     $(".sections .filterlink-container .filterlink").click(function () {
+        tabname = $(this).attr("id");
+        showDemoHelper(tabname);
         search(true);
         var element = $(this);
         element.addClass("selected").siblings("a").removeClass("selected");

@@ -8,7 +8,8 @@ from django.conf import settings
 from django.shortcuts import render as django_render
 
 def render(request, template_name, context=None, content_type=None, status=None, using=None):
-    if context:
+    
+    if context != None:
         if 'Message' in request.session:
             context['message'] = request.session['Message'].split('\r\n')
             del request.session['Message']
