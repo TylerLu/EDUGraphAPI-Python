@@ -29,8 +29,10 @@
 				<a href="javascript:void(0);" id="userinfolink">
 					{% if user.main_role %} Logged in as: {{ user.main_role }}. {% endif %}
 					Hello {{ user.display_name }}
-					{% if user.photo %}<img src="{{ user.photo }}" />{% endif %}</a>
-            	<span class="caret" id="caret"></span>
+					{% if user.photo %}<img src="{{ user.photo }}" />{% endif %}
+					<span class="caret" id="caret"></span>
+				</a>
+            	
         	</div>
 			<div class="popupcontainer" id="userinfoContainer">
             	<div class="popuserinfo">
