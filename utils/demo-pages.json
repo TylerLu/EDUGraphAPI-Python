@@ -502,7 +502,7 @@
 					"methods": [
 					  {
 						"title": "get_access_token",
-						"description": "Get MS Graph access token to retrive schools."
+						"description": "Get MS Graph access token to retrieve schools."
 					  }
 					]
 				  },
@@ -582,7 +582,7 @@
 					"methods": [
 					  {
 						"title": "get_access_token",
-						"description": "Get MS Graph access token to retrive schools."
+						"description": "Get MS Graph access token to retrieve schools."
 					  }
 					]
 				  }
@@ -717,7 +717,7 @@
 					"methods": [
 					  {
 						"title": "get_access_token",
-						"description": "Get MS Graph access token to retrive schools."
+						"description": "Get MS Graph access token to retrieve schools."
 					  }
 					]
 				  },
@@ -836,7 +836,7 @@
 				  "methods": [
 					{
 					  "title": "get_access_token",
-					  "description": "Get MS Graph access token to retrive schools."
+					  "description": "Get MS Graph access token to retrieve schools."
 					}
 				  ]
 				},
