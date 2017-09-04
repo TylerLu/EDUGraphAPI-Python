@@ -242,7 +242,11 @@
 					{
 						"title": "clear_login_cache",
 						"description": "Remove token cache action."
-					  }
+						},
+						{
+							"title": "add_app_role_assignments",
+							"description": "Enab users access action."
+							}
 				  ]
 				}
 				,
@@ -272,6 +276,20 @@
 						{
 						  "title": "clear_token_cache",
 						  "description": "Remove all user tokens from database."
+						}
+					  ]
+					}
+					,
+					{
+					  "url": "services/aad_graph_service.py",
+					  "methods": [
+						{
+						  "title": "get_service_principal",
+						  "description": "Get the service principal."
+						},
+						{
+						  "title": "add_app_role_assignments",
+						  "description": "Add role assignments for each users."
 						}
 					  ]
 					}
