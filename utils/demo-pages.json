@@ -245,7 +245,7 @@
 						},
 						{
 							"title": "add_app_role_assignments",
-							"description": "Enab users access action."
+							"description": "Enable users access action."
 							}
 				  ]
 				}
@@ -289,7 +289,7 @@
 						},
 						{
 						  "title": "add_app_role_assignments",
-						  "description": "Add role assignments for each users."
+						  "description": "Add role assignments for each user."
 						}
 					  ]
 					}
