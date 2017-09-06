@@ -750,7 +750,7 @@
         "tab": "studentsinmyclasses",
         "files": [
           {
-            "url": "/blob/master/app/Services/EducationService.php",
+            "url": "services/education_service.py",
             "methods": [
               {
                 "title": "get_my_sections",
