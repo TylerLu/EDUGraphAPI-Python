@@ -177,8 +177,8 @@ def users(request, school_object_id):
     if user.is_teacher:
         my_sections = education_service.get_my_sections(school.school_id)            
         for section in my_sections:
-            for stu in section.members:
-                if stu.id not in studentsInMyClasses:                
+            for stu in section.members:               
+                if (stu.id not in studentsInMyClasses) and ( stu.is_teacher !=True):                
                     studentsInMyClasses[stu.id]=stu
    
     studentsInMyClassesArray = []
