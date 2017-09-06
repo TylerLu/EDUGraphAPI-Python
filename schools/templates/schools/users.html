@@ -40,12 +40,32 @@
 			<div class="teacicon"></div><div>Teacher</div>
 		</div>
 		<div class="col-md-6 filterlink-container">
-			<span>FILTER:</span> <a id="filterteacher" class="filterlink" data-type="teachers">Teachers</a> | <a id="filterstudent" class="filterlink" data-type="students">Students</a> | <a id="filterall" class="filterlink selected" data-type="users">All</a>
+			<span>FILTER:</span> 
+			{% if user.is_teacher %}
+			<a id="studentsinmyclasses" class="filterlink" data-type="studentsinmyclasses"> Students in my classes</a><span> | </span>
+			{% endif %}   
+			<a id="filterteacher" class="filterlink" data-type="teachers">Teachers</a> | <a id="filterstudent" class="filterlink" data-type="students">Students</a> | <a id="filterall" class="filterlink selected" data-type="users">All</a>
 		</div>
 	</div>
 	<br style="clear:both;"/>
 </div>
 <div class="users-container tiles-root-container">
+	<div id="studentsinmyclasses" class="tiles-secondary-container">
+			{% if studentsInMyClasses|length == 0 %}
+			<div class="nodata"> There is no data available for this page at this time.</div>
+			{% else %}
+			<div class="content">
+			{% for  student in studentsInMyClasses %}
+				<div class="element student-bg">
+				<div class="userimg">
+					<img src="{{ student.photo }}"/>
+				</div>
+				<div class="username">{{ student.name }}</div>
+			</div>
+			{% endfor %}
+			</div>	
+			{% endif %}		
+	</div>
 	<div id="users" class="tiles-secondary-container">
 		{% if users|length == 0 %}
 		<div class="nodata"> There is no data available for this page at this time.</div>

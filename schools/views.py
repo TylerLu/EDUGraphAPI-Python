@@ -172,6 +172,18 @@ def users(request, school_object_id):
     users, usersnextlink = education_service.get_members(school_object_id)
     teachers, teachersnextlink = education_service.get_teachers(school.school_id)
     students, studentsnextlink = education_service.get_students(school.school_id)
+    
+    studentsInMyClasses = dict()
+    if user.is_teacher:
+        my_sections = education_service.get_my_sections(school.school_id)            
+        for section in my_sections:
+            for stu in section.members:
+                if stu.id not in studentsInMyClasses:                
+                    studentsInMyClasses[stu.id]=stu
+   
+    studentsInMyClassesArray = []
+    for stu in studentsInMyClasses.items():
+        studentsInMyClassesArray.append(stu[1])
 
     context = {
         'user': user,
@@ -179,6 +191,7 @@ def users(request, school_object_id):
         'users': users,
         'teachers': teachers,
         'students': students,
+        'studentsInMyClasses': studentsInMyClassesArray,
         'usersnextlink': usersnextlink,
         'studentsnextlink': studentsnextlink,
         'teachersnextlink': teachersnextlink,

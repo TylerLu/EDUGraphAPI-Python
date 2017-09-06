@@ -403,7 +403,10 @@ max-width: 140px;
 .teacher-student .tiles-root-container .student-bg{background-color:#444444}
 .teacher-student .tiles-root-container .teacher-bg{background-color:#4DA143;}
 .teacher-student .tiles-root-container .tiles-secondary-container{display:none}
-.teacher-student .users-container #users.tiles-secondary-container, .teacher-student .students-container #students.tiles-secondary-container, .teacher-student .teachers-container #teachers.tiles-secondary-container{display:block}
+.teacher-student .studentsinmyclasses-container #studentsinmyclasses.tiles-secondary-container,
+.teacher-student .users-container #users.tiles-secondary-container, 
+.teacher-student .students-container #students.tiles-secondary-container,
+.teacher-student .teachers-container #teachers.tiles-secondary-container{display:block}
 
 /* Demo Helper Control */
 .demo-helper-control .collapse{display:block;}
