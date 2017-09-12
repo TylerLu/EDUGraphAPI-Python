@@ -129,6 +129,25 @@ class EducationService(object):
         
         return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='@odata.nextLink')
 
+    def add_member(self, class_id, user_id):
+        '''
+        Add a user to members of a class.
+        Reference URL: https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/group_post_members
+        '''
+        url = self.api_base_uri + "groups/" + class_id + "/members/$ref"
+        data ={'@odata.id':'https://graph.microsoft.com/v1.0/directoryObjects/'+user_id}  
+        return self.rest_api_service.post_json(url,self.access_token,None,data)
+
+    def add_owner(self, class_id, user_id):
+        '''
+        Add a user to owner of a class.
+        Reference URL: https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/group_post_owners
+        '''
+        url = self.api_base_uri + "groups/" + class_id + "/owners/$ref"
+        data ={'@odata.id':'https://graph.microsoft.com/v1.0/users/'+user_id}  
+        return self.rest_api_service.post_json(url,self.access_token,None,data)
+
+
     def _get_skip_token(self, nextlink):
         if nextlink and nextlink.find('skiptoken') != -1:
             link_skiptoken = self.skip_token_re.findall(nextlink)[0]

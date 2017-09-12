@@ -47,6 +47,7 @@ urlpatterns = [
     url(r'^Schools/(?P<school_object_id>\w+-\w+-\w+-\w+-\w+)/Students/Next', schools_views.students_next, name='students_next'),
     url(r'^Schools/(?P<school_object_id>\w+-\w+-\w+-\w+-\w+)/Teachers/Next', schools_views.teachers_next, name='teachers_next'),
     url(r'^Schools/(?P<school_object_id>\w+-\w+-\w+-\w+-\w+)/Classes/(?P<class_object_id>\w+-\w+-\w+-\w+-\w+)', schools_views.class_details, name='class_details'),
+    url(r'^Class/(?P<class_object_id>\w+-\w+-\w+-\w+-\w+)/Coteacher/(?P<user_object_id>\w+-\w+-\w+-\w+-\w+)', schools_views.add_coteacher, name='add_coteacher'),
     url(r'^Schools/SaveSeatingArrangements$', schools_views.save_seating_arrangements, name='save_seating_arrangements'),
 
     url(r'^Manage/AboutMe', manage_views.aboutme, name='aboutme'),

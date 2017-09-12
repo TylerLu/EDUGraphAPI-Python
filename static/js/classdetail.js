@@ -17,6 +17,12 @@ $(document).ready(function () {
         tabname = $(this).find("a").attr("href");
         showDemoHelper(tabname);
     });
+    $('.schoolteachers .close').click(function (e) {
+        $(this).parent().hide();
+    });
+    $('#addateacher').click(function (e) {
+        $('.schoolteachers').show();
+    });
 });
 
 function iniTiles(){

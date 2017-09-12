@@ -231,7 +231,7 @@ textarea {
 .b-title{font-size:24px;color:#666565;}
 .class-details .b-title{font-family:'Helvetica Neue LT Std Th'}
 .coursedetail .col-md-6{padding:12px 0 6px 0;}
-.coursedetail .col-md-6 span:not(#termdate):not(#termdate-separator){font-family:'Helvetica Neue LT Std Bold'}
+.coursedetail .col-md-6 span:not(#termdate):not(#termdate-separator):not(.coteacher-name){font-family:'Helvetica Neue LT Std Bold'}
 .coursedetail .col-md-6:last-child{padding:12px 0 6px 0;}
 .coursedetail .col-md-6:last-child > b{color:#F7F7F7;}
 .coursedetail .col-md-6:last-child > b:first-child{color:#333;}
@@ -272,6 +272,54 @@ textarea {
 .students #studoc.table-green tbody tr.tr-content.selected td.border-holder, .students #stuconv.table-green tbody tr.tr-content.selected td.border-holder{background-color:#127605}
 .students #documents .see-more, .students #conversations .see-more{float:right; margin-right:16px; padding:2px 10px; background:-prefix-linear-zgradient(top, #137A05, #28BB14); background:linear-gradient(to bottom, #137A05, #28BB14);}
 .students #documents .see-more a, .students #conversations .see-more a{color:#ffffff; font-size:12px; font-family:'Helvetica Neue LT Std Bold'; text-decoration:none}
+.coursedetail {position: relative;}
+.coursedetail .schoolteachers{
+    display: none;
+    position: absolute;
+    background: #fff;
+    color: #000;
+    min-width: 360px;
+    min-height: 230px;
+    max-height: 500px;
+    padding: 8px 20px 30px 20px;
+    z-index: 10;
+    border: solid #C2C2C2 1px;
+    box-shadow: 1px 2px 1px 2px #c2c2c2;
+    left: 33%;
+    top: -30px;
+}
+.coursedetail .schoolteachers .title{
+    font-size: 18px;
+}
+.coursedetail .schoolteachers .list{
+    margin-top: 12px;
+    max-height: 330px;
+    overflow: auto;
+}
+
+.coursedetail .schoolteachers ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.coursedetail .schoolteachers li{
+    display: block;
+    padding: 10px 8px;
+}
+
+.schoolteachers li:nth-child(2n+1) {
+    background-color: #f8f8f8;
+}
+.schoolteachers .close img{    border-radius: 30px;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border: 1px solid #e4e4e4;
+    max-width: 22px;
+    height: auto;}
+#addateacher{
+    display:block;
+}
+
 
 /*User info popup window*/
 .navbar-right a{color:white;text-decoration:none;}
@@ -308,7 +356,7 @@ textarea {
 #seatingchart .greenicon{width:14px;height:14px;background:#237e17;float:left;margin:3px 6px 0 0;}
 .assignseat{margin:12px 0;}
 #lstproducts{padding-left:0;}
-#lstproducts img, .deskicon img, #studentsTable img, .userinfo img, .aboutme img{
+#lstproducts img, .deskicon img, #studentsTable img, .userinfo img, .aboutme img, .schoolteachers img{
 border-radius: 30px;
 -webkit-border-radius: 30px;
 -moz-border-radius: 30px;

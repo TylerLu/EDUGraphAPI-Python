@@ -41,11 +41,38 @@
 				<span id="termdate">{{ section.course_termenddate }}</span>
             </div>
             <div class="col-md-6">
+				<span>Teacher:</span>
 				{% for teach in teachers %}
-				<span>Teacher:</span> {{ teach.name }}
-				{% if not forloop.last %}<br />{% endif %} 
+				 {{ teach.name }}
+				{% if not forloop.last %},{% endif %} 
 				{% endfor %}
-            </div>
+				{% if not user.is_student %}
+				<br/><a id="addateacher" href="javascript:void(0)">Add a teacher</a>
+				{% endif %}
+			</div>
+			{% if not user.is_student %}
+			<div class="schoolteachers">
+					<div class="close"><img src="/static/Images/close.png"></div>
+					<div class="title">Select a teacher</div>
+					<div class="list">
+							{% if filteredTeachers|length == 0%}
+						 
+							<div > There is no data available at this time.</div>
+							{% else %}
+							<ul>
+									{% for  key, value in filteredTeachers.items %}
+									<li>
+									<a href="/Class/{{ section.id|safe }}/Coteacher/{{ value.id|safe }}">
+										<img src="/static/Images/header-default.jpg" realheader="{{ value.photo|safe }}"/> {{ value.name }}
+									</a>
+									</li>
+									{% endfor %}
+							</ul>
+							{% endif %}
+
+					</div>
+				</div>
+			{% endif %}
         </div>
         <div style="clear:both;"></div>
     </div>

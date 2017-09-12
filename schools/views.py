@@ -100,6 +100,17 @@ def classes_next(request, school_object_id):
 
 @login_required
 @linked_users_only
+def add_coteacher(request, class_object_id, user_object_id):    
+    previousURL = request.META.get('HTTP_REFERER')    
+    user = AuthService.get_current_user(request)
+    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)
+    education_service.add_member(class_object_id,user_object_id)
+    education_service.add_owner(class_object_id,user_object_id)
+    return HttpResponseRedirect(previousURL)
+
+@login_required
+@linked_users_only
 def class_details(request, school_object_id, class_object_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
@@ -110,7 +121,7 @@ def class_details(request, school_object_id, class_object_id):
     members = education_service.get_section_members(class_object_id)
     teachers = [m for m in members if m.education_object_type == 'Teacher']
     students = [m for m in members if m.education_object_type == 'Student'] 
-
+    
     # set favorite colors and seating positions
     for student in students:
         favorite_color = user_service.get_favorite_color_by_o365_user_id(student.id)
@@ -120,7 +131,16 @@ def class_details(request, school_object_id, class_object_id):
         if not seating_position:
             seating_position = 0
         student.custom_data['position'] = seating_position
-
+   
+    allTeachersInSchool = education_service.get_teachers(school.school_id,100,'')
+    filteredTeachers = {}
+    for teacher in allTeachersInSchool[0]:
+        filteredTeachers[teacher.id] = teacher
+    for teacher in teachers:
+        if(teacher.id in filteredTeachers):
+            del filteredTeachers[teacher.id]    
+   
+       
     # set seatrange
     seatrange = range(1, 37)
 
@@ -150,7 +170,8 @@ def class_details(request, school_object_id, class_object_id):
         'school_object_id': school_object_id,
         'class_object_id': class_object_id,
         'is_in_a_school': True,
-        'favorite_color': favorite_color
+        'favorite_color': favorite_color,
+        'filteredTeachers':filteredTeachers
     }
     return render(request, 'schools/classdetails.html', context)
 

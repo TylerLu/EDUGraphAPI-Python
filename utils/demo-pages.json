@@ -578,8 +578,11 @@
               {
                 "title": "class_details",
                 "description": "Page action."
+              },
+              {
+                "title": "add_coteacher",
+                "description": "Add co-teacher to a class."
               }
-
             ]
           },
           {
@@ -611,6 +614,14 @@
               {
                 "title": "get_section",
                 "description": "Get a class by using the id."
+              },
+              {
+                "title": "add_member",
+                "description": "Add a user to members of a class."
+              },
+              {
+                "title": "add_owner",
+                "description": "Add a user to owner of a class."
               }
             ]
           }
