@@ -42,9 +42,8 @@
             </div>
             <div class="col-md-6">
 				<span>Teacher:</span>
-				{% for teach in teachers %}
-				 {{ teach.name }}
-				{% if not forloop.last %},{% endif %} 
+				{% for teach in teachers %}				
+				 {{teach.name}}{% if not forloop.last %},{% endif %} 
 				{% endfor %}
 				{% if not user.is_student %}
 				<br/><a id="addateacher" href="javascript:void(0)">Add a teacher</a>
