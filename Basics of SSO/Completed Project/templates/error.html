@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<h2 class="text-danger">Error</h2>
+<h3 class="text-danger">{{ reason }}</h3>
+{% endblock %}

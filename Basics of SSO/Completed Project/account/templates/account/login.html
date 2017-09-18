@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
+
+{% block title %}Log in{% endblock %}
+
+{% block csslink %}
+    <link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
+{% block content %}
+<div class="loginbody">
+   <div class="row">
+	   <div class="col-md-5">
+		   <section id="loginForm">
+			   <form class="form-horizontal" action="/Account/Login" method="post" role="form">{% csrf_token %}
+			   <h4 class="margin-btm-20">Use your local account to log in</h4>
+				   <div class="form-group">
+					   {% if errors %}
+					   <div class="validation-summary-errors text-danger">
+						   <ul>
+							   {% for error in errors %}
+							   <li>{{ error }}</li>
+							   {% endfor %}
+						   </ul>
+					   </div>
+					   {% endif %}
+					   <div class="col-md-12">
+						   {{ user_form.Email }}
+						   <span class="field-validation-valid text-danger" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+					   </div>
+				   </div>
+				   <div class="form-group">
+					   <div class="col-md-12">
+						   {{ user_form.Password }}
+						   <span class="field-validation-valid text-danger" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+					   </div>
+				   </div>
+				   <div class="form-group">
+					   <div class="margin-left-20 col-md-10">
+						   <div class="checkbox">	
+							   {{ user_form.RememberMe }}		
+							   <label for="RememberMe">Remember me?</label>
+						   </div>
+					   </div>
+				   </div>
+				   <div class="form-group">
+					   <div class=" col-md-10">
+						   <input type="submit" value="Sign in" class="btn btn-default btn-local-login" />
+					   </div>
+				   </div>
+				   <p>
+					   <a href="/Account/Register" class="registerlink">Register as a new user</a>
+				   </p>
+		   </form>
+		   </section>
+	   </div>
+	   <div class="col-md-5">
+		   <section id="socialLoginForm">
+		   <h4 class="margin-btm-20">Use your school account</h4>
+		   <form action="/Account/O365Login" method="post">{% csrf_token %}
+			   <div id="socialLoginList">
+				   <p>
+					   <button type="submit" class="btn btn-default btn-ms-login" id="OpenIdConnect" name="provider" value="OpenIdConnect" title="Log in using your Microsoft Work or school account"></button>
+				   </p>
+			   </div>
+		   </form>
+		   </section>
+	   </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block localjs %}
+<script src="/static/js/jquery.validate.js"></script>
+<script src="/static/js/jquery.validate.min.js"></script>
+<script src="/static/js/jquery.validate-vsdoc.js"></script>
+<script src="/static/js/jquery.validate.unobtrusive.js"></script>
+{% endblock %}

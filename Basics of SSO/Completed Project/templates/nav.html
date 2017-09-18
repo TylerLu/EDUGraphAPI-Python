@@ -1,0 +1,45 @@
+{% comment %}
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.  
+ *   * See LICENSE in the project root for license information.  
+{% endcomment %}  
+<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+	 		<a class="navbar-brand" href="">Edu Demo App</a>
+		</div>
+		<div class="navbar-collapse collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="/">Home</a></li>
+			</ul>
+		{% if user.is_authenticated %}
+		<form action="/Account/LogOff" class="navbar-right" id="logoutForm" method="post">{% csrf_token %}
+        	<div class="userinfo">
+				<a href="javascript:void(0);" id="userinfolink">
+					{% if user.main_role %} Logged in as: {{ user.main_role }}. {% endif %}
+					Hello {{ user.display_name }}					
+					<span class="caret" id="caret"></span>
+				</a>
+            	
+        	</div>
+			<div class="popupcontainer" id="userinfoContainer">
+            	<div class="popuserinfo">
+                	<div class="subitem">
+                    	<a href="javascript:document.getElementById('logoutForm').submit()">Log off</a>
+                	</div>
+            	</div>
+			</div>
+    	</form>
+		{% else %}
+    	<ul class="nav navbar-nav navbar-right">
+			<li><a href="/Account/Register" id="registerLink">Register</a></li>
+			<li><a href="/Account/Login" id="loginLink">Log in</a></li>
+    	</ul>
+		{% endif %}
+		</div>
+	</div>
+</div>
