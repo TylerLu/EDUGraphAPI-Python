@@ -74,7 +74,7 @@ The starter project is a simple application with only SQL authentication configu
 
      Click **Reply URLs**, add the following URL into it. 
 
-     [https://localhost:8000/](https://localhost:8000/)
+     [https://localhost:8000/Auth/O365/Callback](https://localhost:8000/Auth/O365/Callback)
 
    * Click **Required permissions**. Add the following permissions:
 
@@ -110,7 +110,7 @@ The starter project is a simple application with only SQL authentication configu
 
    **ClientSecret**: use the Key value of the app registration you created earlier.
 
-3. Create a new file named **** in the same directory as **manage.py**, remove all generated code and paste the following.  
+3. Create a new file named **constant.py** in the same directory as **manage.py**, remove all generated code and paste the following.  
 
    ```python
    '''
