@@ -477,9 +477,7 @@ The starter project is a simple application with only SQL authentication configu
 
 8.   Create a new file **ms_graph_service.py** in **services** folder, remove all code and paste the following.
 
-   ```python
-
-
+	```python
 	import msgraph
 	import constant
 	from utils.auth_provider import AuthProvider
@@ -631,7 +629,7 @@ The starter project is a simple application with only SQL authentication configu
        def clear_o365_user(request):
            if constant.o365_user_session_key in request.session:
                del request.session[constant.o365_user_session_key]
-   ```
+	```
 
    New methods are added to set or clear O365 user login information.
 
@@ -774,6 +772,7 @@ The starter project is a simple application with only SQL authentication configu
 		AuthService.clear_o365_user(request)
 		auth_logout(request)
 		return HttpResponseRedirect('/')
+		
     ​```
     
     Two new methods with name o365_login and o365_auth_callback are added. These methods are used for user login to O365 and then handle login result from O365.
