@@ -639,7 +639,7 @@ The starter project is a simple application with only SQL authentication configu
 
 10. Edit account\views.py, remove all code and paste the following.
 
-  ```python
+	```python
 	import constant
 	from utils.shortcuts import render
 
