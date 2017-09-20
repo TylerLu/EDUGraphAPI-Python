@@ -775,9 +775,9 @@ The starter project is a simple application with only SQL authentication configu
 		
    ```
     
-		Two new methods with name o365_login and o365_auth_callback are added. These methods are used for user login to O365 and then handle login result from O365.
-		
-		To see how this file works in the Demo app, refer to the file located [here](../account/views.py) in the Demo app.
+   Two new methods with name o365_login and o365_auth_callback are added. These methods are used for user login to O365 and then handle login result from O365.
+    
+   To see how this file works in the Demo app, refer to the file located [here](../account/views.py) in the Demo app.
 
 11. Open command and then locate to the same directory as **manage.py**. Run below commands one by one. 
 
