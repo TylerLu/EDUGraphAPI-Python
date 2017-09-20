@@ -81,10 +81,11 @@ def o365_login(request):
 
 
 def o365_auth_callback(request):
+    
     AuthService.validate_state(request)
     code = request.POST.get('code')
     id_token = AuthService.get_id_token(request)
-
+    
     o365_user_id = id_token.get('oid')
     tenant_id = id_token.get('tid')
 
@@ -93,13 +94,11 @@ def o365_auth_callback(request):
     token_service.cache_tokens(auth_result, o365_user_id)
 
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))
+    
     o365_user = ms_graph_service.get_o365_user(tenant_id)
+    
     AuthService.set_o365_user(request, o365_user)
 
-    for role in o365_user.roles:
-        user_service.update_role(o365_user.id, role)
-
-    user_service.create_or_update_organization(tenant_id, o365_user.tenant_name)
     local_user = user_service.get_user_by_o365_email(o365_user.email)
     if local_user:
         auth_login(request, local_user)

@@ -22,9 +22,10 @@ class MSGraphService(object):
         self.ms_graph_client = msgraph.GraphServiceClient(self.api_base_uri, auth_provider, msgraph.HttpProvider())
 
     def get_o365_user(self, tenant_id):
+        
         me = self._get_me().to_dict()
         org = self._get_organization(tenant_id)
-
+        
         id = me['id']
         first_name = me['givenName']
         last_name = me['surname']
@@ -34,8 +35,11 @@ class MSGraphService(object):
             email = me['userPrincipalName']
         tenant_name = org['displayName']
         roles = self._get_roles(id)
-        photo = '/Photo/UserPhoto/' + id
-        return O365User(id, email, first_name, last_name, display_name, tenant_id, tenant_name, roles, photo)
+        photo = ''
+        
+        result  = O365User(id, email, first_name, last_name, display_name, tenant_id, tenant_name, roles, photo)
+        
+        return result
 
     def get_photo(self, object_id):
         url = self.api_base_uri + 'users/%s/photo/$value' % object_id
@@ -65,21 +69,6 @@ class MSGraphService(object):
 
     def _get_roles(self, user_id):
         roles = []
-        # check if the user is an admin
-        directory_roles = self._get_directory_roles()
-        admin_role = next(r for r in directory_roles if r.display_name == constant.company_admin_role_name)
-        if admin_role:
-            members = admin_role.to_dict()['members']
-            if any(m for m in members if m['id']==user_id):
-                roles.append(constant.Roles.Admin)
-        # check if the user is a faculty or a student
-        assigned_licenses = self._get_assigned_licenses()
-        for license in assigned_licenses:
-            license_id = license['skuId']
-            if license_id == constant.O365ProductLicenses.Faculty or license_id == constant.O365ProductLicenses.FacultyPro:
-                roles.append(constant.Roles.Faculty)
-            if license_id == constant.O365ProductLicenses.Student or license_id == constant.O365ProductLicenses.StudentPro:
-                roles.append(constant.Roles.Student)
         return roles
 
     def _get_me(self):
