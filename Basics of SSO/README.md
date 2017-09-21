@@ -479,16 +479,16 @@ The starter project is a simple application with only SQL authentication configu
 8. Create a new file **ms_graph_service.py** in **services** folder, remove all code and paste the following.
 
    ```python
-	import msgraph
-	import constant
-	from utils.auth_provider import AuthProvider
-	from services.rest_api_service import RestApiService
-	from models.auth import O365User
-	from models.education import Document, Conversation
+   import msgraph
+   import constant
+   from utils.auth_provider import AuthProvider
+   from services.rest_api_service import RestApiService
+   from models.auth import O365User
+   from models.education import Document, Conversation
 
-	class MSGraphService(object):
+   class MSGraphService(object):
 
-    def __init__(self, access_token):
+   def __init__(self, access_token):
         self.access_token = access_token
         self.api_base_uri = constant.Resources.MSGraph + 'v1.0' + '/'
         self.rest_api_service = RestApiService()
@@ -497,7 +497,7 @@ The starter project is a simple application with only SQL authentication configu
         auth_provider.access_token(self.access_token)
         self.ms_graph_client = msgraph.GraphServiceClient(self.api_base_uri, auth_provider, msgraph.HttpProvider())
 
-    def get_o365_user(self, tenant_id):
+   def get_o365_user(self, tenant_id):
         
         me = self._get_me().to_dict()
         org = self._get_organization(tenant_id)
@@ -517,49 +517,49 @@ The starter project is a simple application with only SQL authentication configu
         
         return result
 
-    def get_photo(self, object_id):
+   def get_photo(self, object_id):
         url = self.api_base_uri + 'users/%s/photo/$value' % object_id
         try:
             return self.rest_api_service.get_img(url, self.access_token)
         except:
             return None
 
-    def get_documents(self, object_id):
+   def get_documents(self, object_id):
         url = self.api_base_uri + 'groups/%s/drive/root/children' % object_id
         return self.rest_api_service.get_object_list(url, self.access_token, model=Document)
 
-    def get_documents_root(self, object_id):
+   def get_documents_root(self, object_id):
         url = self.api_base_uri + 'groups/%s/drive/root' % object_id
         document = self.rest_api_service.get_object(url, self.access_token, model=Document)
         return document.web_url
 
-    def get_conversations(self, object_id):
+   def get_conversations(self, object_id):
         url = self.api_base_uri + 'groups/%s/conversations' % object_id
         return self.rest_api_service.get_object_list(url, self.access_token, model=Conversation)
     
-    def get_conversations_url(self, conversation_id, section_email):
+   def get_conversations_url(self, conversation_id, section_email):
         return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0&ConvID=%s' % (section_email, conversation_id, )
 
-    def get_conversations_root(self, section_email):
+   def get_conversations_root(self, section_email):
         return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0' % section_email
 
-    def _get_roles(self, user_id):
+   def _get_roles(self, user_id):
         roles = []
         return roles
 
-    def _get_me(self):
+   def _get_me(self):
         return self.ms_graph_client.me.get()
 
-    def _get_assigned_licenses(self):
+   def _get_assigned_licenses(self):
         url = self.api_base_uri + 'me/assignedLicenses'
         return self.rest_api_service.get_json(url, self.access_token)['value']
 
-    def _get_organization(self, tenant_id):
+   def _get_organization(self, tenant_id):
         url = self.api_base_uri + 'organization/' + tenant_id
         return self.rest_api_service.get_json(url, self.access_token)
 
 
-    def _get_directory_roles(self):
+   def _get_directory_roles(self):
         expand_members = msgraph.options.QueryOption('$expand', 'members')
         return self.ms_graph_client.directory_roles.request(options=[expand_members]).get()
    ```
