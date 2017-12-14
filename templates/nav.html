@@ -16,8 +16,8 @@
 			<ul class="nav navbar-nav">
 				<li><a href="/">Home</a></li>
 				{% if is_in_a_school %}
-				<li><a href="/Schools/{{ school_object_id }}/Classes">Classes</a></li>
-				<li><a href="/Schools/{{ school_object_id }}/Users">Teachers & Students</a></li>
+				<li><a href="/Schools/{{ school_id }}/Classes">Classes</a></li>
+				<li><a href="/Schools/{{ school_id }}/Users">Teachers & Students</a></li>
 				{% endif %}
 				{% if user.is_authenticated and user.is_admin %}
 				<li><a href="/Admin">Admin</a></li>
@@ -29,7 +29,7 @@
 				<a href="javascript:void(0);" id="userinfolink">
 					{% if user.main_role %} Logged in as: {{ user.main_role }}. {% endif %}
 					Hello {{ user.display_name }}
-					{% if user.photo %}<img src="{{ user.photo }}" />{% endif %}
+					<img src="/Photo/UserPhoto/{{ user.id }}" />
 					<span class="caret" id="caret"></span>
 				</a>
             	

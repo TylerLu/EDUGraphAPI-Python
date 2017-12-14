@@ -6,7 +6,7 @@
 import re
 import constant
 from services.rest_api_service import RestApiService
-from models.education import School, Section, EduUser
+from models.education import School, Class, EduUser
 
 class EducationService(object):
 
@@ -14,14 +14,11 @@ class EducationService(object):
         self.api_base_uri = constant.Resources.MSGraph  + constant.Resources.MSGraph_VERSION + '/'
         self.access_token = access_token
         self.rest_api_service = RestApiService()
-        self.skip_token_re = re.compile('\$skiptoken=.*')
+        self.skip_token_re = re.compile('(?<=skiptoken=).*')
 
-    def get_my_school_id(self):
-        url = self.api_base_uri + 'me'
-          
-        user_content = self.rest_api_service.get_json(url, self.access_token)
-        school_id = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId', '')
-        return school_id
+    def get_me(self):
+        url = self.api_base_uri + 'education/me?$expand=schools,classes'
+        return self.rest_api_service.get_object(url, self.access_token, model=EduUser)
 
     def get_school_user_id(self):
         url = self.api_base_uri + 'me'
@@ -37,96 +34,66 @@ class EducationService(object):
         '''
         Get all schools that exist in the Azure Active Directory tenant.
         '''
-        url = self.api_base_uri + 'administrativeUnits'
+        url = self.api_base_uri + 'education/schools'
         return self.rest_api_service.get_object_list(url, self.access_token, model=School)
 
-    def get_school(self, object_id):
+    def get_school(self, school_id):
         '''
         Get a school by using the object_id.
-        <param name="object_id">The Object ID of the school administrative unit in Azure Active Directory.</param>
         '''
-        url = self.api_base_uri + 'administrativeUnits/%s' % object_id
+        url = self.api_base_uri + 'education/schools/%s' % school_id
         return self.rest_api_service.get_object(url, self.access_token, model=School)
 
-    def get_section_members(self, section_object_id):
+    def get_my_classes(self, school_id=None):
         '''
-        Get a section members by using the object_id.
-        <param name="section_object_id">The Object ID of the section.</param>
-        <param name="object_type">The members type.</param>
-        '''
-        url = self.api_base_uri + 'groups/%s?$expand=members' % section_object_id
-       
-        return self.rest_api_service.get_object_list(url, self.access_token, key='members', model=EduUser)
-
-    def get_my_sections(self, school_id):
-        '''
-        Get my sections within a school
+        Get my classes within a school
         <param name="school_id">The school id.</param>
         '''
-        url = self.api_base_uri + 'me/memberOf'           
-        section_list = self.rest_api_service.get_object_list(url, self.access_token, model=Section)
-        mysection_list = [s for s in section_list if s.education_object_type == 'Section' and s.school_id == school_id ]
+        url = self.api_base_uri + 'education/me/classes?$expand=schools'           
+        classes = self.rest_api_service.get_object_list(url, self.access_token, model=Class)
+        if school_id:
+            classes = [c for c in classes if any(s.id == school_id for s in c.schools)]
       
-        for section in mysection_list:
-            section.members = self.get_section_members(section.id)
+        for c in classes:
+            c.members = self.get_class_members(c.id)
                 
-        mysection_list.sort(key=lambda d:d.combined_course_number)
-        
-        return mysection_list
+        classes.sort(key=lambda c:c.code)        
+        return classes
 
-    def get_sections(self, school_id, top=12, nextlink=''):
+    def get_classes(self, school_id, top=12, nextlink=''):
         '''
-        Get sections within a school
+        Get classes within a school
         <param name="school_id">The school id.</param>
         <param name="mysection_emails">All my section's email</param>
         <param name="top">Get record number from API</param>
         <param name="nextlink">Get skiptoken from nextlink</param>
         '''
         skiptoken = self._get_skip_token(nextlink)
-        url = self.api_base_uri + "groups?$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
+        url = self.api_base_uri + "education/schools/%s/classes?$expand=schools&$top=%s&skiptoken=%s" % (school_id, top, skiptoken)
+        return self.rest_api_service.get_object_list(url, self.access_token, model=Class, next_key='@odata.nextLink')
 
-        return self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='@odata.nextLink')
-
-    def get_section(self, object_id):
+    def get_class(self, class_id):
         '''
         Get a section by using the object_id.
         <param name="object_id">The Object ID of the section.</param>
         '''
-        url = self.api_base_uri + 'groups/%s' % object_id
-        return self.rest_api_service.get_object(url, self.access_token, model=Section)
+        url = self.api_base_uri + "education/classes/%s" % class_id
+        return self.rest_api_service.get_object(url, self.access_token, model=Class)
 
-    def get_members(self, object_id, top=12, nextlink=''):
+    def get_class_members(self, class_id):
         '''
-        Get members within a school
-        <param name="object_id">The Object ID of the school.</param>
-        <param name="top">Get record number from API</param>
-        <param name="nextlink">Get skiptoken from nextlink</param>
+        Get a class members by using the object_id.
+        <param name="class_id">The Object ID of the section.</param>
+        <param name="object_type">The members type.</param>
         '''
-        skiptoken = self._get_skip_token(nextlink)
-        url = self.api_base_uri + 'administrativeUnits/%s/members?$top=%s%s' % (object_id, top, skiptoken)
-        return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='@odata.nextLink')
+        url = self.api_base_uri + 'education/classes/%s/members' % class_id       
+        return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser)
 
-    def get_students(self, school_id, top=12, nextlink=''):
-        '''
-        Get students within a school
-        <param name="school_id">The school id.</param>
-        <param name="top">Get record number from API</param>
-        <param name="nextlink">Get skiptoken from nextlink</param>
-        '''
-        skiptoken = self._get_skip_token(nextlink)
-        url = self.api_base_uri + "users?$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Student'&$top=%s%s" % (school_id, top, skiptoken)
-        return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='@odata.nextLink')
-    
-    def get_teachers(self, school_id, top=12, nextlink=''):
+    def get_teachers(self, school_id):
         '''
         Get teachers within a school
-        <param name="school_id">The school id.</param>
-        <param name="top">Get record number from API</param>
-        <param name="nextlink">Get skiptoken from nextlink</param>
         '''
-        skiptoken = self._get_skip_token(nextlink)
-        url = self.api_base_uri + "users?$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Teacher'&$top=%s%s" % (school_id, top, skiptoken)
-        
+        url = self.api_base_uri + "users?$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Teacher'" % school_id        
         return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='@odata.nextLink')
 
     def add_member(self, class_id, user_id):
@@ -147,9 +114,9 @@ class EducationService(object):
         data ={'@odata.id':'https://graph.microsoft.com/v1.0/users/'+user_id}  
         return self.rest_api_service.post_json(url,self.access_token,None,data)
 
-
     def _get_skip_token(self, nextlink):
-        if nextlink and nextlink.find('skiptoken') != -1:
-            link_skiptoken = self.skip_token_re.findall(nextlink)[0]
-            return '&%s' % link_skiptoken
+        if nextlink:
+            matches = self.skip_token_re.findall(nextlink)
+            if matches:
+                return matches[0]
         return ''

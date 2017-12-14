@@ -7,7 +7,7 @@ import json
 import constant
 
 class O365User(object):
-    def __init__(self, id=None, email=None, first_name=None, last_name=None, display_name=None, tenant_id=None, tenant_name=None, roles=None, photo=None):
+    def __init__(self, id=None, email=None, first_name=None, last_name=None, display_name=None, tenant_id=None, tenant_name=None, roles=None):
         self._id = id
         self._email = email
         self._first_name = first_name
@@ -16,7 +16,6 @@ class O365User(object):
         self._tenant_id = tenant_id
         self._tenant_name = tenant_name
         self._roles = roles
-        self._photo = photo
 
     @property
     def id(self):
@@ -49,10 +48,6 @@ class O365User(object):
     @property
     def roles(self):
         return self._roles
-
-    @property
-    def photo(self):
-        return self._photo
 
     def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -142,12 +137,6 @@ class UnifiedUser(object):
             if role in roles:
                 return role
         return None
-
-    @property
-    def photo(self):
-        if not self.o365_user:
-            return None
-        return self.o365_user.photo
 
     @property
     def local_user(self):

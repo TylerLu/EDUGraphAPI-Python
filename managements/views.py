@@ -30,7 +30,7 @@ def aboutme(request):
         token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)        
         education_service = EducationService(user.tenant_id, token)            
         my_school_id = education_service.get_my_school_id()             
-        context['groups'] = education_service.get_my_sections(my_school_id)
+        context['groups'] = education_service.get_my_classes(my_school_id)
     else:
         context['groups'] = []
     return render(request, 'managements/aboutme.html', context)

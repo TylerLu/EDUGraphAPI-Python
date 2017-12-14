@@ -26,16 +26,18 @@ def schools(request):
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
-    my_school_id = education_service.get_my_school_id()
+    me = education_service.get_me()
     school_user_id = education_service.get_school_user_id()
     schools = education_service.get_schools()
+    for school in schools:
+        school.custom_data['is_my'] = me.is_in_school(school.id)
+
     # sort schools: my school will be put to the top
-    schools.sort(key=lambda d:d.name if d.id == my_school_id else 'Z_' + d.name)
+    schools.sort(key=lambda s:s.display_name if me.is_in_school(s.id) else 'Z_' + s.display_name)
   
- 
     context = {
         'user': user,
-        'my_school_id': my_school_id,
+        'me': me,
         'schools': schools,
         'school_user_id': school_user_id
     }
@@ -43,123 +45,127 @@ def schools(request):
 
 @login_required
 @linked_users_only
-def classes(request, school_object_id):
+def classes(request, school_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
-    school = education_service.get_school(school_object_id)
-    my_sections = education_service.get_my_sections(school.school_id)
-    all_sections, sectionsnextlink = education_service.get_sections(school.school_id)
+    school = education_service.get_school(school_id)
+    my_classes = education_service.get_my_classes(school_id)
+    all_classes, classesnextlink = education_service.get_classes(school_id, 3)
 
-    my_section_ids = []
-    for section in my_sections:
-        my_section_ids.append(section.id)
-    for section in all_sections:
-        section.custom_data['is_my'] = section.id in my_section_ids
+    for c in all_classes:
+        my_class = next((mc for mc in my_classes if c.id == mc.id), None)
+        c.custom_data['is_my'] = my_class != None
+        if my_class != None:
+            c.members = my_class.members
 
     context = {
         'user': user,
         'school': school,
-        'sectionsnextlink': sectionsnextlink,
-        'sections': all_sections,
-        'mysections': my_sections,
-        'school_object_id': school_object_id,
+        'classesnextlink': classesnextlink,
+        'classes': all_classes,
+        'myclasses': my_classes,
+        'school_id': school_id,
         'is_in_a_school': True
     }
     return render(request, 'schools/classes.html', context)
 
 @login_required
-def classes_next(request, school_object_id):
+def classes_next(request, school_id):
     nextlink = request.GET.get('nextLink')
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
 
     education_service = EducationService(user.tenant_id, token)
-    school = education_service.get_school(school_object_id)
-    my_sections = education_service.get_my_sections(school.id)
-    all_sections, sectionsnextlink = education_service.get_sections(school.school_id, nextlink=nextlink)
+    #school = education_service.get_school(school_id)
+    my_classes = education_service.get_my_classes(school_id)
+    all_classes, classnextlink = education_service.get_classes(school_id, top=3, nextlink=nextlink)
 
-    my_section_ids = []
-    for section in my_sections:
-        my_section_ids.append(section.id)
-    for section in all_sections:
-        section.custom_data['is_my'] = section.id in my_section_ids
+    for c in all_classes:
+        my_class = next((mc for mc in my_classes if c.id == mc.id), None)
+        c.custom_data['is_my'] = my_class != None
+        if my_class != None:
+            c.members = my_class.members
 
-    my_section_list = [m.to_dict() for m in my_sections]
-    for my_section in my_section_list:
-        my_section['members'] = [member.to_dict() for member in my_section['members']]
-        my_section['teachers'] = [teacher.to_dict() for teacher in my_section['teachers']]
+    # my_section_list = [m.to_dict() for m in my_classes]
 
     ajax_result = {}
-    ajax_result['Sections'] = {}
-    ajax_result['Sections']['Value'] = [s.to_dict() for s in all_sections]
-    ajax_result['Sections']['NextLink'] = sectionsnextlink
-    ajax_result['MySections'] = my_section_list
+    ajax_result['classes'] = {}
+    ajax_result['classes']['value'] = [{
+          'is_my': c.custom_data['is_my'],
+          'display_name': c.display_name,
+          'code': c.code,
+          'teachers': [{ 'display_name': t.display_name } for t in c.teachers],
+          'term_name': c.term.display_name,
+          'term_start_time': c.term.start_date,
+          'term_end_time': c.term.end_date } for c in all_classes]
+    ajax_result['classes']['next_link'] = classnextlink
+    # ajax_result['MyClasss'] = my_section_list
+
     return JsonResponse(ajax_result, safe=False)
 
 @login_required
 @linked_users_only
-def add_coteacher(request, class_object_id, user_object_id):    
+def add_coteacher(request, class_id, user_object_id):    
     previousURL = request.META.get('HTTP_REFERER')    
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
-    education_service.add_member(class_object_id,user_object_id)
-    education_service.add_owner(class_object_id,user_object_id)
+    education_service.add_member(class_id,user_object_id)
+    education_service.add_owner(class_id,user_object_id)
     return HttpResponseRedirect(previousURL)
 
 @login_required
 @linked_users_only
-def class_details(request, school_object_id, class_object_id):
+def class_details(request, school_id, class_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
 
-    school = education_service.get_school(school_object_id)
-    section = education_service.get_section(class_object_id)    
-    members = education_service.get_section_members(class_object_id)
-    teachers = [m for m in members if m.education_object_type == 'Teacher']
-    students = [m for m in members if m.education_object_type == 'Student'] 
+    school = education_service.get_school(school_id)
+    current_class = education_service.get_class(class_id)    
+    members = education_service.get_class_members(class_id)
+    teachers = [m for m in members if m.primary_role == 'teacher']
+    students = [m for m in members if m.primary_role == 'student'] 
     
     # set favorite colors and seating positions
     for student in students:
         favorite_color = user_service.get_favorite_color_by_o365_user_id(student.id)
         if favorite_color:
             student.custom_data['favorite_color'] = favorite_color
-        seating_position = get_seating_position = user_service.get_seating_position(student.id, class_object_id)
+        seating_position = user_service.get_seating_position(student.id, class_id)
         if not seating_position:
             seating_position = 0
         student.custom_data['position'] = seating_position
    
-    allTeachersInSchool = education_service.get_teachers(school.school_id,100,'')
+    allTeachersInSchool = education_service.get_teachers(school_id)
     filteredTeachers = {}
     for teacher in allTeachersInSchool[0]:
         filteredTeachers[teacher.id] = teacher
     for teacher in teachers:
         if(teacher.id in filteredTeachers):
-            del filteredTeachers[teacher.id]    
-   
-       
+            del filteredTeachers[teacher.id]
+
     # set seatrange
     seatrange = range(1, 37)
 
     ms_token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     ms_graph_service = MSGraphService(ms_token)
 
-    documents = ms_graph_service.get_documents(class_object_id)
-    documents_root = ms_graph_service.get_documents_root(class_object_id)
-    conversations = ms_graph_service.get_conversations(class_object_id)
+    documents = ms_graph_service.get_documents(class_id)
+    documents_root = ms_graph_service.get_documents_root(class_id)
+    conversations = ms_graph_service.get_conversations(class_id)
     for conversation in conversations:
-        conversation.custom_data['url'] = ms_graph_service.get_conversations_url(conversation.id, section.email)
-    conversations_root = ms_graph_service.get_conversations_root(section.email)
+        conversation.custom_data['url'] = ms_graph_service.get_conversations_url(conversation.id, current_class.mail_nickname)
+    conversations_root = ms_graph_service.get_conversations_root(current_class.mail_nickname)
 
     favorite_color = user_service.get_favorite_color_by_o365_user_id(user.o365_user_id)
 
     context = {
         'user': user,
         'school': school,
-        'section': section,
+        'class': current_class,
         'teachers': teachers,
         'students': students,
         'documents': documents,
@@ -167,8 +173,8 @@ def class_details(request, school_object_id, class_object_id):
         'conversations': conversations,
         'conversations_root': conversations_root,
         'seatrange': seatrange,
-        'school_object_id': school_object_id,
-        'class_object_id': class_object_id,
+        'school_id': school_id,
+        'class_id': class_id,
         'is_in_a_school': True,
         'favorite_color': favorite_color,
         'filteredTeachers':filteredTeachers
@@ -181,86 +187,3 @@ def save_seating_arrangements(request):
         seat_arrangements = json.loads(request.body.decode())
         user_service.update_positions(seat_arrangements)
     return HttpResponse(json.dumps({'save':'ok'}))
-
-@login_required
-@linked_users_only
-def users(request, school_object_id):
-    user = AuthService.get_current_user(request)
-    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
-
-    education_service = EducationService(user.tenant_id, token)
-    school = education_service.get_school(school_object_id)
-    users, usersnextlink = education_service.get_members(school_object_id)
-    teachers, teachersnextlink = education_service.get_teachers(school.school_id)
-    students, studentsnextlink = education_service.get_students(school.school_id)
-    
-    studentsInMyClasses = dict()
-    if user.is_teacher:
-        my_sections = education_service.get_my_sections(school.school_id)            
-        for section in my_sections:
-            for stu in section.members:               
-                if (stu.id not in studentsInMyClasses) and ( stu.is_teacher !=True):                
-                    studentsInMyClasses[stu.id]=stu
-   
-    studentsInMyClassesArray = []
-    for stu in studentsInMyClasses.items():
-        studentsInMyClassesArray.append(stu[1])
-
-    context = {
-        'user': user,
-        'school': school,
-        'users': users,
-        'teachers': teachers,
-        'students': students,
-        'studentsInMyClasses': studentsInMyClassesArray,
-        'usersnextlink': usersnextlink,
-        'studentsnextlink': studentsnextlink,
-        'teachersnextlink': teachersnextlink,
-        'school_object_id': school_object_id,
-        'is_in_a_school': True
-    }
-    return render(request, 'schools/users.html', context)
-
-@login_required
-def users_next(request, school_object_id):
-    nextlink = request.GET.get('nextLink')
-    user = AuthService.get_current_user(request)
-    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
-    education_service = EducationService(user.tenant_id, token)
-    users, usersnextlink = education_service.get_members(school_object_id, nextlink=nextlink)
-
-    ajax_result = {}
-    ajax_result['Users'] = {}
-    ajax_result['Users']['Value'] = [u.to_dict() for u in users]
-    ajax_result['Users']['NextLink'] = usersnextlink
-    return JsonResponse(ajax_result, safe=False)
-
-@login_required
-def students_next(request, school_object_id):
-    nextlink = request.GET.get('nextLink')
-    user = AuthService.get_current_user(request)
-    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
-    education_service = EducationService(user.tenant_id, token)
-    school = education_service.get_school(school_object_id)
-    students, studentsnextlink = education_service.get_students(school.school_id, nextlink=nextlink)
-    #import pdb;pdb.set_trace()
-    ajax_result = {}
-    ajax_result['Students'] = {}
-    ajax_result['Students']['Value'] = [s.to_dict() for s in students]
-    ajax_result['Students']['NextLink'] = studentsnextlink
-    return JsonResponse(ajax_result, safe=False)
-
-@login_required
-def teachers_next(request, school_object_id):
-    nextlink = request.GET.get('nextLink')
-    user = AuthService.get_current_user(request)
-    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
-    education_service = EducationService(user.tenant_id, token)
-    school = education_service.get_school(school_object_id)
-    teachers, teachersnextlink = education_service.get_students(school.school_id, nextlink=nextlink)
-
-    ajax_result = {}
-    ajax_result['Teachers'] = {}
-    ajax_result['Teachers']['Value'] = [t.to_dict() for t in teachers]
-    ajax_result['Teachers']['NextLink'] = teachersnextlink
-    return JsonResponse(ajax_result, safe=False)

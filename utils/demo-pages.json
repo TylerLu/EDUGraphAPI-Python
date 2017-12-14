@@ -540,7 +540,7 @@
             "url": "services/education_service.py",
             "methods": [
               {
-                "title": "get_my_sections",
+                "title": "get_my_classes",
                 "description": "Get my classes within a school."
               }
             ]
@@ -555,7 +555,7 @@
             "url": "services/education_service.py",
             "methods": [
               {
-                "title": "get_sections",
+                "title": "get_classes",
                 "description": "Get all classes within a school."
               }
             ]
@@ -764,7 +764,7 @@
             "url": "services/education_service.py",
             "methods": [
               {
-                "title": "get_my_sections",
+                "title": "get_my_classes",
                 "description": "Get all classes and students in my school."
               }
             ]
@@ -886,7 +886,7 @@
                 "description": "Get current user's school GUID by MS Graph API."
               },
               {
-                "title": "get_my_sections",
+                "title": "get_my_classes",
                 "description": "Get my classes within a school."
               }
             ]

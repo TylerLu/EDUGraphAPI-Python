@@ -117,7 +117,6 @@ def register(request):
         errors = []
         user_reg_form = UserRegInfo(request.POST)
         if user_reg_form.is_valid():
-            import pdb; pdb.set_trace()
             data = user_reg_form.clean()
             user = user_service.register(data['Email'], data['Password'],'')
             if user:

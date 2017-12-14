@@ -28,7 +28,7 @@ The sample demonstrates:
 
   After linking accounts, users can use either local or Office 365 accounts to log into the sample website and use it.
 
-- Getting schools, sections, teachers, and students from Office 365 Education:
+- Getting schools, classes, teachers, and students from Office 365 Education:
 
   - [Office 365 Schools REST API reference](https://msdn.microsoft.com/office/office365/api/school-rest-operations)
 
@@ -336,7 +336,7 @@ For more information, see [Build a multi-tenant SaaS web application using Azure
 
 ### Office 365 Education API
 
-The [Office 365 Education APIs](https://msdn.microsoft.com/office/office365/api/school-rest-operations) return data from any Office 365 tenant which has been synced to the cloud by Microsoft School Data Sync. The APIs provide information about schools, sections, teachers, students, and rosters. The Schools REST API provides access to school entities in Office 365 for Education tenants.
+The [Office 365 Education APIs](https://msdn.microsoft.com/office/office365/api/school-rest-operations) return data from any Office 365 tenant which has been synced to the cloud by Microsoft School Data Sync. The APIs provide information about schools, classes, teachers, students, and rosters. The Schools REST API provides access to school entities in Office 365 for Education tenants.
 
 In this sample, the **Microsoft.Education** Class Library project encapsulates the Office 365 Education API. 
 
@@ -359,7 +359,7 @@ def get_school(self, object_id):
 **Get classes**
 
 ~~~typescript
-def get_sections(self, school_id, top=12, nextlink=''):
+def get_classes(self, school_id, top=12, nextlink=''):
     skiptoken = self._get_skip_token(nextlink)
     url = self.api_base_uri + "groups?$filter=extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Section' and extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s'&$top=%s%s" % (school_id, top, skiptoken)
     return self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='odata.nextLink')

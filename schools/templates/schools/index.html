@@ -17,23 +17,7 @@
 			ALL SCHOOLS
 		</div>
 	</div>
-	<div class="col-md-6 schooltiles">
-		{% if school_user_id %}
-		<div class="infocontainer">
-			<div class="infoheader">
-				{% if user.is_student %}
-				Student
-				{% else %}
-				Teacher
-				{% endif %}
-				Id
-			</div>
-			<div class="infobody">
-				{{ school_user_id }}
-			</div>
-		</div>
-		{% endif %}
-	</div>
+	<div class="col-md-6 schooltiles"></div>
 	<div class="container myschool">
 		<div class="schoolenrolled">
 			Current school(s) enrolled
@@ -60,32 +44,25 @@
 			Address
 		</th>
 		<th></th>
-	</tr>
-	
+	</tr>	
 	{% for school in schools %}
-
-		{% if my_school_id == school.school_id %}
+		{% if school.custom_data.is_my %}
 			<tr class="tr-content td-green">			
 		{% else %}
 			<tr class="tr-content">			
 		{% endif %}
-		<td >{{ school.name }}</td>
-		<td >{{ school.principalname }}</td>
-		<td >{{ school.lowestgrade }} - {{ school.highestgrade }}</td>
+		<td >{{ school.display_name }}</td>
+		<td >{{ school.principal_name }}</td>
+		<td >{{ school.lowest_grade }} - {{ school.highest_grade }}</td>
 		<td>
 			<div class="schooladdress">
-				{{ school.address }}
-				{% if school.city %}
+				{{ school.address.street }}
 				<br />
-				{{ school.city }},
-				{% endif %}
-				{{ school.state }} {{ school.zip }}
+				{{ school.address.city }}, {{ school.address.state }} {{ school.address.postal_code }}
 			</div>
-
 		</td>
 		<td>
 			<a href="Schools/{{ school.id }}/Classes" class="btnlink">Classes</a>
-			<a href="Schools/{{ school.id }}/Users" class="btnlink">Teachers/students</a>
 		</td>
 	</tr>
 	{% endfor %}

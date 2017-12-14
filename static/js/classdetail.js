@@ -198,7 +198,7 @@ function disableDragAndDrop() {
 
 function saveEditDesk() {
     var classroomSeatingArrangements = [];
-    var classId = $("#hidSectionid").val();
+    var classId = $("#hiddenClassId").val();
     $(".deskcontainer").each(function () {
         var userid = $(this).attr("userid");
         if (userid) {

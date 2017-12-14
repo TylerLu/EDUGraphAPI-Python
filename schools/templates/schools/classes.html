@@ -7,11 +7,11 @@
 {% block title %}CLASSES{% endblock %}
 
 {% block content %}
-<div class="row schools sections">
+<div class="row schools classes">
 	<div class="tophero">
 		<div class="col-md-8">
 			<div class="secondnav">
-				<a href="/Schools"> All Schools</a> > {{ school.name }}
+				<a href="/Schools"> All Schools</a> > {{ school.display_name }}
 			</div>
 			<div class="a-heading">
 				Classes
@@ -19,14 +19,14 @@
 		</div>
 		<div class="toptiles">
 			<div class="section-school-name">
-				{{ school.name }}
+				{{ school.display_name }}
 			</div>
 			<div class="infocontainer">
 				<div class="infoheader">
 					PRINCIPAL
 				</div>
 				<div class="infobody" title="{{ school.principalname }}">
-					{{ school.principalname }}
+					{{ school.principal_name }}
 				</div>
 			</div>
 			<div class="infocontainer">
@@ -34,7 +34,7 @@
 					Grade levels
 				</div>
 				<div class="infobody" title="{{ school.lowestgrade }} - {{ school.highestgrade }}">
-					{{ school.lowestgrade }} - {{ school.highestgrade }}
+					{{ school.lowest_grade }} - {{ school.highest_grade }}
 				</div>
 			</div>
 		</div>
@@ -58,58 +58,53 @@
 	</div>
 	<div class="myclasses-container tiles-root-container">
 		<div id="allclasses" class="tiles-secondary-container">
-			<div class="section-tiles">
-				{% if sections|length == 0 %}
+			<div class="class-tiles">
+				{% if classes|length == 0 %}
 				<div class="nodata"> No classes in this school.</div>
 				{% else %}
 				<div class="content clearfix">
-					{% for section in sections %}
-					
+					{% for c in classes %}					
 					<div class="tile-container">
-						{% if section.custom_data.is_my %}
-						<a class="mysectionlink" href="Classes/{{ section.id }}">
+						{% if c.custom_data.is_my %}
+						<a class="myclasslink" href="Classes/{{ section.id }}">
 							<div class="tile">
-								<h5>{{ section.name }}</h5>
-								<h2>{{ section.combined_course_number }}</h2>
+								<h5>{{ c.display_name }}</h5>
+								<h2>{{ c.code }}</h2>
 							</div>
 						</a>
 						{% else %}
 						<div class="tile">
-							<h5>{{ section.name }}</h5>
-							<h2>{{ section.combined_course_number }}</h2>
+							<h5>{{ c.display_name }}</h5>
+							<h2>{{ c.code }}</h2>
 						</div>
 						{% endif %}
 						<div class="detail">
-							<h5>Course Id:</h5>
-							<h6>{{ section.course_id }}</h6>
-							<h5>Description:</h5>
-							<h6>{{ section.course_desc }}</h6>
+							<h5>Class Number:</h5>
+							<h6>{{ c.code }}</h6>
 							<h5>Teachers:</h5>
-							{% for teacher in section.teachers %}
-								<h6>{{ teacher.name }}</h6>
+							{% for teacher in c.teachers %}
+								<h6>{{ teacher.display_name }}</h6>
 							{% endfor %}
 							<h5>Term Name:</h5>
-							<h6>{{ section.term_name }}</h6>
+							<h6>{{ c.term.display_name }}</h6>
 							<h5>Start/Finish Date:</h5>
 							<h6>
-								<span id="termdate">{{ section.term_start_date }}</span>
+								<span id="termdate">{{ c.term.start_date }}</span>
 								<span> - </span>
-								<span id="termdate">{{ section.term_end_date }}</span>
+								<span id="termdate">{{ c.term.end_date }}</span>
 							</h6>
-							<h5>Period:</h5>
-							<h6>{{ section.period }}</h6>
 						</div>
 					</div>
 					{% endfor %}
 				</div>
 				{% endif %}
-				{% if sectionsnextlink %}
+				{% if classesnextlink %}
 				<div class="seemore" id="see-more">
 				{% else %}
 				<div class="seemore hideitem" id="see-more">
 				{% endif %}
-					<input id="nextlink" type="hidden" value="{{ sectionsnextlink }}" />
-					<input id="schoolid" type="hidden" value="{{ school_object_id }}" />
+					<input id="nextlink" type="hidden" value="{{ classesnextlink }}" />
+					<input id="schoolid" type="hidden" value="{{ school_id }}" />
 					<span>See More</span>
 				</div>
 			</div>
@@ -117,8 +112,8 @@
 	</div>
 	<div class="myclasses-container tiles-root-container">
 		<div id="myclasses" class="tiles-secondary-container">
-			<div class="section-tiles">
-			{% if mysections|length == 0%}
+			<div class="class-tiles">
+			{% if myclasses|length == 0%}
 				{% if user.is_student %}
 				<div class="nodata"> Not enrolled in any classes.</div>
 				{% else %}
@@ -126,33 +121,29 @@
 				{% endif %}
 			{% else %}
 			<div class="content clearfix">
-			{% for mysection in mysections %}
+			{% for c in myclasses %}
 				<div class="tile-container">
-					<a class="mysectionlink" href="Classes/{{mysection.id }}">
+					<a class="myclasslink" href="Classes/{{c.id }}">
 						<div class="tile">
-							<h5>{{ mysection.name }}</h5>
-							<h2>{{ mysection.combined_course_number }}</h2>
+							<h5>{{ c.display_name }}</h5>
+							<h2>{{ c.code }}</h2>
 						</div>
 					</a>
 					<div class="detail">
-						<h5>Course Id:</h5>
-						<h6>{{ mysection.course_id }}</h6>
-						<h5>Description:</h5>
-						<h6>{{ mysection.course_desc }}</h6>
+						<h5>Class Number:</h5>
+						<h6>{{ c.code }}</h6>
 						<h5>Teachers:</h5>
-						{% for teacher in mysection.teachers %}
-						<h6>{{ teacher.name }}</h6>
+						{% for teacher in c.teachers %}
+						<h6>{{ teacher.display_name }}</h6>
 						{% endfor %}
 						<h5>Term Name:</h5>
-						<h6>{{ mysection.term_name }}</h6>
+						<h6>{{ c.term.display_name }}</h6>
 						<h5>Start/Finish Date:</h5>
 						<h6>
-							<span id="termdate">{{ mysection.term_start_date }}</span>
+							<span id="termdate">{{ c.term.start_date }}</span>
 							<span> - </span>
-							<span id="termdate">{{ mysection.term_end_date }}</span>
+							<span id="termdate">{{ c.term.end_date }}</span>
 						</h6>
-						<h5>Period:</h5>
-						<h6>{{ mysection.period }}</h6>
 					</div>
 				</div>
 			{% endfor %}
@@ -173,5 +164,5 @@
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/respond.js"></script>
 <script src="/static/js/site.js"></script>
-<script src="/static/js/sections.js"></script>
+<script src="/static/js/classes.js"></script>
 {% endblock %}

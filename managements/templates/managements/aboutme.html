@@ -13,7 +13,7 @@
 	</h2>
     <div class="margin-top-12 margin-btm-12 aboutme">
 		<b>Username:</b><br /> {{ user.display_name }} 
-		{% if user.photo %}<img src="{{ user.photo }}" />{% endif %}</a>
+		<img src="/Photo/UserPhoto/{{ user.id }}" />
     </div>
     <div class="margin-top-12 margin-btm-12">
 		<b>Logged in as:</b><br /> {{ user.main_role }}

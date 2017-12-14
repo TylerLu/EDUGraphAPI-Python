@@ -17,12 +17,12 @@ $(document).ready(function () {
         });
     };
 
-    function hasSection(section, sections) {
-        if (!(sections instanceof Array)) {
+    function hasSection(section, classes) {
+        if (!(classes instanceof Array)) {
             return false;
         }
         var result = false;
-        $.each(sections, function (i, s) {
+        $.each(classes, function (i, s) {
             if (section.Email == s.Email) {
                 return result = true;
             }
@@ -30,22 +30,22 @@ $(document).ready(function () {
         return result;
     }
 
-    bindShowDetail($(".section-tiles .tile-container"));
+    bindShowDetail($(".class-tiles .tile-container"));
     var tabname = '';
-    if ($(".sections .filterlink-container .selected").length > 0) {
-        tabname = $(".sections .filterlink-container .selected").attr("id");
+    if ($(".classes .filterlink-container .selected").length > 0) {
+        tabname = $(".classes .filterlink-container .selected").attr("id");
     }
     showDemoHelper(tabname);
 
 
-    $(".sections .filterlink-container .filterlink").click(function () {
+    $(".classes .filterlink-container .filterlink").click(function () {
         tabname = $(this).attr("id");
         showDemoHelper(tabname);
         search(true);
         var element = $(this);
         element.addClass("selected").siblings("a").removeClass("selected");
         var filterType = element.data("type");
-        var tilesContainer = $(".sections .tiles-root-container");
+        var tilesContainer = $(".classes .tiles-root-container");
         tilesContainer.removeClass(tilesContainer.attr("class").replace("tiles-root-container", "")).addClass(filterType + "-container");
     });
 
@@ -76,39 +76,31 @@ $(document).ready(function () {
 
                 var tiles = element.parent().prev(".content");
                 var newTiles = $();
-                $.each(data.Sections.Value, function (i, s) {
-                    var isMine = hasSection(s, data.MySections);
+                $.each(data.classes.value, function (i, c) {
                     var newTile = $('<div class="tile-container"></div>');
                     var tileContainer = newTile;
-                    if (isMine) {
-                        tileContainer = $('<a class="mysectionlink" href="/Schools/' + schoolId + '/Classes/' + s.ObjectId + '"></a>').appendTo(newTile);
+                    if (c.is_my) {
+                        tileContainer = $('<a class="myclasslink" href="/Schools/' + schoolId + '/Classes/' + c.id + '"></a>').appendTo(newTile);
                     }
-                    var tile = $('<div class="tile"><h5>' + s.DisplayName + '</h5><h2>' + s.CombinedCourseNumber + '</h2></div>');
+                    var tile = $('<div class="tile"><h5>' + c.display_name + '</h5><h2>' + c.code + '</h2></div>');
                     tile.appendTo(tileContainer);
+                    var teachers = c.teachers.reduce(function (accu, cur) {
+                        accu += '<h6>' + cur.display_name + '</h6>';
+                        return accu;
+                    }, '');
                     var tileDetail = $('<div class="detail" style="display: none;">' +
-                                            '<h5>Course Id:</h5>' +
-                                            '<h6>' + s.CourseId + '</h6>' +
-                                            '<h5>Description:</h5>' +
-                                            '<h6>' + s.CourseDescription + '</h6>' +
+                                            '<h5>Course Number:</h5>' +
+                                            '<h6>' + c.code + '</h6>' +
                                             '<h5>Teachers:</h5>' +
-                                            ((s.Members instanceof Array) ?
-                                            s.Members.reduce(function (accu, cur) {
-                                                if (cur.ObjectType == 'Teacher') {
-                                                    accu += '<h6>' + cur.DisplayName + '</h6>';
-                                                }
-                                                return accu;
-                                            }, '') : '') +
-
+                                            teachers + 
                                             '<h5>Term Name:</h5>' +
-                                            '<h6>' + s.TermName + '</h6>' +
+                                            '<h6>' + c.term_name + '</h6>' +
                                             '<h5>Start/Finish Date:</h5>' +
-                                            ((s.TermStartDate || s.TermEndDate) ?
-                                            ('<h6><span id="termdate">' + s.TermStartDate + '</span>' +
+                                            ((c.term_start_date || c.term_end_date) ?
+                                            ('<h6><span id="termdate">' + c.term_start_date + '</span>' +
                                             '<span> - </span>' +
-                                            '<span id="termdate">' + s.TermEndDate + '</span>' +
+                                            '<span id="termdate">' + c.term_end_date + '</span>' +
                                             '</h6>') : '') +
-                                            '<h5>Period:</h5>' +
-                                            '<h6>' + s.Period + '</h6>' +
                                         '</div>');
                     tileDetail.appendTo(newTile);
                     newTiles = newTiles.add(newTile);
@@ -116,10 +108,10 @@ $(document).ready(function () {
                 newTiles.appendTo(tiles).hide().fadeIn("slow");
                 bindShowDetail(newTiles);
 
-                var newNextLink = data.Sections.NextLink;
+                var newNextLink = data.classes.next_link;
                 nextLinkElement.val(newNextLink);
                 if (typeof (newNextLink) != "string" || newNextLink.length == 0) {
-                    element.addClass("nomore");
+                    element.hide();
                 }
                 $(window).scrollTop($(document).height() - $(window).height())
             },

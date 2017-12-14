@@ -34,8 +34,7 @@ class MSGraphService(object):
             email = me['userPrincipalName']
         tenant_name = org['displayName']
         roles = self._get_roles(id)
-        photo = '/Photo/UserPhoto/' + id
-        return O365User(id, email, first_name, last_name, display_name, tenant_id, tenant_name, roles, photo)
+        return O365User(id, email, first_name, last_name, display_name, tenant_id, tenant_name, roles)
 
     def get_photo(self, object_id):
         url = self.api_base_uri + 'users/%s/photo/$value' % object_id

@@ -17,33 +17,27 @@
     	<div class="container">
             <div class="col-md-6 secondnav">
                 <a href="/Schools"> All Schools</a>
-				> <a href="/Schools/{{ school_object_id }}/Classes">{{ school.name }}</a>
-				> {{ section.course_name }}
+				> <a href="/Schools/{{ school_id }}/Classes">{{ school.display_name }}</a>
+				> {{ class.display_name }}
             </div>
         </div>
         <div class="container">
             <div class="a-heading ">Class Details</div>
-			<div class="b-title"> {{ section.course_number }} | {{ section.course_displayname}}</div>
+			<div class="b-title"> {{ class.code }} | {{ class.display_name}}</div>
         </div>
         <div class="container coursedetail">
             <div class="col-md-6">
-				<span>Course Name:</span> {{ section.course_name }}
-                <br />
-				<span>Description:</span> {{ section.course_desc }}
-                <br />
-				<span>Period:</span> {{ section.course_period }}
-                <br />
-				<span>Term Name:</span> {{ section.course_termname }}
+				<span>Term Name:</span> {{ class.term.display_name }}
                 <br />
                 <span>Start/Finish Date:</span>
-				<span id="termdate">{{ section.course_termstartdate }}</span>
+				<span id="termdate">{{ class.term.start_date }}</span>
                 <span id="termdate-separator"> - </span>
-				<span id="termdate">{{ section.course_termenddate }}</span>
+				<span id="termdate">{{ class.term.end_date }}</span>
             </div>
             <div class="col-md-6">
 				<span>Teacher:</span>
 				{% for teach in teachers %}				
-				 {{teach.name}}{% if not forloop.last %},{% endif %} 
+				 {{teach.display_name}}{% if not forloop.last %},{% endif %} 
 				{% endfor %}
 				{% if not user.is_student %}
 				<br/><a id="addateacher" href="javascript:void(0)">Add a teacher</a>
@@ -54,21 +48,19 @@
 					<div class="close"><img src="/static/Images/close.png"></div>
 					<div class="title">Select a teacher</div>
 					<div class="list">
-							{% if filteredTeachers|length == 0%}
-						 
+							{% if filteredTeachers|length == 0%}						 
 							<div > There is no data available at this time.</div>
 							{% else %}
 							<ul>
-									{% for  key, value in filteredTeachers.items %}
+								{% for  key, value in filteredTeachers.items %}
 									<li>
 									<a href="/Class/{{ section.id|safe }}/Coteacher/{{ value.id|safe }}">
-										<img src="/static/Images/header-default.jpg" realheader="{{ value.photo|safe }}"/> {{ value.name }}
+										<img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ value.id }}"/> {{ value.name }}
 									</a>
 									</li>
 									{% endfor %}
 							</ul>
 							{% endif %}
-
 					</div>
 				</div>
 			{% endif %}
@@ -91,14 +83,12 @@
 					<thead>
 						<tr class="table-green-header">
 							<th class="tdleft">student name</th>
-							<th>grade</th>
 						</tr>
 					</thead>
 					<tbody>
 						{% for student in students %}
 						<tr class="tr-content">
-							<td><img src="/static/Images/header-default.jpg" realheader="{{ student.photo|safe }}"/> {{ student.name }}</td>
-							<td>{{ student.grade }}</td>
+							<td><img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ student.id }}"/> {{ student.display_name }}</td>
 						</tr>
 						{% endfor %}
 					</tbody>
@@ -109,7 +99,7 @@
 				{% if documents|length == 0 %}
 				<div class="nodata"> There is no data available for this page at this time.</div>
 				{% else %}
-				<table id="studoc" class="table  table-green table-student tablesorter">
+				<table id="studoc" class="table table-green table-student tablesorter">
 					<thead>
 						<tr class="table-green-header">
 							<th class="border-holder"></th>
@@ -174,7 +164,7 @@
                     <ul id="lstproducts">
 						{% for student in students %}
 							<li id="{{ student.id }}">
-								<img src="/static/Images/header-default.jpg" realheader={{ student.photo }}/>
+								<img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ student.id }}"}/>
 								<span class="disname">{{ student.name }}</span>
 								{% if student.custom_data.position == 0 %}
 								<span class="seated hideitem">
@@ -203,7 +193,7 @@
 							{% endif %}
 									<div class="deskclose"><img src="/static/Images/close.png"></div>
 									<div class="deskicon">
-										<img src="/static/Images/header-default.jpg" realheader="{{ student.photo }}" />
+										<img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ student.id }}" />
 									</div>
 									<div class="stuname">{{ student.name }}</div>
 								</div>
@@ -236,7 +226,7 @@
         </div>
     </div>
 </div>
-<input type="hidden" name="hidSectionid" id="hidSectionid" value="{{ class_object_id }}" />
+<input type="hidden" name="hiddenClassId" id="hiddenClassId" value="{{ class_id }}" />
 {% endblock %}
 
 {% block basejs%}

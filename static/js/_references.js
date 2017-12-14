@@ -11,6 +11,6 @@
 /// <reference path="moment.min.js" />
 /// <reference path="respond.min.js" />
 /// <reference path="schools.js" />
-/// <reference path="sections.js" />
+/// <reference path="classes.js" />
 /// <reference path="site.js" />
 /// <reference path="users.js" />

@@ -25,282 +25,185 @@ class GraphObjectBase(object):
         return dict((name, getattr(self, name)) for name in dir(self) if not name.startswith('_')  and not callable(getattr(self, name)))
 
     @property
-    def object_id(self):
-        return self.get_value('objectId')
+    def id(self):
+        return self.get_value('id')
     
-    @property
-    def ObjectId(self):
-        return self.object_id
-
-    
-    @property
-    def object_type(self):
-        return self.get_value('ObjectType')
-
-    @property
-    def ObjectType(self):
-        return self.object_type
-
-    @property
-    def education_object_type(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType')
-
     @property
     def custom_data(self):
         return self._custom_data
 
+
 class School(GraphObjectBase):
+
     def __init__(self, prop_dict={}):
         super(School, self).__init__(prop_dict)
+        self._address = None
 
     @property
-    def id(self):
-        return self.get_value('id')
-
-    @property
-    def school_id (self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId')
+    def external_id (self):
+        return self.get_value('externalId')
     
-    @property
-    def name(self):
-        name = self.get_value('displayName')
-        if not name or len(name.strip()) == 0:
-            name = '-'
-        return name
-
     @property
     def display_name(self):
         return self.get_value('displayName')
 
     @property
     def principal_name(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SchoolPrincipalName')
-    
-    @property
-    def principalname(self):
-        p_name = self.principal_name
-        if not p_name or len(p_name.strip()) == 0:
-            p_name = '-'
-        return p_name
+        return self.get_value('principalName')
 
     @property
-    def lowestgrade(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_LowestGrade')
+    def highest_grade(self):
+        return self.get_value('highestGrade')
 
     @property
-    def highestgrade(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_HighestGrade')
-
-    @property
-    def zip(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_Zip')
+    def lowest_grade(self):
+        return self.get_value('lowestGrade')
 
     @property
     def address(self):
-        address = self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_Address')
-        zip = self.zip
-        if not address and not zip:
-            address = '-'
-        return address
+        if not self._address:
+            self._address = PhysicalAddress(self.get_value('address'))
+        return self._address
+
+
+class PhysicalAddress(GraphObjectBase):
+
+    def __init__(self, prop_dict={}):
+        super(PhysicalAddress, self).__init__(prop_dict)
+
+    @property
+    def street(self):
+        return self.get_value('street')
 
     @property
     def city(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_City')
+        return self.get_value('city')
 
     @property
     def state(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_State')
+        return self.get_value('state')
 
-class Section(GraphObjectBase):
+    @property
+    def postal_code(self):
+        return self.get_value('postalCode')
+
+
+class Class(GraphObjectBase):
+
     def __init__(self, prop_dict={}):
-        super(Section, self).__init__(prop_dict)
-
-    @property
-    def id(self):
-        return self.get_value('id')
-    
-    @property
-    def mail(self):
-        return self.get_value('mail')
-
-    @property
-    def email(self):
-        return self.mail
-    
-    @property
-    def Email(self):
-        return self.mail
+        super(Class, self).__init__(prop_dict)
+        self._term = None
+        self._members = []
+        self._schools = []
 
     @property
     def display_name(self):
         return self.get_value('displayName')
 
     @property
-    def name(self):
-        name = self.get_value('displayName')
-        if not name or len(name.strip()) == 0:
-            name = '-'
-        return name
+    def code(self):
+        return self.get_value('classCode')
 
     @property
-    def course_displayname(self):
-        return self.name
-
-    @property
-    def DisplayName(self):
-        return self.name
-
-    @property
-    def course_id(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_CourseId')
+    def mail_nickname(self):
+        return self.get_value('mailNickname')
     
     @property
-    def CourseId(self):
-        return self.course_id
-    
-    @property
-    def course_desc(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_CourseDescription')
+    def description(self):
+        return self.get_value('description')
 
     @property
-    def CourseDescription(self):
-        return self.course_desc
-    
-    @property
-    def course_name(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_CourseName')
-    
-    @property
-    def course_number(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_CourseNumber')
-    
-    @property
-    def term_name(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_TermName')
+    def term(self):
+        if not self._term:
+            self._term = Term(self.get_value('term'))
+        return self._term
 
     @property
-    def TermName(self):
-        return self.term_name
-    
-    @property
-    def course_termname(self):
-        return self.term_name
-
-    @property
-    def start_date(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_TermStartDate')
-
-    @property
-    def end_date(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_TermEndDate')
-
-    @property
-    def period(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_Period')
-
-    @property
-    def Period(self):
-        return self.period
-
-    @property
-    def course_period(self):
-        return self.period
-
-    @property
-    def school_id(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId')
-
-    @property
-    def combined_course_number(self):
-        combined_course_number = ''
-        if self.course_name and self.course_number:
-            combined_course_number = self.course_name[0:3].upper() + re.match('\d+', self.course_number).group()
-        return combined_course_number
-
-    @property
-    def CombinedCourseNumber(self):
-        return self.combined_course_number
-
-    @property
-    def term_start_date(self):
-        out_start_date = ''
-        if self.start_date:
-            convert_date = datetime.datetime.strptime(self.start_date, '%m/%d/%Y')
-            out_start_date = convert_date.strftime('%Y-%m-%dT%H:%M:%S')
-        return out_start_date
-
-    @property
-    def course_termstartdate(self):
-        return self.term_start_date
-
-    @property
-    def TermStartDate(self):
-        return self.term_start_date
-
-    @property
-    def term_end_date(self):
-        out_end_date = ''
-        if self.end_date:
-            convert_date = datetime.datetime.strptime(self.end_date, '%m/%d/%Y')
-            out_end_date = convert_date.strftime('%Y-%m-%dT%H:%M:%S')
-        return out_end_date
-    
-    @property
-    def course_termenddate(self):
-        return self.term_end_date
-
-    @property
-    def TermEndDate(self):
-        return self.term_end_date
+    def schools(self):
+        if not self._schools:
+            self._schools = [School(s) for s in self.get_value('schools')]
+        return self._schools
 
     @property
     def members(self):
-        return self.get_value('members')
+        if not self._members:
+            self._members = [EduUser(m) for m in self.get_value('members')]
+        return self._members
 
     @members.setter
     def members(self, value):
-        self.set_value('members', value)
+        self._members = value
 
     @property
     def teachers(self):
-        if self.members:
-            return [m for m in self.members if m.education_object_type == 'Teacher']
-        return None
+        return [m for m in self.members if m.primary_role == 'teacher']
 
-class EduUser(GraphObjectBase):
+    def is_in_school(self, school_id):
+        return any(s for s in self.schools if s.id == school_id)
+
+
+class Term(GraphObjectBase):
+
     def __init__(self, prop_dict={}):
-        super(EduUser, self).__init__(prop_dict)
-    
-    @property
-    def id(self):
-        return self.get_value('id')
+        super(Term, self).__init__(prop_dict)
 
     @property
-    def name(self):
-        return self.get_value('displayName')
+    def external_id(self):
+        return self.get_value('externalId')
 
     @property
     def display_name(self):
-        return self.name
+        return self.get_value('displayName')
 
     @property
-    def DisplayName(self):
-        return self.name
+    def start_date(self):
+        return self.get_value('startDate')
+
+    @property
+    def end_date(self):
+        return self.get_value('endDate')
+
+
+class EduUser(GraphObjectBase):
+
+    def __init__(self, prop_dict={}):
+        super(EduUser, self).__init__(prop_dict)
+        self._schools = []
+        self._classes = []
+    
+    @property
+    def display_name(self):
+        return self.get_value('displayName')
 
     @property
     def grade(self):
-        return self.get_value('extension_fe2174665583431c953114ff7268b7b3_Education_Grade')
+        return self.get_value('grade')
+
+    @property
+    def primary_role(self):
+        return self.get_value('primaryRole')
 
     @property
     def is_teacher(self):
-        return self.education_object_type == 'Teacher'
+        return self.primary_role == 'teacher'
 
     @property
-    def photo(self):
-        photo = '/Photo/UserPhoto/%s' % self.id
-        return photo
+    def schools(self):
+        if not self._schools:
+            self._schools = [School(s) for s in self.get_value('schools')]
+        return self._schools
 
+    @property
+    def classes(self):
+        if not self._classes:
+            self._classes = [Class(s) for s in self.get_value('classes')]
+        return self._classes
+
+    def is_in_school(self, school_id):
+        return any(s for s in self.schools if s.id == school_id)
+    
 class Document(GraphObjectBase):
+
     def __init__(self, prop_dict={}):
         super(Document, self).__init__(prop_dict)
 
@@ -325,6 +228,7 @@ class Document(GraphObjectBase):
         return last_modified_user_name
 
 class Conversation(GraphObjectBase):
+
     def __init__(self, prop_dict={}):
         super(Conversation, self).__init__(prop_dict)
 
