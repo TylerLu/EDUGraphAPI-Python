@@ -78,7 +78,6 @@ def login_post(request):
 
 def o365_login(request):
     extra_params = {
-        'scope': 'openid+profile',
         'nonce': AuthService.get_random_string()
     }
     o365_email = request.COOKIES.get(constant.o365_email_cookie)
@@ -86,7 +85,7 @@ def o365_login(request):
         extra_params['login_hint'] = o365_email
     else:
         extra_params['prompt'] = 'login'
-    o365_login_url = AuthService.get_authorization_url(request, 'code+id_token', 'Auth/O365/Callback', AuthService.get_random_string(), extra_params)
+    o365_login_url = AuthService.get_authorization_url(request, 'code', 'Auth/O365/Callback', AuthService.get_random_string(), extra_params)
     settings.SESSION_EXPIRE_AT_BROWSER_CLOSE = True
     return HttpResponseRedirect(o365_login_url)
 
@@ -99,13 +98,11 @@ def reset(request):
 def o365_auth_callback(request):
     AuthService.validate_state(request)
     code = request.POST.get('code')
-    id_token = AuthService.get_id_token(request)
-
-    o365_user_id = id_token.get('oid')
-    tenant_id = id_token.get('tid')
 
     redirect_uri = AuthService.get_redirect_uri(request, 'Auth/O365/Callback')
     auth_result = token_service.get_token_with_code(code, redirect_uri, constant.Resources.MSGraph)
+    o365_user_id = auth_result.get('oid')
+    tenant_id = auth_result.get('tenantId')
     token_service.cache_tokens(auth_result, o365_user_id)
 
     ms_graph_service = MSGraphService(auth_result.get('accessToken'))

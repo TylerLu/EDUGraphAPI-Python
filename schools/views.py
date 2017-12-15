@@ -52,7 +52,7 @@ def classes(request, school_id):
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_id)
     my_classes = education_service.get_my_classes(school_id)
-    all_classes, classesnextlink = education_service.get_classes(school_id, 3)
+    all_classes, classesnextlink = education_service.get_classes(school_id, 12)
 
     for c in all_classes:
         my_class = next((mc for mc in my_classes if c.id == mc.id), None)
@@ -80,7 +80,7 @@ def classes_next(request, school_id):
     education_service = EducationService(user.tenant_id, token)
     #school = education_service.get_school(school_id)
     my_classes = education_service.get_my_classes(school_id)
-    all_classes, classnextlink = education_service.get_classes(school_id, top=3, nextlink=nextlink)
+    all_classes, classnextlink = education_service.get_classes(school_id, top=12, nextlink=nextlink)
 
     for c in all_classes:
         my_class = next((mc for mc in my_classes if c.id == mc.id), None)
@@ -141,7 +141,7 @@ def class_details(request, school_id, class_id):
    
     allTeachersInSchool = education_service.get_teachers(school_id)
     filteredTeachers = {}
-    for teacher in allTeachersInSchool[0]:
+    for teacher in allTeachersInSchool:
         filteredTeachers[teacher.id] = teacher
     for teacher in teachers:
         if(teacher.id in filteredTeachers):

@@ -18,7 +18,7 @@
 			</div>
 		</div>
 		<div class="toptiles">
-			<div class="section-school-name">
+			<div class="classes-school-name">
 				{{ school.display_name }}
 			</div>
 			<div class="infocontainer">
@@ -66,7 +66,7 @@
 					{% for c in classes %}					
 					<div class="tile-container">
 						{% if c.custom_data.is_my %}
-						<a class="myclasslink" href="Classes/{{ section.id }}">
+						<a class="myclasslink" href="Classes/{{ c.id }}">
 							<div class="tile">
 								<h5>{{ c.display_name }}</h5>
 								<h2>{{ c.code }}</h2>

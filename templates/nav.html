@@ -29,7 +29,7 @@
 				<a href="javascript:void(0);" id="userinfolink">
 					{% if user.main_role %} Logged in as: {{ user.main_role }}. {% endif %}
 					Hello {{ user.display_name }}
-					<img src="/Photo/UserPhoto/{{ user.id }}" />
+					<img src="/Photo/UserPhoto/{{ user.o365_user_id }}" />
 					<span class="caret" id="caret"></span>
 				</a>
             	

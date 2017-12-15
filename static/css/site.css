@@ -252,7 +252,7 @@ textarea {
 .class-tiles .tile-container:nth-child(6n) .detail,.class-tiles .tile-container:nth-child(6n-1) .detail{left:-380px;}
 .class-tiles .detail>h5{margin-top: 10px;font-weight: 800;font-size:12px;text-transform:uppercase;}
 .class-tiles .detail>h6{margin-top: 10px;font-size:12px;}
-.class-school-name{font-size:18px; width:100%; padding:0 20px 10px 0; text-align:right;}
+.classes-school-name{font-size:18px; width:100%; padding:0 20px 10px 0; text-align:right;}
 
 .classes .tiles-root-container .tiles-secondary-container{display:none}
 .classes .allclasses-container #allclasses.tiles-secondary-container, .classes .myclasses-container #myclasses.tiles-secondary-container{display:block}

@@ -94,7 +94,7 @@ class EducationService(object):
         Get teachers within a school
         '''
         url = self.api_base_uri + "users?$filter=extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_SchoolId eq '%s' and extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType eq 'Teacher'" % school_id        
-        return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='@odata.nextLink')
+        return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser)
 
     def add_member(self, class_id, user_id):
         '''
