@@ -370,21 +370,11 @@ def get_section(self, object_id):
     url = self.api_base_uri + 'groups/%s' % object_id
     return self.rest_api_service.get_object(url, self.access_token, model=Section)
 ```
-**Get users**
-
-```typescript
-def get_members(self, object_id, top=12, nextlink=''):
-    skiptoken = self._get_skip_token(nextlink)
-    url = self.api_base_uri + 'administrativeUnits/%s/members?$top=%s%s' % (object_id, top, skiptoken)
-    return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser, next_key='odata.nextLink')
-```
 Below are some screenshots of the sample app that show the education data.
 
 ![](Images/edu-schools.png)
 
-![](Images/edu-users.png)
-
-![](Images/edu-classes.png)
+[](Images/edu-classes.png)
 
 ![](Images/edu-class.png)
 
