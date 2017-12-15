@@ -56,6 +56,10 @@ class School(GraphObjectBase):
         return self.get_value('highestGrade')
 
     @property
+    def number(self):
+        return self.get_value('schoolNumber')
+
+    @property
     def lowest_grade(self):
         return self.get_value('lowestGrade')
 

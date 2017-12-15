@@ -48,14 +48,14 @@
 					<div class="close"><img src="/static/Images/close.png"></div>
 					<div class="title">Select a teacher</div>
 					<div class="list">
-							{% if filteredTeachers|length == 0%}						 
+							{% if filtered_teachers|length == 0%}						 
 							<div > There is no data available at this time.</div>
 							{% else %}
 							<ul>
-								{% for  key, value in filteredTeachers.items %}
+								{% for teacher in filtered_teachers %}
 									<li>
-									<a href="/Class/{{ section.id|safe }}/Coteacher/{{ value.id|safe }}">
-										<img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ value.id }}"/> {{ value.name }}
+									<a href="/Class/{{ class.id }}/Coteacher/{{ teacher.id }}">
+										<img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ teacher.id }}"/> {{ teacher.display_name }}
 									</a>
 									</li>
 									{% endfor %}

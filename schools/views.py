@@ -139,13 +139,8 @@ def class_details(request, school_id, class_id):
             seating_position = 0
         student.custom_data['position'] = seating_position
    
-    allTeachersInSchool = education_service.get_teachers(school_id)
-    filteredTeachers = {}
-    for teacher in allTeachersInSchool:
-        filteredTeachers[teacher.id] = teacher
-    for teacher in teachers:
-        if(teacher.id in filteredTeachers):
-            del filteredTeachers[teacher.id]
+    all_teachers = education_service.get_teachers(school.number)
+    filtered_teachers = [t for t in all_teachers if all(t.id != i.id for i in teachers)]
 
     # set seatrange
     seatrange = range(1, 37)
@@ -177,7 +172,7 @@ def class_details(request, school_id, class_id):
         'class_id': class_id,
         'is_in_a_school': True,
         'favorite_color': favorite_color,
-        'filteredTeachers':filteredTeachers
+        'filtered_teachers': filtered_teachers
     }
     return render(request, 'schools/classdetails.html', context)
 
