@@ -27,7 +27,6 @@ def schools(request):
 
     education_service = EducationService(user.tenant_id, token)
     me = education_service.get_me()
-    school_user_id = education_service.get_school_user_id()
     schools = education_service.get_schools()
     for school in schools:
         school.custom_data['is_my'] = me.is_in_school(school.id)
@@ -38,8 +37,7 @@ def schools(request):
     context = {
         'user': user,
         'me': me,
-        'schools': schools,
-        'school_user_id': school_user_id
+        'schools': schools
     }
     return render(request, 'schools/index.html', context)
 

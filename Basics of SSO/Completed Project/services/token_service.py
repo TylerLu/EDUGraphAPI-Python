@@ -72,5 +72,3 @@ class TokenService(object):
         token.refreshToken = auth_result.get('refreshToken')
         token.expiresOn = expiresOnUTC
         token.save()
-
-

@@ -14,7 +14,7 @@ class MSGraphService(object):
 
     def __init__(self, access_token):
         self.access_token = access_token
-        self.api_base_uri = constant.Resources.MSGraph + 'v1.0' + '/'
+        self.api_base_uri = constant.Resources.MSGraph + '/v1.0/'
         self.rest_api_service = RestApiService()
 
         auth_provider = AuthProvider()

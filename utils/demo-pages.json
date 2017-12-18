@@ -446,10 +446,6 @@
                 "description": "Get current user's school GUID by MS Graph API."
               },
               {
-                "title": "get_school_user_id",
-                "description": "Get current user's GUID by MS Graph API."
-              },
-              {
                 "title": "get_schools",
                 "description": "Get all schools that exist in the Azure Active Directory tenant."
               }

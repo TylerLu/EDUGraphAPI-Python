@@ -11,7 +11,7 @@ from models.education import School, Class, EduUser
 class EducationService(object):
 
     def __init__(self, tenant_id, access_token):
-        self.api_base_uri = constant.Resources.MSGraph  + constant.Resources.MSGraph_VERSION + '/'
+        self.api_base_uri = constant.Resources.MSGraph + '/' + constant.Resources.MSGraph_VERSION + '/'
         self.access_token = access_token
         self.rest_api_service = RestApiService()
         self.skip_token_re = re.compile('(?<=skiptoken=).*')
@@ -19,16 +19,6 @@ class EducationService(object):
     def get_me(self):
         url = self.api_base_uri + 'education/me?$expand=schools,classes'
         return self.rest_api_service.get_object(url, self.access_token, model=EduUser)
-
-    def get_school_user_id(self):
-        url = self.api_base_uri + 'me'
-        user_content = self.rest_api_service.get_json(url, self.access_token)
-        sid = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_StudentId', '')
-        tid = user_content.get('extension_fe2174665583431c953114ff7268b7b3_Education_SyncSource_TeacherId', '')
-        if sid:
-            return sid
-        elif tid:
-            return tid
 
     def get_schools(self):
         '''
