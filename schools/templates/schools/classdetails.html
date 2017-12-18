@@ -165,7 +165,7 @@
 						{% for student in students %}
 							<li id="{{ student.id }}">
 								<img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ student.id }}"}/>
-								<span class="disname">{{ student.name }}</span>
+								<span class="disname">{{ student.display_name }}</span>
 								{% if student.custom_data.position == 0 %}
 								<span class="seated hideitem">
 								{% else %}
@@ -195,7 +195,7 @@
 									<div class="deskicon">
 										<img src="/static/Images/header-default.jpg" realheader="/Photo/UserPhoto/{{ student.id }}" />
 									</div>
-									<div class="stuname">{{ student.name }}</div>
+									<div class="stuname">{{ student.display_name }}</div>
 								</div>
 						{% endfor %}
                     </div>

@@ -76,7 +76,7 @@ class EducationService(object):
         <param name="class_id">The Object ID of the section.</param>
         <param name="object_type">The members type.</param>
         '''
-        url = self.api_base_uri + 'education/classes/%s/members' % class_id       
+        url = self.api_base_uri + 'education/classes/%s/members' % class_id
         return self.rest_api_service.get_object_list(url, self.access_token, model=EduUser)
 
     def get_teachers(self, school_id):
