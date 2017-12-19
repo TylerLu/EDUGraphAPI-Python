@@ -247,3 +247,48 @@ class Conversation(GraphObjectBase):
     @property
     def topic(self):
         return self.get_value('topic')
+
+class Assignment(GraphObjectBase):
+
+    def __init__(self, prop_dict={}):
+        super(Assignment, self).__init__(prop_dict)
+
+    @property
+    def id(self):
+        return self.get_value('id')
+
+    @property
+    def allowLateSubmissions(self):
+        return self.get_value('allowLateSubmissions')
+
+    @property
+    def allowStudentsToAddResourcesToSubmission(self):
+        return self.get_value('allowStudentsToAddResourcesToSubmission')
+    
+    @property
+    def assignDateTime(self):
+        return self.get_value('assignDateTime')
+
+    @property
+    def assignedDateTime(self):
+        return self.get_value('assignedDateTime')
+
+    @property
+    def classId(self):
+        return self.get_value('classId')
+
+    @property
+    def displayName(self):
+        return self.get_value('displayName')
+
+    @property
+    def dueDateTime(self):
+        return self.get_value('dueDateTime')
+
+    @property
+    def status(self):
+        return self.get_value('status')
+
+    @property
+    def resources(self):
+        return self.get_value('resources')

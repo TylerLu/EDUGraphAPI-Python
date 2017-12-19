@@ -12,6 +12,7 @@
 {% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="/static/css/jquery-ui.css">
 <div class="row schools class-details">
 	<div class="tophero">
     	<div class="container">
@@ -69,7 +70,8 @@
     </div>
     <div class="students">
         <ul class="nav nav-tabs">
-            <li class="active"><a data-toggle="tab" href="#students"><span>Students</span></a></li>
+			<li class="active"><a data-toggle="tab" href="#students"><span>Students</span></a></li>
+			<li><a data-toggle="tab" href="#assignments" id="assignmentslink"><span>Assignments</span></a></li>
             <li><a data-toggle="tab" href="#documents" id="classdoclink"><span>Class Documents</span></a></li>
             <li><a data-toggle="tab" href="#conversations"><span>Conversations</span></a></li>
             <li><a data-toggle="tab" href="#seatingchart"><span>SEATING CHART</span></a></li>
@@ -94,7 +96,150 @@
 					</tbody>
 				</table>
 				{% endif %}
-            </div>
+			</div>
+			<div id="assignments" class="tab-pane fade">
+				{% if not user.is_student %}
+				<div class="addassignment"><a href="javascript:void(0)"> + New</a></div>				
+				{% endif %}
+
+				{% if assignments|length == 0%}
+				<div class="nodata"> There is no data available for this page at this time.</div>
+				{% else %}
+				<table class="table  table-green table-student ">
+					<thead>
+					<tr class="table-green-header">
+						<th class="header">Name</th>
+						<th class="header">Due Date</th>
+						<th class="header">Status</th>
+						<th class="header">Details</th>
+					</tr>
+					</thead>
+					<tbody>
+							{% for assignment in assignments %}
+							<tr class="tr-content">
+								<td>{{assignment.displayName}}</td>
+								<td>
+										{{assignment.dueDateTime }}
+								</td>
+								<td>{{assignment.status}}</td>
+								<td>
+									<a class="detaillink"
+									   data-status="{{assignment.status}}"
+									   data-id="{{assignment.id}}"
+									   data-dueDate="{{assignment.dueDateTime}}"
+									   data-title="{{assignment.displayName}}"
+									   data-allowlate="{{assignment.allowLateSubmissions}}"
+									   href="javascript:void(0)">Details</a>
+									   {% if not user.is_student and assignment.status != "draft"%}									
+										<span>|</span>
+										<a href="javascript:void(0)" class="submissionslink"  data-status="{{assignment.status}}" data-id="{{assignment.id}}" data-dueDate="{{assignment.dueDateTime }}" data-title="{{assignment.displayName}}" > Submissions</a>
+										{% endif %}
+								</td>
+							</tr>
+							{% endfor %}
+					</tbody>
+				</table>
+				{% endif %}
+				{% if not user.is_student %}
+				<div class="modal fade"id="new-assignment" role="dialog">
+						<div class="modal-dialog" role="document">
+							<div class="modal-content">
+								<div class="alert alert-danger assignment-alert">
+									<a href="#" class="close" data-dismiss="alert">&times;</a>
+									<span></span>
+								</div>
+								<form action="/Schools/newAssignment" enctype="multipart/form-data" id="new-assignment-form" method="post">
+									{% csrf_token %}
+								<div class="modal-body">
+									<input id="FilesToBeUploaded" name="FilesToBeUploaded" type="hidden" value="">
+									<input id="status" name="status" type="hidden" />							
+									<input name="schoolId" type="hidden" value="{{ school_id}}" />
+									<input name="classId" type="hidden" value="{{class.id}}" />
+
+
+									<fieldset>
+										<label>Name</label>
+										<input type="text" name="name" id="name" value="" class="text ui-widget-content ui-corner-all">
+										<br />
+										<label>Due Date</label>
+										<input type="text" id="duedate" name="duedate" value="" class="text ui-widget-content ui-corner-all">
+										<select class="ui-widget-content ui-corner-all" id="duetime" name="duetime">
+											<option>12:00 AM</option>
+											<option>12:30 AM</option>
+											<option>1:00 AM</option>
+											<option>1:30 AM</option>
+											<option>2:00 AM</option>
+											<option>2:30 AM</option>
+											<option>3:00 AM</option>
+											<option>3:30 AM</option>
+											<option>4:00 AM</option>
+											<option>4:30 AM</option>
+											<option>5:00 AM</option>
+											<option>5:30 AM</option>
+											<option>6:00 AM</option>
+											<option>6:30 AM</option>
+											<option>7:00 AM</option>
+											<option>7:30 AM</option>
+											<option>8:00 AM</option>
+											<option>8:30 AM</option>
+											<option>9:00 AM</option>
+											<option>9:30 AM</option>
+											<option>10:00 AM</option>
+											<option>10:30 AM</option>
+											<option>11:00 AM</option>
+											<option>11:30 AM</option>
+											<option>12:00 PM</option>
+											<option>12:30 PM</option>
+											<option>1:00 PM</option>
+											<option>1:30 PM</option>
+											<option>2:00 PM</option>
+											<option>2:30 PM</option>
+											<option>3:00 PM</option>
+											<option>3:30 PM</option>
+											<option>4:00 PM</option>
+											<option>4:30 PM</option>
+											<option>5:00 PM</option>
+											<option>5:30 PM</option>
+											<option>6:00 PM</option>
+											<option>6:30 PM</option>
+											<option>7:00 PM</option>
+											<option>7:30 PM</option>
+											<option>8:00 PM</option>
+											<option>8:30 PM</option>
+											<option>9:00 PM</option>
+											<option>9:30 PM</option>
+											<option>10:00 PM</option>
+											<option>10:30 PM</option>
+											<option>11:00 PM</option>
+											<option>11:30 PM</option>
+											<option>11:59 PM</option>
+										</select>
+										<br />
+										<div class="uploadcontainer">
+											<label>Resources</label>
+											<div id="uploaders">
+												<input type="file" id="fileToUpload" name="fileUpload" />
+											</div>
+										</div>
+										<br />
+										<span id="spnFile" style="color: #FF0000"></span>
+										<div class="control-section" style="padding: 0px;">
+											<div id="selectedFiles"></div>
+										</div>
+									</fieldset>
+
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary btn-cancel" data-dismiss="modal">Cancel</button>
+									<button type="button" class="btn btn-primary btn-save">Save As Draft</button>
+									<button type="button" class="btn btn-primary btn-publish">Assign</button>
+								</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				{% endif %}
+			</div>
             <div id="documents" class="tab-pane fade">
 				{% if documents|length == 0 %}
 				<div class="nodata"> There is no data available for this page at this time.</div>
@@ -227,6 +372,7 @@
     </div>
 </div>
 <input type="hidden" name="hiddenClassId" id="hiddenClassId" value="{{ class_id }}" />
+<input type="hidden" name="hideIsStudent" id="hideIsStudent" value="{{user.is_student}}" />
 {% endblock %}
 
 {% block basejs%}
@@ -234,11 +380,13 @@
 <script src="/static/js/modernizr-2.6.2.js"></script>
 <script src="/static/js/jquery.tablesorter.min.js"></script>
 <script src="/static/js/moment.min.js"></script>
+<script src="/static/js/jquery-ui.js"></script>
 {% endblock %}
 
 {% block localjs %}
 <script src="/static/js/bootstrap.js"></script>
 <script src="/static/js/respond.js"></script>
 <script src="/static/js/site.js"></script>
+<script src="/static/js/Assignments.js"></script>
 <script src="/static/js/classdetail.js"></script>
 {% endblock %}

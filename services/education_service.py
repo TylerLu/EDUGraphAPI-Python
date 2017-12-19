@@ -6,7 +6,7 @@
 import re
 import constant
 from services.rest_api_service import RestApiService
-from models.education import School, Class, EduUser
+from models.education import School, Class, EduUser,Assignment
 
 class EducationService(object):
 
@@ -104,9 +104,31 @@ class EducationService(object):
         data ={'@odata.id':'https://graph.microsoft.com/v1.0/users/'+user_id}  
         return self.rest_api_service.post_json(url,self.access_token,None,data)
 
+    def get_assignments(self,class_id):
+        '''
+        Get assignments of a class.
+        '''
+        url = self.api_base_uri + 'education/classes/' +class_id + "/assignments"     
+        return self.rest_api_service.get_object_list(url, self.access_token, model=Assignment)
+
+    def add_assignment(self,class_id,name,dueDateTime):
+        url = self.api_base_uri + 'education/classes/' +class_id + "/assignments"       
+        data={"displayName":name,"status":"draft","dueDateTime":dueDateTime,"allowStudentsToAddResourcesToSubmission":"true","assignTo":{"@odata.type":"#microsoft.graph.educationAssignmentClassRecipient"}}
+        return self.rest_api_service.post_json(url,self.access_token,None,data)
+
+    def publish_assignment(self,class_id,assignment_id):
+         url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/publish";
+         return self.rest_api_service.post_json(url,self.access_token,None,None)
+
+    def getAssignmentResourceFolderURL(self,class_id,assignment_id):
+         url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/GetResourcesFolderUrl";
+         return self.rest_api_service.get_json(url,self.access_token)
+
     def _get_skip_token(self, nextlink):
         if nextlink:
             matches = self.skip_token_re.findall(nextlink)
             if matches:
                 return matches[0]
         return ''
+
+    
