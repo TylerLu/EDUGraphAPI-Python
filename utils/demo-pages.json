@@ -95,7 +95,7 @@
             "methods": [
               {
                 "title": "register",
-                "description": "New user register page."
+                "description": "Show register page and handle register post request."
               }
             ]
           },
@@ -104,7 +104,7 @@
             "methods": [
               {
                 "title": "register",
-                "description": "Add a new user to database."
+                "description": "Create a new local user."
               }
             ]
           }
