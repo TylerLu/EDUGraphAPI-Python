@@ -349,12 +349,12 @@
 
             $.ajax({
                 type: 'GET',
-                url: '/getAssignmentResourcesSubmission/' + sectionId + '/' + assignmentId ,
+                url: '/Class/' + sectionId + '/Assignment/' + assignmentId +"/getAssignmentResourcesSubmission" ,
                 success: function (data) {
                     var resourcesListHtml = "";
                     if (data.resources && data.resources.length > 0) {
                         for (var i = 0; i < data.resources.length; i++) {
-                            resourcesListHtml += '<li data-id="' + data.resources[i].id + '">' + data.resources[i].resource.displayName + '</li>';
+                            resourcesListHtml += '<li data-id="' + data.resources[i].id + '">' + data.resources[i].resource + '</li>';
                         }
                     } //else {
                     //    resourcesListHtml = "<li>There is no data available for this page at this time.</li>";
@@ -362,12 +362,12 @@
                     detailForm.find(".resource-list").html(resourcesListHtml);
 
                     var submissionsListHtml = "";
-                    if (data.submission) {
-                        $("input[name='submissionId']").val(data.submission.Id);
+                    if (data.submissionId) {
+                        $("input[name='submissionId']").val(data.submissionId);
                     }
-                    if (data.submission && data.submission[0].resources && data.submission[0].resources.length > 0) {
-                        for (var i = 0; i < data.submission[0].resources.length; i++) {
-                            submissionsListHtml += '<li data-id="' + data.submission[0].resources[i].id + '">' + data.submission[0].resources[i].resource.displayName + '</li>';
+                    if (data.submissionResources) {
+                        for (var i = 0; i < data.submissionResources.length; i++) {
+                            submissionsListHtml += '<li data-id="' + data.submissionResources[i].id + '">' + data.submissionResources[i].resource + '</li>';
                         }
                     } //else {
                     // submissionsListHtml = "<li class='emptyHint'>There is no data available for this page at this time.</li>";

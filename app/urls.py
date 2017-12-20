@@ -48,7 +48,7 @@ urlpatterns = [
     url(r'^Schools/newAssignment$', schools_views.new_assignment, name='new_assignment'),
     url(r'^Class/(?P<class_id>\w+-\w+-\w+-\w+-\w+)/Assignment/(?P<assignment_id>\w+-\w+-\w+-\w+-\w+)/Resources', schools_views.get_assignment_resources, name='get_assignment_resources'),
     url(r'^Class/updateAssignment$', schools_views.update_assignment, name='update_assignment'),
-
+    url(r'^Class/(?P<class_id>\w+-\w+-\w+-\w+-\w+)/Assignment/(?P<assignment_id>\w+-\w+-\w+-\w+-\w+)/getAssignmentResourcesSubmission', schools_views.get_assignment_submission_resources, name='get_assignment_submission_resources'),
 
 
     url(r'^Manage/AboutMe', manage_views.aboutme, name='aboutme'),

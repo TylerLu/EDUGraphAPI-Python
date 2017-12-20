@@ -92,6 +92,14 @@ class RestApiService(object):
             s_headers.update(headers)
         return self._send(method, url, s_headers, json.dumps(data))
 
+    # def put_file(self, url, token, headers=None, file=None):
+    #     method = 'PUT'
+    #     s_headers = {'Accept': 'application/json',
+    #                 'Content-Type': 'application/json'}
+    #     self._set_header_token(s_headers, token)
+    #     if headers:
+    #         s_headers.update(headers)
+    #     return self._send(method, url, s_headers,json.dumps(file))
 
     def _set_header_token(self, headers, token):
         key = 'Authorization'

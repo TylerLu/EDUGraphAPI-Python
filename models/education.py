@@ -318,4 +318,3 @@ class AssignmentResource(GraphObjectBase):
     def resourcesFolderUrl(self):
         return self.get_value('resourcesFolderUrl')
 
-    

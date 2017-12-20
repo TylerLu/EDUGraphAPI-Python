@@ -235,6 +235,36 @@ def get_assignment_resources(request,class_id,assignment_id):
     return JsonResponse(result, safe=False)
 
 @login_required
+def get_assignment_submission_resources(request,class_id,assignment_id):
+    user = AuthService.get_current_user(request)
+    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)
+    assignemtnResources = education_service.getAssignmentResources(class_id,assignment_id)
+    submissionResources = education_service.getAssignmentSubmissionsByUser(class_id,assignment_id,user.o365_user_id)
+    
+    result={}
+    resourceArray=[] 
+    submissionResourcesArray=[]
+    for resource in assignemtnResources:
+        obj={}
+        obj["id"]=resource.id
+        obj["resource"]=resource.resource["displayName"]
+        resourceArray.append(obj)
+    result["resources"]=resourceArray;
+    
+    result["submissionId"]=submissionResources[0].id
+    for resource in submissionResources:
+       for item in resource.resources:
+           obj={}
+           obj["id"]=item["id"]
+           obj["resource"]=item["resource"]["displayName"]
+           submissionResourcesArray.append(obj)
+    result["submissionResources"]=submissionResourcesArray;
+           
+    return JsonResponse(result, safe=False)
+
+
+@login_required
 def update_assignment(request):
    if request.method == 'POST':
   

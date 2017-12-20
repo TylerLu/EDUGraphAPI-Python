@@ -132,7 +132,13 @@ class EducationService(object):
         url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/resources";
         return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
 
-
+    def getAssignmentSubmissionsByUser(self,class_id,assignment_id,user_id):
+        url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions?$filter=submittedBy/user/id eq \''+user_id+'\''
+        return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
+   
+    def getSubmissionResources(self,class_id,assignment_id,user_id):
+        url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions?$filter=submittedBy/user/id eq \''+user_id+'\''
+        return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
     # def uploadFileToOneDrive(self,ids,file):
     #     url = "https://graph.microsoft.com/v1.0/drives/" + ids[0]+"/items/"+ids[1]+":/"+file.name+":/content"
     #     return self.rest_api_service.put_file(url,self.access_token,file)
