@@ -43,6 +43,13 @@ class MSGraphService(object):
         except:
             return None
 
+    def get_user_info(self,user_id):
+        url = self.api_base_uri + 'users/' + user_id
+        try:
+            return self.rest_api_service.get_json(url, self.access_token)
+        except:
+            return None
+
     def get_documents(self, object_id):
         url = self.api_base_uri + 'groups/%s/drive/root/children' % object_id
         return self.rest_api_service.get_object_list(url, self.access_token, model=Document)

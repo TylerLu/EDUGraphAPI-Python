@@ -264,7 +264,7 @@
             $("#assignment-submissions-form tbody").html("<tr><td colspan='2'>Loading...</tr></td>");
             $.ajax({
                 type: 'GET',
-                url: '/submissions/' + _classId + '/' + assignmentId ,
+                url: '/Class/' + _classId + '/Assignment/' + assignmentId +"/getSubmissions",
                 success: function (data) {
                     var resourcesListHtml = "";
                     if (data && data.length > 0) {

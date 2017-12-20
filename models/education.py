@@ -318,3 +318,30 @@ class AssignmentResource(GraphObjectBase):
     def resourcesFolderUrl(self):
         return self.get_value('resourcesFolderUrl')
 
+class Submission(GraphObjectBase):
+    def __init__(self, prop_dict={}):
+        super(Submission, self).__init__(prop_dict)
+
+    @property
+    def id(self):
+        return self.get_value('id')  
+
+    @property
+    def status(self):
+        return self.get_value('status')      
+      
+    @property
+    def submittedDateTime(self):
+        return self.get_value('submittedDateTime')  
+     
+    @property
+    def submittedBy(self):
+        return self.get_value('submittedBy') 
+     
+    @property
+    def resourcesFolder(self):
+        return self.get_value('resourcesFolder') 
+     
+    @property
+    def resourcesFolderUrl(self):
+        return self.get_value('resourcesFolderUrl') 

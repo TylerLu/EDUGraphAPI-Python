@@ -263,6 +263,20 @@ def get_assignment_submission_resources(request,class_id,assignment_id):
            
     return JsonResponse(result, safe=False)
 
+@login_required
+def get_submissions(request,class_id,assignment_id):
+    user = AuthService.get_current_user(request)
+    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)  
+    submissions = education_service.getSubmissions(class_id,assignment_id)   
+    ms_graph_service = MSGraphService(token)
+
+    for submission in submissions:
+        userId =  submission.submittedBy["user"]["id"];
+        user = ms_graph_service.get_user_info(userId)
+        import pdb
+        pdb.set_trace()
+        
 
 @login_required
 def update_assignment(request):
