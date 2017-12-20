@@ -6,7 +6,7 @@
 import re
 import constant
 from services.rest_api_service import RestApiService
-from models.education import School, Class, EduUser,Assignment
+from models.education import School, Class, EduUser,Assignment,AssignmentResource
 
 class EducationService(object):
 
@@ -111,6 +111,10 @@ class EducationService(object):
         url = self.api_base_uri + 'education/classes/' +class_id + "/assignments"     
         return self.rest_api_service.get_object_list(url, self.access_token, model=Assignment)
 
+    def get_assignment(self,class_id,assignment_id):
+        url = self.api_base_uri + 'education/classes/' +class_id + "/assignments/"+assignment_id     
+        return self.rest_api_service.get_object(url, self.access_token, model=Assignment)
+
     def add_assignment(self,class_id,name,dueDateTime):
         url = self.api_base_uri + 'education/classes/' +class_id + "/assignments"       
         data={"displayName":name,"status":"draft","dueDateTime":dueDateTime,"allowStudentsToAddResourcesToSubmission":"true","assignTo":{"@odata.type":"#microsoft.graph.educationAssignmentClassRecipient"}}
@@ -123,6 +127,15 @@ class EducationService(object):
     def getAssignmentResourceFolderURL(self,class_id,assignment_id):
          url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/GetResourcesFolderUrl";
          return self.rest_api_service.get_json(url,self.access_token)
+
+    def getAssignmentResources(self,class_id,assignment_id):
+        url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/resources";
+        return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
+
+
+    # def uploadFileToOneDrive(self,ids,file):
+    #     url = "https://graph.microsoft.com/v1.0/drives/" + ids[0]+"/items/"+ids[1]+":/"+file.name+":/content"
+    #     return self.rest_api_service.put_file(url,self.access_token,file)
 
     def _get_skip_token(self, nextlink):
         if nextlink:

@@ -56,7 +56,7 @@ function iniControl() {
 
     var tabToActivate = $.urlParam("tab");
     if (tabToActivate) {
-        $('.nav-tabs li:eq(' + tabToActivate + ') a').tab('show');
+        $('.nav-tabs a[href="#' + tabToActivate + '"]').tab('show');
     }
 
     function exitEdit() {

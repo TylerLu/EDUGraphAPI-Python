@@ -1,6 +1,6 @@
 ﻿;
 (function () {
-    var _classId = $("#hidSectionid").val();
+    var _classId = $("#hiddenClassId").val();
     var _isStudent = $("#hideIsStudent").val() === "True";
     var _assignment_api = {
         storedFiles: [],
@@ -309,7 +309,7 @@
             detailForm.find(".resource-list").html("<li>Loading...</li>");
             $("input[name='assignmentId']").val(assignmentId);
             $("input[name='assignmentStatus']").val(assignmentStatus);
-            var url = "/getAssignmentResources/"+sectionId + "/" + assignmentId;
+            var url = "/Class/"+sectionId + "/Assignment/" + assignmentId + "/Resources";
             $.ajax({
                 type: 'GET',
                 url:url,
@@ -318,7 +318,7 @@
                     var resourcesListHtml = "";
                     if (data && data.length > 0) {
                         for (var i = 0; i < data.length; i++) {
-                            resourcesListHtml += '<li data-id="' + data[i].Id + '">' + data[i].resource.displayName + '</li>';
+                            resourcesListHtml += '<li data-id="' + data[i].Id + '">' + data[i].resource + '</li>';
                         }
                     }
                     detailForm.find(".resource-list").html(resourcesListHtml);

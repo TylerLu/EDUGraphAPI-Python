@@ -17,6 +17,7 @@ from services.user_service import UserService
 from datetime import datetime,time
 from django import forms
 
+
 user_service = UserService()
 token_service = TokenService()
 
@@ -118,7 +119,6 @@ def add_coteacher(request, class_id, user_object_id):
 @login_required
 @linked_users_only
 def class_details(request, school_id, class_id):
-   
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
@@ -140,6 +140,7 @@ def class_details(request, school_id, class_id):
         student.custom_data['position'] = seating_position
    
     assignments = education_service.get_assignments(class_id)
+
 
 
     all_teachers = education_service.get_teachers(school.number)
@@ -188,7 +189,7 @@ def save_seating_arrangements(request):
     return HttpResponse(json.dumps({'save':'ok'}))
 
 @login_required
-def newAssignment(request):
+def new_assignment(request):
     if request.method == 'POST':        
         post=request.POST
         files=request.FILES
@@ -197,25 +198,67 @@ def newAssignment(request):
         education_service = EducationService(user.tenant_id, token)
         dueDate = post["duedate"] + "T" + post["duetime"] + "Z"       
         dueDateUTC=datetime.strptime(dueDate,"%m/%d/%YT%H:%M %pZ").strftime("%Y-%m-%dT%H:%M:%SZ")
-        #result = education_service.add_assignment(post["classId"],post["name"],dueDateUTC)
-        #assignment = json.loads(result.content)
-        #if post['status']=="assigned":
-            #education_service.publish_assignment(post["classId"],assignment["id"])
+        result = education_service.add_assignment(post["classId"],post["name"],dueDateUTC)
+        assignment = json.loads(result.content)
+        if post['status']=="assigned":
+            education_service.publish_assignment(post["classId"],assignment["id"])
 
-        #resourceFolderURL = education_service.getAssignmentResourceFolderURL(post["classId"],assignment["id"])["value"]
-
-        #if files !=None:
-           # for file in files:
-        uploadFileToOneDrive("")       
-
+        resourceFolderURL = education_service.getAssignmentResourceFolderURL(post["classId"],assignment["id"])["value"]
+        #files["fileUpload"].chunks() memeory
         import pdb;
         pdb.set_trace();
+        aa=request.FILES.get("fileUpload",None)
+        #uploadFileToOneDrive("",aa,education_service)    
+        # if files !=None:
+        #     for file in files["fileUpload"]:
+        #         import pdb;
+        #         pdb.set_trace();
+        #         uploadFileToOneDrive("",aa)       
+
+    
         
     return HttpResponse(json.dumps({'save':'ok'}))
 
-def uploadFileToOneDrive(resourceFolderURL):
+@login_required
+def get_assignment_resources(request,class_id,assignment_id):
+    user = AuthService.get_current_user(request)
+    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)
+    resources = education_service.getAssignmentResources(class_id,assignment_id)   
+    result=[]
+    resourceArray={} 
+    for resource in resources:
+        resourceArray["id"]=resource.id
+        resourceArray["resource"]=resource.resource["displayName"]
+        result.append(resourceArray)
+
+    return JsonResponse(result, safe=False)
+
+@login_required
+def update_assignment(request):
+   if request.method == 'POST':
+  
+        post=request.POST
+        files=request.FILES
+        user = AuthService.get_current_user(request)
+        token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+        education_service = EducationService(user.tenant_id, token)  
+        assignment = education_service.get_assignment(post["classId"],post["assignmentId"])  
+
+        if assignment.status=='draft' and post['assignmentStatus']=='assigned':
+            education_service.publish_assignment(post['classId'], post['assignmentId'])
+        referer = request.META.get('HTTP_REFERER') 
+        if referer.find("?")==-1:
+            referer +="?tab=assignments"
+        return HttpResponseRedirect(referer)
+
+def uploadFileToOneDrive(resourceFolderURL,file,education_service):
     resourceFolderURL = "https://graph.microsoft.com/v1.0/drives/b!XZiBoHlP3UWsnqwn7KnYhG0C2Yly5gFNnYUl0wD2wXTPBGub60tHS5lr_6wwLHbo/items/01EHQ2MT44LPRSZX5LCNF3LW526SH2VBFG"
     ids = getIds(resourceFolderURL)
+    
+    education_service.uploadFileToOneDrive(ids,file)
+    import pdb;
+    pdb.set_trace();
 
 def getIds(resourceFolderURL):
     array = resourceFolderURL.split("/")

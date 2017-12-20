@@ -92,6 +92,7 @@ class RestApiService(object):
             s_headers.update(headers)
         return self._send(method, url, s_headers, json.dumps(data))
 
+
     def _set_header_token(self, headers, token):
         key = 'Authorization'
         value = 'Bearer {0}'.format(token)
