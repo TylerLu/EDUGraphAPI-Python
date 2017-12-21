@@ -271,11 +271,23 @@ def get_submissions(request,class_id,assignment_id):
     submissions = education_service.getSubmissions(class_id,assignment_id)   
     ms_graph_service = MSGraphService(token)
 
+    result=[]
     for submission in submissions:
         userId =  submission.submittedBy["user"]["id"];
-        user = ms_graph_service.get_user_info(userId)
-        import pdb
-        pdb.set_trace()
+        user = ms_graph_service.get_user_info(userId)                
+        resources= education_service.getSubmissionResources(class_id,assignment_id,submission.id)
+        array={}
+        array["displayName"]=user["displayName"]
+        array["submittedDateTime"]  = submission.submittedDateTime 
+        
+        resources_array=[]
+        for resource in resources:
+            resources_dict={}
+            resources_dict["displayName"] = resource.resource["displayName"]
+            resources_array.append(resources_dict)
+        array["resources"]=  resources_array  
+        result.append(array)
+    return JsonResponse(result, safe=False)
         
 
 @login_required

@@ -270,12 +270,12 @@
                     if (data && data.length > 0) {
                         for (var i = 0; i < data.length; i++) {
                             resourcesListHtml += "<tr>"
-                            resourcesListHtml += '<td>' + data[i].submittedBy.user.displayName + '</td><td>' + (data[i].submittedDateTime==null ? 'None' : data[i].submittedDateTime) + '</td>';
+                            resourcesListHtml += '<td>' + data[i].displayName + '</td><td>' + (data[i].submittedDateTime==null ? 'None' : data[i].submittedDateTime) + '</td>';
                             if (data[i].resources) {
                                 if (data[i].resources.length > 0) {
                                     for (var j = 0; j < data[i].resources.length; j++) {
-                                        if (data[i].resources[j].resource && data[i].resources[j].resource.displayName) {
-                                            resourcesListHtml += "<tr><td colspan='2' class='files'>" + data[i].resources[j].resource.displayName + "</td></tr>";
+                                        if (data[i].resources[j].displayName) {
+                                            resourcesListHtml += "<tr><td colspan='2' class='files'>" +data[i].resources[j].displayName + "</td></tr>";
                                         }
                                     }
                                 }

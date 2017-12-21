@@ -345,3 +345,27 @@ class Submission(GraphObjectBase):
     @property
     def resourcesFolderUrl(self):
         return self.get_value('resourcesFolderUrl') 
+
+class EducationAssignmentResource(GraphObjectBase):
+    def __init__(self, prop_dict={}):
+        super(EducationAssignmentResource, self).__init__(prop_dict)
+
+    @property
+    def id(self):
+        return self.get_value('id')  
+
+    @property
+    def distributeForStudentWork(self):
+        return self.get_value('distributeForStudentWork')  
+
+    @property
+    def resources(self):
+        return self.get_value('resources')  
+
+    @property
+    def resource(self):
+        return self.get_value('resource')  
+
+    @property
+    def resourcesFolderUrl(self):
+        return self.get_value('resourcesFolderUrl')  
