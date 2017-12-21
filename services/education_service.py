@@ -148,6 +148,26 @@ class EducationService(object):
         url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions/'+submission_id+'/resources'
         return self.rest_api_service.get_object_list(url, self.access_token, model=EducationAssignmentResource)
 
+    def add_assignment_resources(self,class_id,assignment_id,fileName,resourceURL):
+        url = self.api_base_uri + "/education/classes/"+class_id+"/assignments/"+assignment_id+"/resources";
+        fileType = self.get_fileType(fileName)
+        json = {
+            "resource":{
+               "displayName":fileName,
+               "@odata.type":fileType,
+               "file":{"odataid":resourceURL}
+           }
+        }
+        self.rest_api_service.post_json(url,self.access_token,None,json)
+
+    def get_fileType(self,fileName):
+        defaultFileType = "#microsoft.graph.educationFileResource"
+        if fileName.find(".docx")!=-1:
+            defaultFileType = "#microsoft.graph.educationWordResource"
+        if fileName.find(".xlsx")!=-1:
+            defaultFileType = "#microsoft.graph.educationExcelResource"
+        return defaultFileType
+
     def uploadFileToOneDrive(self,ids,file):
         url = "https://graph.microsoft.com/v1.0/drives/" + ids[0]+"/items/"+ids[1]+":/"+file.name+":/content"
         return self.rest_api_service.put_file(url,self.access_token,file)

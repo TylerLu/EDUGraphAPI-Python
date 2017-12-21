@@ -96,7 +96,7 @@ class RestApiService(object):
         s_headers = {'Content-Type': 'application/octet-stream'}        
         self._set_header_token(s_headers, token)
         method = 'PUT'
-        return self._send(method, url, s_headers,file.chunks())
+        return json.loads(self._send(method, url, s_headers,file.chunks()).text)
 
     def _set_header_token(self, headers, token):
         key = 'Authorization'

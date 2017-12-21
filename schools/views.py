@@ -203,15 +203,16 @@ def new_assignment(request):
            education_service.publish_assignment(post["classId"],assignment["id"])
 
         resourceFolderURL = education_service.getAssignmentResourceFolderURL(post["classId"],assignment["id"])["value"]
-
+        ids = getIds(resourceFolderURL)
         files= request.FILES.getlist("fileUpload")
         if files !=None:
             for file in files:
-                uploadFileToOneDrive(resourceFolderURL,file,education_service)       
-
+               driveFile = uploadFileToOneDrive(resourceFolderURL,file,education_service)      
+               resourceUrl = "https://graph.microsoft.com/v1.0/drives/" + ids[0] + "/items/" + driveFile["id"]
+               education_service.add_assignment_resources(post["classId"],assignment["id"],driveFile["name"],resourceUrl)
     
         
-    return HttpResponse(json.dumps({'save':'ok'}))
+        redirect(request)
 
 @login_required
 def get_assignment_resources(request,class_id,assignment_id):
@@ -220,8 +221,8 @@ def get_assignment_resources(request,class_id,assignment_id):
     education_service = EducationService(user.tenant_id, token)
     resources = education_service.getAssignmentResources(class_id,assignment_id)   
     result=[]
-    resourceArray={} 
     for resource in resources:
+        resourceArray={} 
         resourceArray["id"]=resource.id
         resourceArray["resource"]=resource.resource["displayName"]
         result.append(resourceArray)
@@ -297,14 +298,11 @@ def update_assignment(request):
 
         if assignment.status=='draft' and post['assignmentStatus']=='assigned':
             education_service.publish_assignment(post['classId'], post['assignmentId'])
-        referer = request.META.get('HTTP_REFERER') 
-        if referer.find("?")==-1:
-            referer +="?tab=assignments"
-        return HttpResponseRedirect(referer)
+        redirect(request)
 
 def uploadFileToOneDrive(resourceFolderURL,file,education_service):    
     ids = getIds(resourceFolderURL)
-    education_service.uploadFileToOneDrive(ids,file)
+    return education_service.uploadFileToOneDrive(ids,file)
 
 
 def getIds(resourceFolderURL):
@@ -313,3 +311,8 @@ def getIds(resourceFolderURL):
     return [array[length-3],array[length-1]]
 
 
+def redirect(request):
+        referer = request.META.get('HTTP_REFERER') 
+        if referer.find("?")==-1:
+            referer +="?tab=assignments"
+        return HttpResponseRedirect(referer)
