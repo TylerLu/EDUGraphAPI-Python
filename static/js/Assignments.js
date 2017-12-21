@@ -129,7 +129,7 @@
                 $(this).attr('disabled', 'true');
             });
 
-            //$("input[name='newResource[]']").attr('disabled', 'true');
+            
             $("input[name='newResource']").attr('disabled', 'true');
         },
         //Recreate upload contorl on new assignment form.
@@ -231,10 +231,10 @@
         newResourceFileChange: function (e) {
             if (_isStudent) {
                 var browser = $("#browser").val();
-                var newResources = "newResource[]";
+                var newResources = "newResource";
                 if(browser=="IE")
                 {
-                    newResources = "newResource[]";
+                    newResources = "newResource";
                 }
                 AssignmentPlugin.doReCreateNewResourceControl(e,
                     "#assignment-detail-form .handin-list",
@@ -252,7 +252,7 @@
                 $("#assignment-detail-form .assignment-alert"),
                 $("input[id^='newResourceFileCtrl']"),
                 "newResourceFileCtrl",
-                "newResource[]",
+                "newResource",
                 "#assignment-detail-form .resource-upload");
             }
         },
