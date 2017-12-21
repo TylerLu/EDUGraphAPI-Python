@@ -458,7 +458,7 @@
             "methods": [
               {
                 "title": "schools",
-                "description": "Page action."
+                "description": "Show all schools page."
               }
             ]
           },
@@ -467,7 +467,7 @@
             "methods": [
               {
                 "title": "get_current_user",
-                "description": "Get current logged in user's information"
+                "description": "Get current user's information"
               }
             ]
           },
@@ -476,7 +476,7 @@
             "methods": [
               {
                 "title": "get_access_token",
-                "description": "Get MS Graph access token to retrieve schools."
+                "description": "Get access token."
               }
             ]
           },
@@ -484,12 +484,12 @@
             "url": "services/education_service.py",
             "methods": [
               {
-                "title": "get_my_school_id",
-                "description": "Get current user's school GUID by MS Graph API."
+                "title": "get_me",
+                "description": "Get current user's education information."
               },
               {
                 "title": "get_schools",
-                "description": "Get all schools that exist in the Azure Active Directory tenant."
+                "description": "Get all schools"
               }
             ]
           }
@@ -509,7 +509,11 @@
             "methods": [
               {
                 "title": "classes",
-                "description": "Classes page action."
+                "description": "Show classes page."
+              },
+              {
+                "title": "classes_next",
+                "description": "Return next page of classes (JSON data)."
               }
             ]
           },
@@ -527,7 +531,7 @@
             "methods": [
               {
                 "title": "get_access_token",
-                "description": "Get MS Graph access token to retrieve schools."
+                "description": "Get access token."
               }
             ]
           },
@@ -536,7 +540,7 @@
             "methods": [
               {
                 "title": "get_school",
-                "description": "Get a school by using the id."
+                "description": "Get a school."
               }
             ]
           }
@@ -586,7 +590,7 @@
             "methods": [
               {
                 "title": "class_details",
-                "description": "Page action."
+                "description": "Show class details page."
               },
               {
                 "title": "add_coteacher",
@@ -608,7 +612,7 @@
             "methods": [
               {
                 "title": "get_access_token",
-                "description": "Get MS Graph access token to retrieve schools."
+                "description": "Get access token"
               }
             ]
           },
@@ -618,19 +622,23 @@
 
               {
                 "title": "get_school",
-                "description": "Get a school by using the id."
+                "description": "Get a school."
               },
               {
-                "title": "get_section",
-                "description": "Get a class by using the id."
+                "title": "get_class",
+                "description": "Get a class."
+              },
+              {
+                "title": "get_teachers",
+                "description": "Get teachers of a school."
               },
               {
                 "title": "add_member",
-                "description": "Add a user to members of a class."
+                "description": "Add a user to a class as a member."
               },
               {
                 "title": "add_owner",
-                "description": "Add a user to owner of a class."
+                "description": "Add a user to a class as an owner."
               }
             ]
           }
@@ -644,8 +652,8 @@
             "url": "services/education_service.py",
             "methods": [
               {
-                "title": "get_section_members",
-                "description": "Get a class's students."
+                "title": "get_class_members",
+                "description": "Get members of a class."
               }
             ]
           }
@@ -661,6 +669,14 @@
               {
                 "title": "get_conversations",
                 "description": "Get all conversations."
+              },
+              {
+                "title": "get_conversations_url",
+                "description": "Get URL of a conversation"
+              },
+              {
+                "title": "get_conversations_root",
+                "description": "Get URL of the conversations page."
               }
             ]
           }
@@ -675,8 +691,12 @@
             "methods": [
               {
                 "title": "get_documents",
-                "description": "Get all documents from OneDrive."
-              }
+                "description": "Get documents of a class."
+              },
+              {
+                "title": "get_documents_root",
+                "description": "Get the URL of the documents page"
+              }              
             ]
           }
         ]
@@ -685,6 +705,15 @@
         "title": "Display, edit and save students charts",
         "tab": "#seatingchart",
         "files": [
+          {
+            "url": "schools/views.py",
+            "methods": [
+              {
+                "title": "save_seating_arrangements",
+                "description": "Save seating arrangements."
+              }
+            ]
+          },
           {
             "url": "services/user_service.py",
             "methods": [
