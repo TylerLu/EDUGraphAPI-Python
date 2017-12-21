@@ -148,9 +148,8 @@ class EducationService(object):
         url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions/'+submission_id+'/resources'
         return self.rest_api_service.get_object_list(url, self.access_token, model=EducationAssignmentResource)
 
-    # def uploadFileToOneDrive(self,ids,file):
-    #     url = "https://graph.microsoft.com/v1.0/drives/" + ids[0]+"/items/"+ids[1]+":/"+file.name+":/content"
-    #     return self.rest_api_service.put_file(url,self.access_token,file)
+    def uploadFileToOneDrive(self,ids,file):
+        url = "https://graph.microsoft.com/v1.0/drives/" + ids[0]+"/items/"+ids[1]+":/"+file.name+":/content"
 
     def _get_skip_token(self, nextlink):
         if nextlink:

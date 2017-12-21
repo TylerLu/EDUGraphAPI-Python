@@ -191,8 +191,7 @@ def save_seating_arrangements(request):
 @login_required
 def new_assignment(request):
     if request.method == 'POST':        
-        post=request.POST
-        files=request.FILES
+        post=request.POST        
         user = AuthService.get_current_user(request)
         token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
         education_service = EducationService(user.tenant_id, token)
@@ -201,19 +200,14 @@ def new_assignment(request):
         result = education_service.add_assignment(post["classId"],post["name"],dueDateUTC)
         assignment = json.loads(result.content)
         if post['status']=="assigned":
-            education_service.publish_assignment(post["classId"],assignment["id"])
+           education_service.publish_assignment(post["classId"],assignment["id"])
 
         resourceFolderURL = education_service.getAssignmentResourceFolderURL(post["classId"],assignment["id"])["value"]
-        #files["fileUpload"].chunks() memeory
-        import pdb;
-        pdb.set_trace();
-        aa=request.FILES.get("fileUpload",None)
-        #uploadFileToOneDrive("",aa,education_service)    
-        # if files !=None:
-        #     for file in files["fileUpload"]:
-        #         import pdb;
-        #         pdb.set_trace();
-        #         uploadFileToOneDrive("",aa)       
+
+        files= request.FILES.getlist("fileUpload")
+        if files !=None:
+            for file in files:
+                uploadFileToOneDrive(resourceFolderURL,file,education_service)       
 
     
         
@@ -308,13 +302,10 @@ def update_assignment(request):
             referer +="?tab=assignments"
         return HttpResponseRedirect(referer)
 
-def uploadFileToOneDrive(resourceFolderURL,file,education_service):
-    resourceFolderURL = "https://graph.microsoft.com/v1.0/drives/b!XZiBoHlP3UWsnqwn7KnYhG0C2Yly5gFNnYUl0wD2wXTPBGub60tHS5lr_6wwLHbo/items/01EHQ2MT44LPRSZX5LCNF3LW526SH2VBFG"
+def uploadFileToOneDrive(resourceFolderURL,file,education_service):    
     ids = getIds(resourceFolderURL)
-    
     education_service.uploadFileToOneDrive(ids,file)
-    import pdb;
-    pdb.set_trace();
+
 
 def getIds(resourceFolderURL):
     array = resourceFolderURL.split("/")
