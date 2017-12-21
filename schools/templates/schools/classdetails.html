@@ -275,7 +275,7 @@
 									</div>
 									</form>
 								  {%else%}
-									<form action="/newAssignmentSubmissionResource" enctype="multipart/form-data" id="assignment-detail-form-student" method="post">
+									<form action="/Class/newAssignmentSubmissionResource" enctype="multipart/form-data" id="assignment-detail-form-student" method="post">
 										<input name="schoolId" type="hidden" value="{{ school_id}}" />
 										<input name="classId" type="hidden" value="{{class.id}}" />
 									<input name="assignmentId" type="hidden" />

@@ -287,6 +287,7 @@ def get_submissions(request,class_id,assignment_id):
             resources_array.append(resources_dict)
         array["resources"]=  resources_array  
         result.append(array)
+
     return JsonResponse(result, safe=False)
         
 
@@ -314,6 +315,29 @@ def update_assignment(request):
                driveFile = uploadFileToOneDrive(resourceFolderURL,file,education_service)      
                resourceUrl = "https://graph.microsoft.com/v1.0/drives/" + ids[0] + "/items/" + driveFile["id"]
                education_service.add_assignment_resources(post["classId"],post["assignmentId"],driveFile["name"],resourceUrl)
+    
+        referer = request.META.get('HTTP_REFERER') 
+        if referer.find("?")==-1:
+            referer +="?tab=assignments"
+        return HttpResponseRedirect(referer)
+
+@login_required
+def newAssignmentSubmissionResource(request):
+    if request.method == 'POST':
+        files= request.FILES.getlist("newResource")
+        if len(files)!=0:
+            post=request.POST            
+            user = AuthService.get_current_user(request)
+            token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+            education_service = EducationService(user.tenant_id, token)  
+            submissions = education_service.getAssignmentSubmissionsByUser(post["classId"],post["assignmentId"],user.o365_user_id)  
+            if len(submissions)!=0:
+                resourceFolderURL = submissions[0].resourcesFolderUrl
+                ids = getIds(resourceFolderURL)
+                for file in files:
+                    driveFile = uploadFileToOneDrive(resourceFolderURL,file,education_service)      
+                    resourceUrl = "https://graph.microsoft.com/v1.0/drives/" + ids[0] + "/items/" + driveFile["id"]
+                    education_service.addSubmissionResource(post["classId"],post["assignmentId"],driveFile["name"],resourceUrl,post["submissionId"])
     
         referer = request.META.get('HTTP_REFERER') 
         if referer.find("?")==-1:
