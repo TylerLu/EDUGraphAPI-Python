@@ -150,6 +150,7 @@ class EducationService(object):
 
     def uploadFileToOneDrive(self,ids,file):
         url = "https://graph.microsoft.com/v1.0/drives/" + ids[0]+"/items/"+ids[1]+":/"+file.name+":/content"
+        return self.rest_api_service.put_file(url,self.access_token,file)
 
     def _get_skip_token(self, nextlink):
         if nextlink:
