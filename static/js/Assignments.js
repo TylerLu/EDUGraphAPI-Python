@@ -129,7 +129,7 @@
                 $(this).attr('disabled', 'true');
             });
 
-            //$("input[name='newResource[]']").attr('disabled', 'true');
+            
             $("input[name='newResource']").attr('disabled', 'true');
         },
         //Recreate upload contorl on new assignment form.
@@ -231,10 +231,10 @@
         newResourceFileChange: function (e) {
             if (_isStudent) {
                 var browser = $("#browser").val();
-                var newResources = "newResource[]";
+                var newResources = "newResource";
                 if(browser=="IE")
                 {
-                    newResources = "newResource[]";
+                    newResources = "newResource";
                 }
                 AssignmentPlugin.doReCreateNewResourceControl(e,
                     "#assignment-detail-form .handin-list",
@@ -252,7 +252,7 @@
                 $("#assignment-detail-form .assignment-alert"),
                 $("input[id^='newResourceFileCtrl']"),
                 "newResourceFileCtrl",
-                "newResource[]",
+                "newResource",
                 "#assignment-detail-form .resource-upload");
             }
         },
@@ -270,12 +270,12 @@
                     if (data && data.length > 0) {
                         for (var i = 0; i < data.length; i++) {
                             resourcesListHtml += "<tr>"
-                            resourcesListHtml += '<td>' + data[i].submittedBy.user.displayName + '</td><td>' + (data[i].submittedDateTime==null ? 'None' : data[i].submittedDateTime) + '</td>';
+                            resourcesListHtml += '<td>' + data[i].displayName + '</td><td>' + (data[i].submittedDateTime==null ? 'None' : data[i].submittedDateTime) + '</td>';
                             if (data[i].resources) {
                                 if (data[i].resources.length > 0) {
                                     for (var j = 0; j < data[i].resources.length; j++) {
-                                        if (data[i].resources[j].resource && data[i].resources[j].resource.displayName) {
-                                            resourcesListHtml += "<tr><td colspan='2' class='files'>" + data[i].resources[j].resource.displayName + "</td></tr>";
+                                        if (data[i].resources[j].displayName) {
+                                            resourcesListHtml += "<tr><td colspan='2' class='files'>" +data[i].resources[j].displayName + "</td></tr>";
                                         }
                                     }
                                 }
