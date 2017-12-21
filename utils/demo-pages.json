@@ -11,11 +11,45 @@
             "methods": [
               {
                 "title": "login",
-                "description": "Login page."
+                "description": "Show the login page."
               },
               {
                 "title": "login_post",
-                "description": "Post to server after click login button."
+                "description": "Handle local user login."
+              },
+              {
+                "title": "o365_login",
+                "description": "Redirect to the Office 365 sign in page."
+              },
+              {
+                "title": "reset",
+                "description": "Delete cookies to let the user sign in with a different account."
+              },
+              {
+                "title": "o365_auth_callback",
+                "description": "Handle Azure OAuth2 callback."
+              }
+            ]
+          },
+          {
+            "url": "services/token_service.py",
+            "methods": [
+              {
+                "title": "get_token_with_code",
+                "description": "Use the authorization code to request an access token and an refresh token."
+              },
+              {
+                "title": "cache_tokens",
+                "description": "Cache the access token and refresh token to database."
+              }
+            ]
+          },
+          {
+            "url": "services/ms_graph_service.py",
+            "methods": [
+              {
+                "title": "get_o365_user",
+                "description": "Get Office 365 user information."
               }
             ]
           },
@@ -23,8 +57,8 @@
             "url": "services/user_service.py",
             "methods": [
               {
-                "title": "get_o365_user",
-                "description": "Get the current logged in user information from database."
+                "title": "get_user_by_o365_email",
+                "description": "Get local user by Office 365 email."
               }
             ]
           },
@@ -32,8 +66,16 @@
             "url": "services/auth_service.py",
             "methods": [
               {
+                "title": "get_current_user",
+                "description": "Get current user."
+              },
+              {
                 "title": "set_o365_user",
                 "description": "Add O365 user information to session."
+              },
+              {
+                "title": "get_authorization_url",
+                "description": "Get Office 365 authorization URL."
               }
             ]
           }
@@ -53,7 +95,7 @@
             "methods": [
               {
                 "title": "register",
-                "description": "New user register page."
+                "description": "Show register page and handle register post request."
               }
             ]
           },
@@ -62,7 +104,7 @@
             "methods": [
               {
                 "title": "register",
-                "description": "Add a new user to database."
+                "description": "Create a new local user."
               }
             ]
           }
