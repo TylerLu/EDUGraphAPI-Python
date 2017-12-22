@@ -119,20 +119,20 @@
 							<tr class="tr-content">
 								<td>{{assignment.displayName}}</td>
 								<td>
-										{{assignment.dueDateTime }}
+										{{assignment.dueDateTimeLocal }}
 								</td>
 								<td>{{assignment.status}}</td>
 								<td>
 									<a class="detaillink"
 									   data-status="{{assignment.status}}"
 									   data-id="{{assignment.id}}"
-									   data-dueDate="{{assignment.dueDateTime}}"
+									   data-dueDate="{{assignment.dueDateTimeLocal}}"
 									   data-title="{{assignment.displayName}}"
 									   data-allowlate="{{assignment.allowLateSubmissions}}"
 									   href="javascript:void(0)">Details</a>
 									   {% if not user.is_student and assignment.status != "draft"%}									
 										<span>|</span>
-										<a href="javascript:void(0)" class="submissionslink"  data-status="{{assignment.status}}" data-id="{{assignment.id}}" data-dueDate="{{assignment.dueDateTime }}" data-title="{{assignment.displayName}}" > Submissions</a>
+										<a href="javascript:void(0)" class="submissionslink"  data-status="{{assignment.status}}" data-id="{{assignment.id}}" data-dueDate="{{assignment.dueDateTimeLocal }}" data-title="{{assignment.displayName}}" > Submissions</a>
 										{% endif %}
 								</td>
 							</tr>

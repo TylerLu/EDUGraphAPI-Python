@@ -14,7 +14,8 @@ from services.auth_service import AuthService
 from services.ms_graph_service import MSGraphService
 from services.education_service import EducationService
 from services.user_service import UserService
-from datetime import datetime,time
+from datetime import datetime
+import time
 from django import forms
 
 
@@ -140,6 +141,8 @@ def class_details(request, school_id, class_id):
         student.custom_data['position'] = seating_position
    
     assignments = education_service.get_assignments(class_id)
+    for assignment in assignments:       
+        assignment.dueDateTimeLocal = datetime_from_utc_to_local(datetime.strptime(assignment.dueDateTime, '%Y-%m-%dT%H:%M:%SZ')).strftime("%m/%d/%Y")
 
 
 
@@ -354,5 +357,8 @@ def getIds(resourceFolderURL):
     length = len(array)
     return [array[length-3],array[length-1]]
 
-
+def datetime_from_utc_to_local(utc_datetime):
+    now_timestamp = time.time()
+    offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
+    return utc_datetime + offset
  

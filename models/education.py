@@ -252,6 +252,7 @@ class Assignment(GraphObjectBase):
 
     def __init__(self, prop_dict={}):
         super(Assignment, self).__init__(prop_dict)
+        self.dueDateTimeLocal=""
 
     @property
     def id(self):
@@ -284,7 +285,7 @@ class Assignment(GraphObjectBase):
     @property
     def dueDateTime(self):
         return self.get_value('dueDateTime')
-
+ 
     @property
     def status(self):
         return self.get_value('status')
