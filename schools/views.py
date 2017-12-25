@@ -208,7 +208,7 @@ def new_assignment(request):
 
         files= request.FILES.getlist("fileUpload")
         if files !=None:
-            resourceFolderURL = education_service.getAssignmentResourceFolderURL(post["classId"],assignment["id"])["value"]
+            resourceFolderURL = education_service.get_Assignment_Resource_Folder_URL(post["classId"],assignment["id"])["value"]
             ids = getIds(resourceFolderURL)
             
             for file in files:
@@ -227,7 +227,7 @@ def get_assignment_resources(request,class_id,assignment_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
-    resources = education_service.getAssignmentResources(class_id,assignment_id)   
+    resources = education_service.get_Assignment_Resources(class_id,assignment_id)   
     result=[]
     for resource in resources:
         resourceArray={} 
@@ -242,8 +242,8 @@ def get_assignment_submission_resources(request,class_id,assignment_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
-    assignemtnResources = education_service.getAssignmentResources(class_id,assignment_id)
-    submissionResources = education_service.getAssignmentSubmissionsByUser(class_id,assignment_id,user.o365_user_id)
+    assignemtnResources = education_service.get_Assignment_Resources(class_id,assignment_id)
+    submissionResources = education_service.get_Assignment_Submissions_By_User(class_id,assignment_id,user.o365_user_id)
     
     result={}
     resourceArray=[] 
@@ -271,14 +271,14 @@ def get_submissions(request,class_id,assignment_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)  
-    submissions = education_service.getSubmissions(class_id,assignment_id)   
+    submissions = education_service.get_Submissions(class_id,assignment_id)   
     ms_graph_service = MSGraphService(token)
 
     result=[]
     for submission in submissions:
         userId =  submission.submittedBy["user"]["id"];
         user = ms_graph_service.get_user_info(userId)                
-        resources= education_service.getSubmissionResources(class_id,assignment_id,submission.id)
+        resources= education_service.get_Submission_Resources(class_id,assignment_id,submission.id)
         array={}
         array["displayName"]=user["displayName"]
         array["submittedDateTime"]  = submission.submittedDateTime 
@@ -312,7 +312,7 @@ def update_assignment(request):
         files= request.FILES.getlist("newResource")
 
         if files !=None:
-            resourceFolderURL = education_service.getAssignmentResourceFolderURL(post["classId"],post["assignmentId"])["value"]
+            resourceFolderURL = education_service.get_Assignment_Resource_Folder_URL(post["classId"],post["assignmentId"])["value"]
             ids = getIds(resourceFolderURL)
             for file in files:
                driveFile = uploadFileToOneDrive(resourceFolderURL,file,education_service)      
@@ -333,14 +333,14 @@ def newAssignmentSubmissionResource(request):
             user = AuthService.get_current_user(request)
             token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
             education_service = EducationService(user.tenant_id, token)  
-            submissions = education_service.getAssignmentSubmissionsByUser(post["classId"],post["assignmentId"],user.o365_user_id)  
+            submissions = education_service.get_Assignment_Submissions_By_User(post["classId"],post["assignmentId"],user.o365_user_id)  
             if len(submissions)!=0:
                 resourceFolderURL = submissions[0].resourcesFolderUrl
                 ids = getIds(resourceFolderURL)
                 for file in files:
                     driveFile = uploadFileToOneDrive(resourceFolderURL,file,education_service)      
                     resourceUrl = "https://graph.microsoft.com/v1.0/drives/" + ids[0] + "/items/" + driveFile["id"]
-                    education_service.addSubmissionResource(post["classId"],post["assignmentId"],driveFile["name"],resourceUrl,post["submissionId"])
+                    education_service.add_Submission_Resource(post["classId"],post["assignmentId"],driveFile["name"],resourceUrl,post["submissionId"])
     
         referer = request.META.get('HTTP_REFERER') 
         if referer.find("?")==-1:

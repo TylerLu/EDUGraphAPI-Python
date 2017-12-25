@@ -682,6 +682,58 @@
           }
         ]
       },
+      
+      {
+        "title": "Manage assignments of current class",
+        "tab": "#assignments",
+        "files": [
+          {
+            "url": "services/education_service.py",
+            "methods": [
+              {
+                "title": "get_assignments",
+                "description": "Get a class's assignments."
+              },
+              {
+                "title": "get_Assignment_Resources",
+                "description": "Get resources of an assignment."
+              },
+              {
+                "title": "getAssignmentSubmissions",
+                "description": "Get submissions of an assignment."
+              },
+              {
+                "title": "get_Submissions",
+                "description": "Get a student's assignment submissions."
+              },
+              {
+                "title": "get_Submission_Resources",
+                "description": "Get a submission's resources."
+              },
+              {
+                "title": "add_assignment_resources",
+                "description": "Add resource to an assignment."
+              },
+              {
+                "title": "get_assignment",
+                "description": "Get an assignment by id."
+              },
+              {
+                "title": "publish_assignment",
+                "description": "Publish an assignment. Set its status from draft to published."
+              },
+              {
+                "title": "get_Assignment_Resource_Folder_URL",
+                "description": "Get an assignment's resource folder URL."
+              },
+              {
+                "title": "add_assignment",
+                "description": "Create an assignment."
+              }
+            ]
+          }
+        ]
+      },
       {
         "title": "Get documents from OneDrive of current class",
         "tab": "#documents",

@@ -124,27 +124,27 @@ class EducationService(object):
          url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/publish";
          return self.rest_api_service.post_json(url,self.access_token,None,None)
 
-    def getAssignmentResourceFolderURL(self,class_id,assignment_id):
+    def get_Assignment_Resource_Folder_URL(self,class_id,assignment_id):
          url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/GetResourcesFolderUrl";
          return self.rest_api_service.get_json(url,self.access_token)
 
-    def getAssignmentResources(self,class_id,assignment_id):
+    def get_Assignment_Resources(self,class_id,assignment_id):
         url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/resources";
         return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
 
-    def getAssignmentSubmissionsByUser(self,class_id,assignment_id,user_id):
+    def get_Assignment_Submissions_By_User(self,class_id,assignment_id,user_id):
         url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions?$filter=submittedBy/user/id eq \''+user_id+'\''
         return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
    
-    def getSubmissionResources(self,class_id,assignment_id,user_id):
+    def get_Submission_Resources(self,class_id,assignment_id,user_id):
         url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions?$filter=submittedBy/user/id eq \''+user_id+'\''
         return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
 
-    def getSubmissions(self,class_id,assignment_id):
+    def get_Submissions(self,class_id,assignment_id):
         url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions'
         return self.rest_api_service.get_object_list(url, self.access_token, model=Submission)
 
-    def getSubmissionResources(self,class_id,assignment_id,submission_id):
+    def get_Submission_Resources(self,class_id,assignment_id,submission_id):
         url = self.api_base_uri +'education/classes/' +class_id+ '/assignments/'+assignment_id+'/submissions/'+submission_id+'/resources'
         return self.rest_api_service.get_object_list(url, self.access_token, model=EducationAssignmentResource)
 
@@ -160,7 +160,7 @@ class EducationService(object):
         }
         self.rest_api_service.post_json(url,self.access_token,None,json)
 
-    def addSubmissionResource(self,class_id,assignment_id,fileName,resourceURL,submission_id):
+    def add_Submission_Resource(self,class_id,assignment_id,fileName,resourceURL,submission_id):
         url = self.api_base_uri + "/education/classes/"+class_id+"/assignments/"+assignment_id+"/submissions/"+ submission_id +"/resources";
         fileType = self.get_fileType(fileName)
         json = {
