@@ -37,10 +37,11 @@ def schools(request):
 
     # sort schools: my school will be put to the top
     schools.sort(key=lambda s:s.display_name if me.is_in_school(s.id) else 'Z_' + s.display_name)
-  
+    role = get_user_role(user, me)
     context = {
         'user': user,
         'me': me,
+        'role':role,
         'schools': schools
     }
     return render(request, 'schools/index.html', context)
@@ -50,7 +51,9 @@ def schools(request):
 def classes(request, school_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
-
+    education_service = EducationService(user.tenant_id, token)
+    me = education_service.get_me()
+    role = get_user_role(user, me)
     education_service = EducationService(user.tenant_id, token)
     school = education_service.get_school(school_id)
     my_classes = education_service.get_my_classes(school_id)
@@ -69,7 +72,9 @@ def classes(request, school_id):
         'classes': all_classes,
         'myclasses': my_classes,
         'school_id': school_id,
-        'is_in_a_school': True
+        'is_in_a_school': True,
+        'me': me,
+        'role':role
     }
     return render(request, 'schools/classes.html', context)
 
@@ -125,7 +130,7 @@ def class_details(request, school_id, class_id):
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
     me = education_service.get_me()
-
+    role = get_user_role(user, me)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
 
@@ -172,6 +177,8 @@ def class_details(request, school_id, class_id):
 
     context = {
         'user': user,
+        'me': me,
+        'role':role,
         'is_student':me.is_student,
         'school': school,
         'class': current_class,
@@ -369,3 +376,13 @@ def datetime_from_utc_to_local(utc_datetime):
     offset = datetime.fromtimestamp(now_timestamp) - datetime.utcfromtimestamp(now_timestamp)
     return utc_datetime + offset
  
+def get_user_role(user,me):
+      login_as =""
+      if user.is_admin:
+            login_as ="Admin"
+      if me:
+        if me.is_teacher:
+            login_as="Teacher"
+        if me.is_student:
+            login_as="Student"
+      return  login_as

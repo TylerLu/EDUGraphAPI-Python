@@ -45,6 +45,7 @@ def aboutme(request):
     else:
         context['groups'] = []
     context['login_as'] = login_as
+    context['role']=login_as
     return render(request, 'managements/aboutme.html', context)
 
 @login_required
