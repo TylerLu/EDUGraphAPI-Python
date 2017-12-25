@@ -40,11 +40,11 @@
 				{% for teach in teachers %}				
 				 {{teach.display_name}}{% if not forloop.last %},{% endif %} 
 				{% endfor %}
-				{% if not user.is_student %}
+				{% if not is_student %}
 				<br/><a id="addateacher" href="javascript:void(0)">Add a teacher</a>
 				{% endif %}
 			</div>
-			{% if not user.is_student %}
+			{% if not is_student %}
 			<div class="schoolteachers">
 					<div class="close"><img src="/static/Images/close.png"></div>
 					<div class="title">Select a teacher</div>
@@ -98,7 +98,7 @@
 				{% endif %}
 			</div>
 			<div id="assignments" class="tab-pane fade">
-				{% if not user.is_student %}
+				{% if not is_student %}
 				<div class="addassignment"><a href="javascript:void(0)"> + New</a></div>				
 				{% endif %}
 
@@ -130,7 +130,7 @@
 									   data-title="{{assignment.displayName}}"
 									   data-allowlate="{{assignment.allowLateSubmissions}}"
 									   href="javascript:void(0)">Details</a>
-									   {% if not user.is_student and assignment.status != "draft"%}									
+									   {% if not is_student and assignment.status != "draft"%}									
 										<span>|</span>
 										<a href="javascript:void(0)" class="submissionslink"  data-status="{{assignment.status}}" data-id="{{assignment.id}}" data-dueDate="{{assignment.dueDateTimeLocal }}" data-title="{{assignment.displayName}}" > Submissions</a>
 										{% endif %}
@@ -140,7 +140,7 @@
 					</tbody>
 				</table>
 				{% endif %}
-				{% if not user.is_student %}
+				{% if not is_student %}
 				<div class="modal fade"id="new-assignment" role="dialog">
 						<div class="modal-dialog" role="document">
 							<div class="modal-content">
@@ -247,7 +247,7 @@
 									<a href="#" class="close" data-dismiss="alert">&times;</a>
 									<span></span>
 								</div>
-								{% if not user.is_student %}
+								{% if not is_student %}
 									<form action="/Class/updateAssignment" enctype="multipart/form-data" id="assignment-detail-form-teacher" method="post">                                    <input name="schoolId" type="hidden" value="402aedc5-3189-451a-a2bd-ac294560326f">
 										<input name="schoolId" type="hidden" value="{{ school_id}}" />
 										<input name="classId" type="hidden" value="{{class.id}}" />
@@ -407,7 +407,7 @@
             </div>
             <div id="seatingchart" class="tab-pane fade ">
                 <div class="left" id="dvleft">
-					{% if not user.is_student %}
+					{% if not is_student %}
 					<div class="tip"> To assign seats for each student, drag and drop student profile icons below onto the seating map to the right.</div>
 					{% else %}
 					<div class="assignseat tip"><div class="greenicon" style="background-color:{{ favorite_color }}"></div>Your assigned seat </div>
@@ -452,7 +452,7 @@
                     </div>
                 </div>
                 <div class="right" id="dvright">
-					{% if not user.is_student %}
+					{% if not is_student %}
 						<div class="teacherdesk" style="background-color:{{ favorite_color }}">Teacher's desk</div>
 					{% else %}
 						<div class="teacherdesk" style="">Teacher's desk</div>
@@ -466,7 +466,7 @@
                     </div>
                 </div>
                 <div id="dvedit" class="dvedit">
-					{% if not user.is_student %}
+					{% if not is_student %}
 						<img id="imgedit" src="/static/Images/edit.png" />
 						<img id="imgsave" src="/static/Images/save.png" />
 						<img id="imgcancel" src="/static/Images/cancel.png" />
@@ -478,7 +478,7 @@
     </div>
 </div>
 <input type="hidden" name="hiddenClassId" id="hiddenClassId" value="{{ class_id }}" />
-<input type="hidden" name="hideIsStudent" id="hideIsStudent" value="{{user.is_student}}" />
+<input type="hidden" name="hideIsStudent" id="hideIsStudent" value="{{is_student}}" />
 {% endblock %}
 
 {% block basejs%}

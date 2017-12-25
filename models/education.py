@@ -191,6 +191,10 @@ class EduUser(GraphObjectBase):
     def is_teacher(self):
         return self.primary_role == 'teacher'
 
+    @property 
+    def is_student(self):
+        return self.primary_role == "student"
+
     @property
     def schools(self):
         if not self._schools:

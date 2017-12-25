@@ -13,10 +13,10 @@
 	</h2>
     <div class="margin-top-12 margin-btm-12 aboutme">
 		<b>Username:</b><br /> {{ user.display_name }} 
-		<img src="/Photo/UserPhoto/{{ user.id }}" />
+		<img src="/Photo/UserPhoto/{{ user.o365_user_id }}" />
     </div>
     <div class="margin-top-12 margin-btm-12">
-		<b>Logged in as:</b><br /> {{ user.main_role }}
+		<b>Logged in as:</b><br /> {{ login_as }}
     </div>
 	{% if show_color %}
     <div class="margin-btm-12">

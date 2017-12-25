@@ -30,6 +30,7 @@ def schools(request):
 
     education_service = EducationService(user.tenant_id, token)
     me = education_service.get_me()
+
     schools = education_service.get_schools()
     for school in schools:
         school.custom_data['is_my'] = me.is_in_school(school.id)
@@ -123,6 +124,10 @@ def class_details(request, school_id, class_id):
     user = AuthService.get_current_user(request)
     token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
     education_service = EducationService(user.tenant_id, token)
+    me = education_service.get_me()
+
+    token = token_service.get_access_token(constant.Resources.MSGraph, user.o365_user_id)
+    education_service = EducationService(user.tenant_id, token)
 
     school = education_service.get_school(school_id)
     current_class = education_service.get_class(class_id)    
@@ -166,6 +171,7 @@ def class_details(request, school_id, class_id):
 
     context = {
         'user': user,
+        'is_student':me.is_student,
         'school': school,
         'class': current_class,
         'teachers': teachers,
