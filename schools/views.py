@@ -146,8 +146,9 @@ def class_details(request, school_id, class_id):
         student.custom_data['position'] = seating_position
    
     assignments = education_service.get_assignments(class_id)
-    for assignment in assignments:       
-        assignment.dueDateTimeLocal = datetime_from_utc_to_local(datetime.strptime(assignment.dueDateTime, '%Y-%m-%dT%H:%M:%SZ')).strftime("%m/%d/%Y")
+    for assignment in assignments: 
+        if assignment.dueDateTime !=None:      
+            assignment.dueDateTimeLocal = datetime_from_utc_to_local(datetime.strptime(assignment.dueDateTime, '%Y-%m-%dT%H:%M:%SZ')).strftime("%m/%d/%Y")
 
 
 
