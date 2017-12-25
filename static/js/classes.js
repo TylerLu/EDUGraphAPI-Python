@@ -96,10 +96,10 @@ $(document).ready(function () {
                                             '<h5>Term Name:</h5>' +
                                             '<h6>' + c.term_name + '</h6>' +
                                             '<h5>Start/Finish Date:</h5>' +
-                                            ((c.term_start_date || c.term_end_date) ?
-                                            ('<h6><span id="termdate">' + c.term_start_date + '</span>' +
+                                            ((c.term_start_time || c.term_end_time) ?
+                                            ('<h6><span id="termdate">' + c.term_start_time + '</span>' +
                                             '<span> - </span>' +
-                                            '<span id="termdate">' + c.term_end_date + '</span>' +
+                                            '<span id="termdate">' + c.term_end_time + '</span>' +
                                             '</h6>') : '') +
                                         '</div>');
                     tileDetail.appendTo(newTile);
