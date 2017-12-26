@@ -28,7 +28,9 @@
 				<a href="javascript:void(0);" id="userinfolink">
 					{% if role %} Logged in as: {{ role }}. {% endif %}
 					Hello {{ user.display_name }}
+					{% if user and user.o365_user_id%}
 					<img src="/Photo/UserPhoto/{{ user.o365_user_id }}" />
+					{% endif %}
 					<span class="caret" id="caret"></span>
 				</a>
             	
