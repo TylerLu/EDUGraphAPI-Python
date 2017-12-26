@@ -72,13 +72,8 @@ class UserService(object):
         return User.objects.filter(id=id).first()
 
     def get_roles(self, uid):
-        users = UserRole.objects.filter(o365UserId=uid)
-        if users:
-            roles = []
-            for user in users:
-                roles.append(user.name)
-            return roles
-        return None
+        roles = UserRole.objects.filter(o365UserId=uid).values_list('name', flat=True)
+        return [x for x in roles]
 
     def update_role(self, uid, role_name):
          role = UserRole.objects.get_or_create(o365UserId=uid)[0]
