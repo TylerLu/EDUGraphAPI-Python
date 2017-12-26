@@ -28,6 +28,10 @@ class LinkService(object):
         profile.organization_id = org.id
         profile.save()
 
+        UserRole.objects.filter(o365UserId=o365_user.id).delete()
+        for role in o365_user.roles:
+            UserRole.objects.create(name=role, o365UserId=o365_user.id)
+
     def get_link(self, link_id):
         profile = Profile.objects.filter(id=link_id).first()
         if profile:
