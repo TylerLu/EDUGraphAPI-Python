@@ -10,7 +10,7 @@ from services.rest_api_service import RestApiService
 class AADGraphService(object):
 
     def __init__(self, tenant_id, access_token):
-        self.api_base_uri = constant.Resources.AADGraph + tenant_id + '/'
+        self.api_base_uri = constant.Resources.AADGraph + '/' + tenant_id + '/'
         self.access_token = access_token
         self.rest_api_service = RestApiService()
 
