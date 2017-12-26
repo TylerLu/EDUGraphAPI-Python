@@ -41,7 +41,7 @@
 		<div>
 			<div class="col-md-4 usericon">
 				<div class="icon"></div>
-				{% if user.is_student %}
+				{% if me.is_student %}
 				<div>Not Enrolled</div>
 				{% else %}
 				<div>Not Teaching</div>
@@ -114,7 +114,7 @@
 		<div id="myclasses" class="tiles-secondary-container">
 			<div class="class-tiles">
 			{% if myclasses|length == 0%}
-				{% if user.is_student %}
+				{% if me.is_student %}
 				<div class="nodata"> Not enrolled in any classes.</div>
 				{% else %}
 				<div class="nodata"> Not teaching any classes.</div>
