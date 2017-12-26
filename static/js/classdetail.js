@@ -69,11 +69,11 @@ function iniControl() {
 }
 
 function formatDateTime() {
-    $(".coursedetail #termdate").each(function (i, e) {
+    $(".coursedetail .termdate").each(function (i, e) {
         var $e = $(e);
         var dateStr = $e.text();
         if (dateStr) {
-            $e.text(moment.utc(dateStr).local().format('MMMM D YYYY'));
+            $e.text(moment.utc(dateStr).local().format('MMMM DD YYYY'));
         }
     });
     $("#studoc tbody .tr-content td:nth-child(4)").each(function (i, e) {
