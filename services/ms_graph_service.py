@@ -7,6 +7,7 @@ import msgraph
 import constant
 from utils.auth_provider import AuthProvider
 from services.rest_api_service import RestApiService
+from services.education_service import EducationService
 from models.auth import O365User
 from models.education import Document, Conversation
 
@@ -33,7 +34,7 @@ class MSGraphService(object):
         if not email:
             email = me['userPrincipalName']
         tenant_name = org['displayName']
-        roles = self._get_roles(id)
+        roles = self._get_roles(tenant_id, id)
         return O365User(id, email, first_name, last_name, display_name, tenant_id, tenant_name, roles)
 
     def get_photo(self, object_id):
@@ -69,7 +70,7 @@ class MSGraphService(object):
     def get_conversations_root(self, section_email):
         return 'https://outlook.office.com/owa/?path=/group/%s/mail&exsvurl=1&ispopout=0' % section_email
 
-    def _get_roles(self, user_id):
+    def _get_roles(self, tenant_id, user_id):
         roles = []
         # check if the user is an admin
         directory_roles = self._get_directory_roles()
@@ -79,26 +80,21 @@ class MSGraphService(object):
             if any(m for m in members if m['id']==user_id):
                 roles.append(constant.Roles.Admin)
         # check if the user is a faculty or a student
-        assigned_licenses = self._get_assigned_licenses()
-        for license in assigned_licenses:
-            license_id = license['skuId']
-            if license_id == constant.O365ProductLicenses.Faculty or license_id == constant.O365ProductLicenses.FacultyPro:
+        education_service = EducationService(tenant_id, self.access_token)
+        me = education_service.get_me()
+        if me:
+            if me.is_teacher:
                 roles.append(constant.Roles.Faculty)
-            if license_id == constant.O365ProductLicenses.Student or license_id == constant.O365ProductLicenses.StudentPro:
-                roles.append(constant.Roles.Student)
+            if me.is_student:
+                roles.append(constant.Roles.Student)        
         return roles
 
     def _get_me(self):
         return self.ms_graph_client.me.get()
 
-    def _get_assigned_licenses(self):
-        url = self.api_base_uri + 'me/assignedLicenses'
-        return self.rest_api_service.get_json(url, self.access_token)['value']
-
     def _get_organization(self, tenant_id):
         url = self.api_base_uri + 'organization/' + tenant_id
         return self.rest_api_service.get_json(url, self.access_token)
-
 
     def _get_directory_roles(self):
         expand_members = msgraph.options.QueryOption('$expand', 'members')
