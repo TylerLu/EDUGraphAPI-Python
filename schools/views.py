@@ -100,6 +100,7 @@ def classes_next(request, school_id):
     ajax_result = {}
     ajax_result['classes'] = {}
     ajax_result['classes']['value'] = [{
+          'id': c.id,
           'is_my': c.custom_data['is_my'],
           'display_name': c.display_name,
           'code': c.code,
