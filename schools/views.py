@@ -215,8 +215,9 @@ def new_assignment(request):
         education_service = EducationService(user.tenant_id, token)
         dueDate = post["duedate"] + "T" + post["duetime"] + "Z"       
         dueDateUTC=datetime.strptime(dueDate,"%m/%d/%YT%H:%M %pZ").strftime("%Y-%m-%dT%H:%M:%SZ")
-        result = education_service.add_assignment(post["classId"],post["name"],dueDateUTC)
-        assignment = json.loads(result.content)
+        result = education_service.add_assignment(post["classId"],post["name"],dueDateUTC)        
+        jsonContent = result.content.decode('utf8')
+        assignment = json.loads(jsonContent)
         if post['status']=="assigned":
            education_service.publish_assignment(post["classId"],assignment["id"])
 
