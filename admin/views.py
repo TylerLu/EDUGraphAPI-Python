@@ -72,7 +72,8 @@ def unconsent(request):
     aad_graph_service = AADGraphService(user.tenant_id, token)
 
     service_principal = aad_graph_service.get_service_principal()
-    aad_graph_service.delete_service_principal(service_principal['objectId'])    
+    if service_principal:
+        aad_graph_service.delete_service_principal(service_principal['objectId'])    
     user_service.update_organization(user.tenant_id, False)
     link_service.remove_links(user.tenant_id)
 
