@@ -421,7 +421,7 @@ The first 2 flows (Local Login/O365 Login) enable users to login in with either 
 
 This flow shows how an administrator logs into the system and performs administrative operations.
 
-After logging into the app with an Office 365 account,the administrator will be asked to link to a local account. This step is not required and can be skipped. 
+After logging into the app with an Office 365 account, the administrator will be asked to link to a local account. This step is not required and can be skipped. 
 
 As mentioned earlier, the web app is a multi-tenant app which uses some application permissions, so tenant administrator must consent the app first.  
 
