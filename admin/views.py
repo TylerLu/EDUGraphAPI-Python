@@ -51,7 +51,7 @@ def consent_alone(request):
 
 def process_code(request):
     AuthService.validate_state(request)
-    id_token = AuthService.get_id_token(request)    
+    id_token = AuthService.get_id_token(request)
     tenant_id = id_token.get('tid')
 
     user_service.update_organization(tenant_id, True)
