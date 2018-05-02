@@ -90,3 +90,6 @@ ENV/
 
 .tfignore
 .vscode/*
+database.sqlite3
+database.sqlite3
+*.sqlite3
