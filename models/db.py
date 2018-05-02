@@ -60,3 +60,12 @@ class ClassroomSeatingArrangement(models.Model):
     classId = models.CharField(null=True, max_length=255)
     class Meta:
         db_table = 'classroom_seating_arranements'
+
+class DataSyncRecord(models.Model):
+    id = models.AutoField(primary_key=True)
+    tenantId = models.CharField(null=True, max_length=255)
+    query = models.TextField(null=True)
+    deltaLink = models.TextField(null=True)
+    updated = models.DateTimeField()
+    class Meta:
+        db_table = 'data_sync_record'
