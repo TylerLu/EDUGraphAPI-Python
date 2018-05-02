@@ -23,11 +23,23 @@ microsoft_certs_uri = 'https://login.microsoftonline.com/common/discovery/v2.0/k
 company_admin_role_name = "Company Administrator"
 
 
+mysql_host = os.environ['MySQLHost']
+
+mysql_port = '3306'
+
+mysql_name = 'edu'
+
+mysql_user = os.environ['MySQLUser']
+
+mysql_password = os.environ['MySQLPassword']
+
+
 o365_username_cookie = "O365CookieUsername"
 
 o365_email_cookie = "O365CookieEmail"
 
 o365_user_session_key = '_o365_user'
+
 
 favorite_colors = [
     {'value':'#2F19FF', 'name':'Blue'}, 
