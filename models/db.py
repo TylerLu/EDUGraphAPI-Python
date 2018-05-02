@@ -22,6 +22,9 @@ class Profile(models.Model):
     o365UserId = models.CharField(null=True, max_length=255)
     o365Email = models.CharField(null=True, max_length=255)
     favoriteColor = models.CharField(null=True, max_length=255)
+    jobTitle = models.CharField(null=True, max_length=255)
+    department = models.CharField(null=True, max_length=255)
+    mobilePhone = models.CharField(null=True, max_length=255)
     organization = models.ForeignKey(Organization, models.SET_NULL, null=True)
     class Meta:
         db_table = 'profiles'
