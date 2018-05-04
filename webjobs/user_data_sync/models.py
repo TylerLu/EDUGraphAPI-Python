@@ -1,5 +1,5 @@
 import os
-from peewee import MySQLDatabase, Model, BooleanField, CharField, ForeignKeyField
+from peewee import MySQLDatabase, Model, BooleanField, CharField, TextField, DateTimeField, ForeignKeyField
 
 mysql_host = os.environ['MySQLHost']
 mysql_port = int('3306')
@@ -32,18 +32,26 @@ class Profile(BaseModel):
     class Meta:
         db_table = "profiles"
 
-db.connect()
+class DataSyncRecord(BaseModel):
+    tenantId = CharField()
+    query = TextField()
+    deltaLink = TextField()
+    updated = DateTimeField(null=True)
+    class Meta:
+        db_table = 'data_sync_records'
 
-organizations = Organization.select() \
-    .where(Organization.isAdminConsented)
+# db.connect()
 
-for org in organizations:
-    print(org.name)
+# organizations = Organization.select() \
+#     .where(Organization.isAdminConsented)
+
+# for org in organizations:
+#     print(org.name)
 
 
-profiles = Profile.select()
+# profiles = Profile.select()
 
-for profile in profiles:
-    print(profile.o365Email)
+# for profile in profiles:
+#     print(profile.o365Email)
 
-db.close()
+# db.close()

@@ -66,6 +66,6 @@ class DataSyncRecord(models.Model):
     tenantId = models.CharField(null=True, max_length=255)
     query = models.TextField(null=True)
     deltaLink = models.TextField(null=True)
-    updated = models.DateTimeField()
+    updated = models.DateTimeField(null=True)
     class Meta:
-        db_table = 'data_sync_record'
+        db_table = 'data_sync_records'
