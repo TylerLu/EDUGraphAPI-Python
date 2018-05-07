@@ -1,45 +1,22 @@
-import os
-import adal
+import constants
+
 import datetime
 
-from OpenSSL import crypto
-from cryptography.hazmat.primitives import serialization
 
 from rest_api_service import RestApiService
 import models 
 
-client_id = os.environ['ClientId']
-client_cert_path = os.environ['ClientCertificatePath']
-client_cert_password = os.environ['ClientCertificatePassword']
+from authentication_helper import AuthenticationHelper
 
-aad_instance = 'https://login.microsoftonline.com/'
-ms_graph_resource = 'https://graph.microsoft.com'
 
 users_query = "/users/delta?$select=jobTitle,department,mobilePhone"
 
-# load certificate and thumbprint
-with open(client_cert_path, 'rb') as cert_file:
-    pkcs12 = crypto.load_pkcs12(cert_file.read(), client_cert_password)
-
-private_key = pkcs12.get_privatekey() \
-    .to_cryptography_key()  \
-    .private_bytes(
-        serialization.Encoding.PEM, 
-        serialization.PrivateFormat.PKCS8, 
-        serialization.NoEncryption())
-
-thumbprint = pkcs12.get_certificate() \
-    .digest('sha1') \
-    .decode() \
-    .replace(':', '')
-
-# get access token
-
+authentication_helper = AuthenticationHelper(constants.client_cert_path, constants.client_cert_password)
 
 models.db.connect()
 
 
-url = ms_graph_resource + '/v1.0/users/delta?$select=jobTitle,department,mobilePhone'
+url = constants.ms_graph_resource + '/v1.0/users/delta?$select=jobTitle,department,mobilePhone'
 
 rest_api_service = RestApiService()
 
@@ -54,21 +31,14 @@ for organization in organizations:
         query = users_query)
     
     if created:
-        url = ms_graph_resource + '/v1.0' + users_query
+        url = constants.ms_graph_resource + '/v1.0' + users_query
     else:
         url = data_sync_record.deltaLink
 
-
-    authority = aad_instance + organization.tenantId
-    auth_context = adal.AuthenticationContext(authority, api_version=None)
-
-    token = auth_context.acquire_token_with_client_certificate(
-        ms_graph_resource,
-        client_id,
-        private_key,
-        thumbprint)
-
-    access_token = token['accessToken']
+    access_token = authentication_helper.get_app_only_access_token(
+        organization.tenantId,
+        constants.client_id,
+        constants.ms_graph_resource)
 
     while True:
         res = rest_api_service.get_json(url, access_token)    
