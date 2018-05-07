@@ -10,7 +10,7 @@ class AuthenticationHelper(object):
 
     def __init__(self, cert_path, cert_password):
         self.__cert_private_key, self.__cert_thumbprint = \
-            self.__get_certificate_private_key_and_thumbnail(cert_path, cert_password)
+            self._get_certificate_private_key_and_thumbnail(cert_path, cert_password)
 
     def get_app_only_access_token(self, tenant_id, client_id, resource):
 
@@ -25,7 +25,7 @@ class AuthenticationHelper(object):
         
         return token['accessToken']
 
-    def __get_certificate_private_key_and_thumbnail(self, cert_path, cert_password):
+    def _get_certificate_private_key_and_thumbnail(self, cert_path, cert_password):
 
         with open(cert_path, 'rb') as cert_file:
             pkcs12 = crypto.load_pkcs12(cert_file.read(), cert_password)
