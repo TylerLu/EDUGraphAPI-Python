@@ -2,7 +2,7 @@ import constants
 import datetime
 
 from authentication_helper import AuthenticationHelper
-from models import database, Organization, DataSyncRecord, Profile
+from models import database, Organization, DataSyncRecord, Profile, UserRole, TokenCache
 from ms_graph import GraphServiceClient
 
 class UserDataSyncService(object):
@@ -13,9 +13,9 @@ class UserDataSyncService(object):
     
     def sync(self):
         for organization in Organization.get_consented():
-            self.sync_organization(organization)
+            self._sync_organization(organization)
 
-    def sync_organization(self, organization):
+    def _sync_organization(self, organization):
         print('Sync tenant ' + organization.name)    
 
         client = self._get_graph_service_client(organization.tenantId)
@@ -34,7 +34,10 @@ class UserDataSyncService(object):
             for user in users:
                 profile = Profile.get_or_none(Profile.o365UserId == user['id'])
                 if profile:
-                    self._update_profile(profile, user)
+                    if user.get('@removed'):
+                        self._delete_profile_and_related(profile)
+                    else:
+                        self._update_profile(profile, user)
             if next_link:
                 users, next_link, delta_link = client.get_users(next_link)
             else:
@@ -48,6 +51,12 @@ class UserDataSyncService(object):
         profile.department = user['department']
         profile.mobilePhone = user['mobilePhone']
         profile.save()
+
+    def _delete_profile_and_related(self, profile):
+        UserRole.delete().where(UserRole.o365UserId == profile.o365UserId).execute()
+        TokenCache.delete().where(TokenCache.o365UserId == profile.o365UserId).execute()
+        profile.delete_instance()
+        profile.user.delete_instance()
 
     def _update_data_sync_record(self, record, delta_link):
         record.deltaLink = delta_link
