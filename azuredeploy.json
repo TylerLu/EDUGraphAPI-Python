@@ -123,6 +123,19 @@
       },
       "resources": [
         {
+          "apiVersion": "2017-12-01-preview",
+          "type": "databases",
+          "location": "[variables('location')]",
+          "name": "edu",
+          "properties":{  
+             "charset":"utf8",
+             "collation":"utf8_general_ci"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.DBforMySQL/servers', variables('mySQLName'))]"
+          ]
+        },
+        {
           "type": "firewallRules",
           "apiVersion": "2017-12-01-preview",
           "kind": "v12.0",
