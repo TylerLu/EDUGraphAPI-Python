@@ -1,5 +1,11 @@
+'''
+ *   * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ *   * See LICENSE in the project root for license information.
+'''
+
 import os
 import constants
+
 from peewee import MySQLDatabase, Model, PrimaryKeyField, BooleanField, CharField, TextField, DateTimeField, ForeignKeyField
 
 database  = MySQLDatabase(constants.mysql_name, 
