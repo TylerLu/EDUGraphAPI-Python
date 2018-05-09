@@ -1,3 +1,4 @@
+import sys
 import constants
 import datetime
 
@@ -15,7 +16,10 @@ class UserDataSyncService(object):
         consented_organizations = Organization.get_consented()
         if consented_organizations:
             for organization in consented_organizations:
-                self._sync_organization(organization)
+                try:
+                    self._sync_organization(organization)
+                except:
+                    print('Failed to sync users of {0}. Error: {1}'.format(organization.name, sys.exc_info()))
         else:
             print('No consented organization found. This sync was canceled.')
 
@@ -35,7 +39,7 @@ class UserDataSyncService(object):
             users, next_link, delta_link = client.get_users(record.deltaLink)
 
         while True:
-            print('\tGet {} users.'.format(len(users)))
+            print('\tGet {} user(s).'.format(len(users)))
             for user in users:
                 profile = Profile.get_or_none(Profile.o365UserId == user['id'])
                 if profile:
@@ -67,7 +71,7 @@ class UserDataSyncService(object):
         profile.save()
 
     def _delete_profile_and_related(self, profile):
-        print('\tDeleting user: ' + profile.o365Email)
+        print('\tDeleting user and related data: ' + profile.o365Email)
         UserRole.delete().where(UserRole.o365UserId == profile.o365UserId).execute()
         TokenCache.delete().where(TokenCache.o365UserId == profile.o365UserId).execute()
         profile.delete_instance()
@@ -78,7 +82,7 @@ class UserDataSyncService(object):
         record.updated = datetime.datetime.now()
         record.save()
 
-    def _get_graph_service_client(self, tenant_id):        
+    def _get_graph_service_client(self, tenant_id):
         access_token = self._auth_helper.get_app_only_access_token(
             tenant_id, constants.client_id, constants.ms_graph_resource)
         return GraphServiceClient(constants.ms_graph_resource, access_token)
