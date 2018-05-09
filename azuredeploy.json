@@ -120,7 +120,23 @@
           "tier": "Basic",
           "capacity": 1,
           "size": 5120
-      }
+      },
+      "resources": [
+        {
+          "type": "firewallRules",
+          "apiVersion": "2017-12-01-preview",
+          "kind": "v12.0",
+          "name": "AllowAllWindowsAzureIps",
+          "location": "[variables('location')]",
+          "properties": {
+            "startIpAddress": "0.0.0.0",
+            "endIpAddress": "0.0.0.0"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.DBforMySQL/servers', variables('mySQLName'))]"
+          ]
+        }
+      ]
     },
     {
       "type": "Microsoft.Web/sites",
@@ -141,7 +157,7 @@
           "name": "[variables('pythonSiteExtensionName')]",
           "type": "siteextensions",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+            "[resourceId('Microsoft.Web/sites', variables('webSiteName'))]"
           ]
         },
         {
@@ -158,7 +174,7 @@
             "ClientCertificatePath": "[parameters('clientCertificatePath')]",
             "ClientCertificatePassword": "[parameters('clientCertificatePassword')]",
             "MySQLHost": "[concat(variables('mySQLName'), '.mysql.database.azure.com')]",
-            "MySQLUser": "[parameters('mySqlAdministratorLogin')]",
+            "MySQLUser": "[concat(parameters('mySqlAdministratorLogin'), '@', variables('mySQLName'))]",
             "MySQLPassword": "[parameters('mySqlAdministratorLoginPassword')]",
             "SourceCodeRepositoryUrl": "[parameters('SourceCodeRepositoryUrl')]",
             "command": "deploy.cmd"
