@@ -106,6 +106,9 @@ IF EXIST "%DEPLOYMENT_TARGET%\requirements.txt" (
   IF !ERRORLEVEL! NEQ 0 goto error
 )
 
+echo Migrate database.
+%PYTHON_EXE% manage.py migrate
+
 REM Add additional package installation here
 REM -- Example --
 REM env\scripts\easy_install pytz
