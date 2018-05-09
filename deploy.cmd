@@ -126,6 +126,9 @@ IF EXIST "%DEPLOYMENT_SOURCE%\web.%PYTHON_VER%.config" (
 ::  %PYTHON_EXE% manage.py collectstatic --noinput --clear
 ::)
 
+:: 6. Deploy WebJobs
+xcopy /y/s "%DEPLOYMENT_SOURCE%\webjobs" "%DEPLOYMENT_TARGET%\App_Data\jobs\triggered\"
+
 popd
 
 :postPython

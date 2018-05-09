@@ -9,11 +9,18 @@
         "description": "The name of the web client app that you wish to create."
       }
     },
-    "hostingPlanName": {
+    "mySqlAdministratorLogin": {
       "type": "string",
-      "defaultValue": "EDUGraphAPIPython",
+      "defaultValue": "azureuser",
       "metadata": {
-        "description": "The hosting service plan name that you wish to create."
+        "description": "The administrator login of the MySQL."
+      }
+    },
+    "mySqlAdministratorLoginPassword": {
+      "type": "securestring",
+      "defaultValue": "P@ssw0rd",
+      "metadata": {
+        "description": "The administrator login password of the MySQL."
       }
     },
     "sourceCodeRepositoryURL": {
@@ -45,35 +52,74 @@
       }
     },
     "clientSecret": {
-      "type": "string",
+      "type": "securestring",
       "defaultValue": "",
       "metadata": {
         "description": ""
+      }
+    },
+    "clientCertificatePath": {
+      "type": "string",
+      "defaultValue": "app_only_cert.pfx",
+      "metadata": {
+        "description": "Path of the app-only certificate."
+      }
+    },
+    "clientCertificatePassword": {
+      "type": "securestring",
+      "defaultValue": "J48W23RQeZv85vj",
+      "metadata": {
+        "description": "Password of the app-only certificate."
       }
     }
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "lowerSiteName": "[toLower(parameters('siteName'))]",
-    "webSiteName": "[variables('lowerSiteName')]",
+    "hostingPlanName": "[parameters('siteName')]",
+    "webSiteName": "[toLower(parameters('siteName'))]",
+    "mySQLName": "[variables('webSiteName')]",
     "pythonSiteExtensionName": "python353x64"
   },
   "resources": [
     {
       "type": "Microsoft.Web/serverfarms",
       "sku": {
-        "name": "F1",
-        "tier": "Free",
-        "size": "F1",
-        "family": "F",
+        "name": "B1",
+        "tier": "Basic",
+        "size": "B1",
+        "family": "B",
         "capacity": 0
       },
-      "name": "[parameters('hostingPlanName')]",
+      "name": "[variables('hostingPlanName')]",
       "apiVersion": "2015-08-01",
       "location": "[variables('location')]",
       "properties": {
-        "name": "[parameters('hostingPlanName')]",
+        "name": "[variables('hostingPlanName')]",
         "numberOfWorkers": 1
+      }
+    },
+    {
+      "type": "Microsoft.DBforMySQL/servers",
+      "apiVersion": "2017-12-01-preview",
+      "kind": "",
+      "location": "[variables('location')]",
+      "name": "[variables('mySQLName')]",
+      "properties": {
+          "version": "5.7",
+          "administratorLogin": "[parameters('mySqlAdministratorLogin')]",
+          "administratorLoginPassword": "[parameters('mySqlAdministratorLoginPassword')]",
+          "storageProfile": {
+              "storageMB": 5120,
+              "backupRetentionDays": "7",
+              "geoRedundantBackup": "Disabled"
+          }
+      },
+      "sku": {
+          "name": "B_Gen4_1",
+          "family": "Gen4",
+          "tier": "Basic",
+          "capacity": 1,
+          "size": 5120
       }
     },
     {
@@ -84,7 +130,10 @@
       "location": "[variables('location')]",
       "properties": {
         "name": "[variables('webSiteName')]",
-        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+        "siteConfig": {
+          "AlwaysOn": true
+        }
       },
       "resources": [
         {
@@ -106,6 +155,11 @@
           "properties": {
             "ClientId": "[parameters('clientId')]",
             "ClientSecret": "[parameters('clientSecret')]",
+            "ClientCertificatePath": "[parameters('clientCertificatePath')]",
+            "ClientCertificatePassword": "[parameters('clientCertificatePassword')]",
+            "MySQLHost": "[concat(variables('mySQLName'), '.mysql.database.azure.com')]",
+            "MySQLUser": "[parameters('mySqlAdministratorLogin')]",
+            "MySQLPassword": "[parameters('mySqlAdministratorLoginPassword')]",
             "SourceCodeRepositoryUrl": "[parameters('SourceCodeRepositoryUrl')]",
             "command": "deploy.cmd"
           }
@@ -126,7 +180,7 @@
         }
       ],
       "dependsOn": [
-        "[resourceId('Microsoft.Web/serverfarms', parameters('hostingPlanName'))]"
+        "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
       ]
     }
   ]
