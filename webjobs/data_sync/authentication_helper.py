@@ -34,6 +34,7 @@ class AuthenticationHelper(object):
                 serialization.Encoding.PEM, 
                 serialization.PrivateFormat.PKCS8, 
                 serialization.NoEncryption())
+        import pdb; pdb.set_trace()
         thumbprint = pkcs12.get_certificate() \
             .digest('sha1') \
             .decode() \
