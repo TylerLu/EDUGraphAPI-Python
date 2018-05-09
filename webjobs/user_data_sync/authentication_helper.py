@@ -1,10 +1,8 @@
-
 import adal
 import constants
 
 from OpenSSL import crypto
 from cryptography.hazmat.primitives import serialization
-
 
 class AuthenticationHelper(object):
 
