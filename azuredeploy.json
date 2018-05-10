@@ -78,7 +78,7 @@
     "hostingPlanName": "[parameters('siteName')]",
     "webSiteName": "[toLower(parameters('siteName'))]",
     "mySQLName": "[variables('webSiteName')]",
-    "pythonSiteExtensionName": "python353x64"
+    "pythonSiteExtensionName": "azureappservice-python353x64"
   },
   "resources": [
     {
@@ -178,8 +178,7 @@
           "type": "config",
           "name": "appsettings",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]",
-            "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), variables('pythonSiteExtensionName'))]"
+            "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]"
           ],
           "properties": {
             "ClientId": "[parameters('clientId')]",
@@ -199,7 +198,8 @@
           "type": "sourcecontrols",
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]",
-            "[resourceId('Microsoft.Web/Sites/config', variables('webSiteName'), 'appsettings')]"
+            "[resourceId('Microsoft.Web/Sites/config', variables('webSiteName'), 'appsettings')]",
+            "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), variables('pythonSiteExtensionName'))]"
           ],
           "properties": {
             "RepoUrl": "[parameters('sourceCodeRepositoryURL')]",
