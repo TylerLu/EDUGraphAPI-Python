@@ -50,9 +50,56 @@ This sample is implemented with the Python language and [Django](https://www.dja
 
   - [Python](https://www.python.org/downloads/) 3.5.2 or above
   - [Django](https://www.djangoproject.com/download/) 1.11 or above
-  - [SQLite](https://www.sqlite.org/)
+  - [MySQL](https://www.mysql.com)
 
+## Generate a self-signed certificate
 
+A self-signed certificate is required by the SyncData WebJob. For preview, you may skip the steps below and use the default certificate we provided:
+
+* Certificate file: `/webjobs/sync_data/app_only_cert.pfx`
+* Password: `J48W23RQeZv85vj`
+* Key credential: `/webjobs/sync_data/key_credential.txt`
+
+For production, you should you own certifcate:
+
+1. Generate a certificate with PowerShell
+
+   Run PowerShell **as administrator**, then execute the commands below:
+
+   ```
+   $cert = New-SelfSignedCertificate -Type Custom -KeyExportPolicy Exportable -KeySpec Signature -Subject "CN=Edu App-only Cert" -NotAfter (Get-Date).AddYears(20) -CertStoreLocation "cert:\CurrentUser\My" -KeyLength 2048
+   ```
+
+   > Note: please keep the PowerShell window open until you finish the steps below.
+
+2. Get keyCredential
+
+   Execute the commands below to get keyCredential:
+
+   > Note: Feel free to change the file path at the end of the command.
+
+   ```
+   $keyCredential = @{}
+   $keyCredential.customKeyIdentifier = [System.Convert]::ToBase64String($cert.GetCertHash())
+   $keyCredential.keyId = [System.Guid]::NewGuid().ToString()
+   $keyCredential.type = "AsymmetricX509Cert"
+   $keyCredential.usage = "Verify"
+   $keyCredential.value = [System.Convert]::ToBase64String($cert.GetRawCertData())
+   $keyCredential | ConvertTo-Json > c:\keyCredential.txt
+   ```
+
+   The keyCredential is in the generated file, and will be used to create App Registrations in AAD.
+
+   ![](Images/cert-key-credential.png)
+
+3. Export the certificate
+
+   ```
+   $password = Read-Host -Prompt "Enter password" -AsSecureString
+   Export-PfxCertificate -Cert $cert -Password $password -FilePath c:\app_only_cert.pfx
+   ```
+
+   
 
 ## Register the application in Azure Active Directory
 
@@ -76,45 +123,28 @@ This sample is implemented with the Python language and [Django](https://www.dja
 
 5. Once completed, the app will show in the list.
 
-   ![](/Images/aad-create-app-03.png)
+   ![](Images/aad-create-app-03.png)
 
 6. Click it to view its details. 
 
-   ![](/Images/aad-create-app-04.png)
+   ![](Images/aad-create-app-04.png)
 
 7. Click **All settings**, if the setting window did not show.
 
    - Click **Properties**, then set **Multi-tenanted** to **Yes**.
 
-     ![](/Images/aad-create-app-05.png)
+     ![](Images/aad-create-app-05.png)
 
      Copy aside **Application ID**, then Click **Save**.
 
    - Click **Required permissions**. Add the following permissions:
 
-     | API                            | Application Permissions | Delegated Permissions                    |
-     | ------------------------------ | ----------------------- | ---------------------------------------- |
-     | Microsoft Graph                |                         | Read directory data<br>Access directory as the signed in user<br>Sign users in<br> Have full access to all files user can access<br> Have full access to user files<br> Read users' class assignments without grades<br> Read and write users' class assignments without grades<br> Read users' class assignments and their grades<br> Read and write users' class assignments and their grades |
-     | Windows Azure Active Directory |                         | Sign in and read user profile<br>Read and write directory data |
+     | API                            | Application Permissions       | Delegated Permissions                                        |
+     | ------------------------------ | ----------------------------- | ------------------------------------------------------------ |
+     | Microsoft Graph                | Read all users' full profiles | Read directory data<br>Access directory as the signed in user<br>Sign users in<br> Have full access to all files user can access<br> Have full access to user files<br> Read users' class assignments without grades<br> Read and write users' class assignments without grades<br> Read users' class assignments and their grades<br> Read and write users' class assignments and their grades |
+     | Windows Azure Active Directory |                               | Sign in and read user profile<br>Read and write directory data |
 
-     ![](/Images/aad-create-app-06.png)
-
-     **Application Permissions**
-
-     | Permission          | Description                              |
-     | ------------------- | ---------------------------------------- |
-     | Read directory data | Allows the app to read data in your organization's directory, such as users, groups and apps, without a signed-in user. |
-
-     **Delegated Permissions**
-
-     | Permission                             | Description                              |
-     | -------------------------------------- | ---------------------------------------- |
-     | Read all users' full profiles          | Allows the app to read the full set of profile properties, reports, and managers of other users in your organization, on behalf of the signed-in user. |
-     | Read directory data                    | Allows the app to read data in your organization's directory, such as users, groups and apps. |
-     | Access directory as the signed in user | Allows the app to have the same access to information in the directory as the signed-in user. |
-     | Sign users in                          | Allows users to sign in to the app with their work or school accounts and allows the app to see basic user profile information. |
-     | Sign in and read user profile          | Allows users to sign-in to the app, and allows the app to read the profile of signed-in users. It also allows the app to read basic company information of signed-in users. |
-     | Read and write directory data          | Allows the app to read and write data in your organization's directory, such as users, and groups.  It does not allow the app to delete users or groups, or reset user passwords. |
+     ![](Images/aad-create-app-06.png)
 
    - Click **Keys**, then add a new key:
 
@@ -124,30 +154,75 @@ This sample is implemented with the Python language and [Django](https://www.dja
 
    Close the Settings window.
 
+8. Add keyCredential
+
+   * Click **Manifest**.
+
+     ![](Images/aad-create-app-10.png)
+
+   * Insert the keyCredential into the square brackets of the **keyCredentials** node.
+
+     ![](Images/aad-create-app-11.png)
+
+   * Click **Save**.
+
 ## Run the sample locally
 
 The following softwares are required:
 
 - [Python](https://www.python.org/downloads/) 3.5.2 or above
 - [Django](https://www.djangoproject.com/download/) 1.11 or above
-- [SQLite](https://www.sqlite.org/)
+- [MySQL](https://www.mysql.com)
 
-Run the app:
+### Preparation
 
-1. Configure the following **environment variables**:
+1. Downlad the source code.
 
-   - **clientId**: use the Client Id of the app registration you created earlier.
-   - **clientSecret**: use the Key value of the app registration you created earlier.
+2. Replace `/webjobs/sync_data/app_only_cert.pfx` with your certificate if you plan to use yours.
+
+3. Start you local MySQL and create a new database **edu**:
+
+   ```mysql
+   CREATE SCHEMA `edu` ;
+   ```
+
+4. Configure the following **environment variables**:
+
+   - **ClientId**: use the Client Id of the app registration you created earlier.
+
+   - **ClientSecret**: use the Key value of the app registration you created earlier.
+
+   - **ClientCertificatePath**: path of the certificate. Please use the default value: `app_only_cert.pfx`
+
+   - **ClientCertificatePassword**: password of the certifcate.
+
+     > Note: the **ClientCertificatePath** and **ClientCertificatePassword** variables are only required by the WebJob.
+
    - **SourceCodeRepositoryURL**: use the URL of this repository.
 
-2. Open terminal and navigate to the source code folder. Execute the command below:
+   - **MySQLHost**/**MySQLPort**: host and port of the MySQL server.
+
+   - **MySQLUser**/**MySQLPassword**: user and password of the MySQL server.
+
+### Run the web app
+
+1. Open terminal and navigate to the source code folder. Execute the command below:
 
    ```sh
    pip install -r requirements.txt
+   python manage.py migrate
    python manage.py runserver
    ```
 
-3. Open http://127.0.0.1:8000/ in a browser.
+2. Open http://127.0.0.1:8000/ in a browser.
+
+### Run the WebJob
+
+1. Open terminal and navigate to `/webjobs/sync_data` folder. Execute the command below:
+
+   ```Sh
+   python start.py
+   ```
 
 ## Deploy the sample to Azure
 
@@ -187,11 +262,13 @@ Run the app:
 
 2. Fork this repository to your GitHub account.
 
-3. Click the Deploy to Azure Button:
+3. Replace `/webjobs/sync_data/app_only_cert.pfx` with your certificate if you plan to use yours.
+
+4. Click the **Deploy to Azure** Button:
 
    [![Deploy to Azure](http://azuredeploy.net/deploybutton.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOfficeDev%2FO365-EDU-Python-Samples%2Fmaster%2Fazuredeploy.json)
 
-4. Fill in the values in the deployment page and select the **I agree to the terms and conditions stated above** checkbox.
+5. Fill in the values in the deployment page and select the **I agree to the terms and conditions stated above** checkbox.
 
    ![](Images/azure-auto-deploy.png)
 
@@ -207,6 +284,10 @@ Run the app:
      >
      > In this case, please use another name.
 
+   - **My Sql Administrator Login**: The administrator login of the MySQL.
+
+   - **My Sql Administrator Login Password**: The administrator login password of the MySQL.
+
    - **Source Code Repository URL**: replace <YOUR REPOSITORY> with the repository name of your fork.
 
    - **Source Code Manual Integration**: choose **false**, since you are deploying from your own fork.
@@ -215,9 +296,13 @@ Run the app:
 
    - **Client Secret**: use the Key value of the app registration you created earlier.
 
+   - **Client Certificate Path**: keep the default value `app_only_cert.pfx`.
+
+   - **Client Certificate Password**: password of the certificate. 
+
    - Check **I agree to the terms and conditions stated above**.
 
-5. Click **Purchase**.
+6. Click **Purchase**.
 
 **Add REPLY URL to the app registration**
 
