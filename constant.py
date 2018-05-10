@@ -25,7 +25,7 @@ company_admin_role_name = "Company Administrator"
 
 mysql_host = os.environ['MySQLHost']
 
-mysql_port = '3306'
+mysql_port = os.environ['MySQLPort']
 
 mysql_name = 'edu'
 

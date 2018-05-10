@@ -188,6 +188,7 @@
             "ClientCertificatePath": "[parameters('clientCertificatePath')]",
             "ClientCertificatePassword": "[parameters('clientCertificatePassword')]",
             "MySQLHost": "[concat(variables('mySQLName'), '.mysql.database.azure.com')]",
+            "MySQLPort": "3306",
             "MySQLUser": "[concat(parameters('mySqlAdministratorLogin'), '@', variables('mySQLName'))]",
             "MySQLPassword": "[parameters('mySqlAdministratorLoginPassword')]",
             "SourceCodeRepositoryUrl": "[parameters('SourceCodeRepositoryUrl')]",
