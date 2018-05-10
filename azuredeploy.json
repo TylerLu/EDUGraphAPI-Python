@@ -78,6 +78,8 @@
     "hostingPlanName": "[parameters('siteName')]",
     "webSiteName": "[toLower(parameters('siteName'))]",
     "mySQLName": "[variables('webSiteName')]",
+    "mySQLFirewallRuleName": "AllowAllWindowsAzureIps",
+    "mySQLDatabaseName": "edu",
     "pythonSiteExtensionName": "azureappservice-python353x64"
   },
   "resources": [
@@ -126,7 +128,7 @@
           "apiVersion": "2017-12-01-preview",
           "type": "databases",
           "location": "[variables('location')]",
-          "name": "edu",
+          "name": "[variables('mySQLDatabaseName')]",
           "properties":{  
              "charset":"utf8",
              "collation":"utf8_general_ci"
@@ -139,7 +141,7 @@
           "type": "firewallRules",
           "apiVersion": "2017-12-01-preview",
           "kind": "v12.0",
-          "name": "AllowAllWindowsAzureIps",
+          "name": "[variables('mySQLFirewallRuleName')]",
           "location": "[variables('location')]",
           "properties": {
             "startIpAddress": "0.0.0.0",
@@ -199,7 +201,9 @@
           "dependsOn": [
             "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]",
             "[resourceId('Microsoft.Web/Sites/config', variables('webSiteName'), 'appsettings')]",
-            "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), variables('pythonSiteExtensionName'))]"
+            "[resourceId('Microsoft.Web/sites/siteextensions', variables('webSiteName'), variables('pythonSiteExtensionName'))]",
+            "[resourceId('Microsoft.DBforMySQL/servers/firewallRules', variables('mySQLName'), variables('mySQLFirewallRuleName'))]",
+            "[resourceId('Microsoft.DBforMySQL/servers/databases', variables('mySQLName'), variables('mySQLDatabaseName'))]"
           ],
           "properties": {
             "RepoUrl": "[parameters('sourceCodeRepositoryURL')]",

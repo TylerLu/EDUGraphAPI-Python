@@ -108,6 +108,7 @@ IF EXIST "%DEPLOYMENT_TARGET%\requirements.txt" (
 
 echo Migrate database.
 %PYTHON_EXE% manage.py migrate
+IF !ERRORLEVEL! NEQ 0 goto error
 
 REM Add additional package installation here
 REM -- Example --
