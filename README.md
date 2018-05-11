@@ -178,11 +178,11 @@ The following softwares are required:
 
 ### Preparation
 
-1. Downlad the source code.
+1. Download the source code.
 
 2. Replace `/webjobs/sync_data/app_only_cert.pfx` with your certificate if you plan to use yours.
 
-3. Start you local MySQL and create a new database **edu**:
+3. Start your local MySQL and create a new database **edu**:
 
    ```mysql
    CREATE SCHEMA `edu` ;
@@ -190,25 +190,25 @@ The following softwares are required:
 
 4. Configure the following **environment variables**:
 
-   - **ClientId**: use the Client Id of the app registration you created earlier.
+   - **ClientId**: the Client Id of the app registration you created earlier.
 
-   - **ClientSecret**: use the Key value of the app registration you created earlier.
+   - **ClientSecret**: the Key value of the app registration you created earlier.
 
-   - **ClientCertificatePath**: path of the certificate. Please use the default value: `app_only_cert.pfx`
+   - **ClientCertificatePath**: the path of the certificate. Please use the default value: `app_only_cert.pfx`
 
-   - **ClientCertificatePassword**: password of the certifcate.
+   - **ClientCertificatePassword**: the password of the certifcate.
 
      > Note: the **ClientCertificatePath** and **ClientCertificatePassword** variables are only required by the WebJob.
 
-   - **SourceCodeRepositoryURL**: use the URL of this repository.
+   - **SourceCodeRepositoryURL**: the URL of this repository.
 
-   - **MySQLHost**/**MySQLPort**: host and port of the MySQL server.
+   - **MySQLHost**/**MySQLPort**: the host and port of the MySQL server.
 
-   - **MySQLUser**/**MySQLPassword**: user and password of the MySQL server.
+   - **MySQLUser**/**MySQLPassword**: the user and password of the MySQL server.
 
 ### Run the web app
 
-1. Open terminal and navigate to the source code folder. Execute the command below:
+1. Open the terminal and navigate to the source code folder. Execute the command below:
 
    ```sh
    pip install -r requirements.txt
@@ -424,7 +424,7 @@ For more information, see [Build a multi-tenant SaaS web application using Azure
 
 **SyncData WebJob**
 
-The sync data WebJob is a standalone Python app. It is located in `/webjobs/sync_data` folder and will be deployed to `/App_Data/jobs/triggered/` folder of the Web App after the deployemnt.
+The sync data WebJob is a standalone Python app. It is located in `/webjobs/sync_data` folder and will be deployed to `/App_Data/jobs/triggered/` folder of the Web App after the deployment.
 
 This app was created to demonstrate differential query. Please check [Differential query](differential-query) section for more details.
 
