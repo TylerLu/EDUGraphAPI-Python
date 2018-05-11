@@ -8,7 +8,7 @@ School data is kept in sync in O365 Education tenants by [Microsoft School Data 
 
 - [Sample Goals](#sample-goals)
 - [Prerequisites](#prerequisites)
-- [Generate a self-signed certificate](generate-a-self-signed-certificate)
+- [Generate a self-signed certificate](#generate-a-self-signed-certificate)
 - [Register the application in Azure Active Directory](#register-the-application-in-azure-active-directory)
 - [Run the sample locally](#run-the-sample-locally)
 - [Deploy the sample to Azure](#deploy-the-sample-to-azure)
@@ -123,15 +123,9 @@ For production, you should you own certifcate:
 
    Click **Create**.
 
-5. Once completed, the app will show in the list.
-
-   ![](Images/aad-create-app-03.png)
-
-6. Click it to view its details. 
-
    ![](Images/aad-create-app-04.png)
 
-7. Click **All settings**, if the setting window did not show.
+5. Click **Settings**.
 
    - Click **Properties**, then set **Multi-tenanted** to **Yes**.
 
@@ -143,7 +137,7 @@ For production, you should you own certifcate:
 
      | API                            | Application Permissions       | Delegated Permissions                                        |
      | ------------------------------ | ----------------------------- | ------------------------------------------------------------ |
-     | Microsoft Graph                | Read all users' full profiles | Read directory data<br>Access directory as the signed in user<br>Sign users in<br> Have full access to all files user can access<br> Have full access to user files<br> Read users' class assignments without grades<br> Read and write users' class assignments without grades<br> Read users' class assignments and their grades<br> Read and write users' class assignments and their grades |
+     | Microsoft Graph                | Read all users' full profiles | Read directory data<br>Access directory as the signed in user<br>Sign users in<br> Have full access to all files user can access<br> Have full access to user files<br> Read and write users' class assignments and their grades<br>Read users' view of the roster |
      | Windows Azure Active Directory |                               | Sign in and read user profile<br>Read and write directory data |
 
      ![](Images/aad-create-app-06.png)
@@ -156,11 +150,13 @@ For production, you should you own certifcate:
 
    Close the Settings window.
 
-8. Add keyCredential
+6. Add keyCredential
 
    * Click **Manifest**.
 
      ![](Images/aad-create-app-10.png)
+
+   * Copy the keyCredential (all the text) from `key_credential.txt` file.
 
    * Insert the keyCredential into the square brackets of the **keyCredentials** node.
 
