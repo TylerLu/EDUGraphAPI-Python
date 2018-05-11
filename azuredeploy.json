@@ -18,7 +18,6 @@
     },
     "mySqlAdministratorLoginPassword": {
       "type": "securestring",
-      "defaultValue": "P@ssw0rd",
       "metadata": {
         "description": "The administrator login password of the MySQL."
       }
@@ -67,7 +66,6 @@
     },
     "clientCertificatePassword": {
       "type": "securestring",
-      "defaultValue": "J48W23RQeZv85vj",
       "metadata": {
         "description": "Password of the app-only certificate."
       }
