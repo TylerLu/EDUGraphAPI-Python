@@ -101,7 +101,7 @@ For production, you should you own certifcate:
    Export-PfxCertificate -Cert $cert -Password $password -FilePath c:\app_only_cert.pfx
    ```
 
-   
+   It will promote you to input a password. Keep the password and the exported certificate.
 
 ## Register the application in Azure Active Directory
 
