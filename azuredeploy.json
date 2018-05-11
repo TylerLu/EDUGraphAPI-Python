@@ -148,7 +148,8 @@
             "endIpAddress": "0.0.0.0"
           },
           "dependsOn": [
-            "[resourceId('Microsoft.DBforMySQL/servers', variables('mySQLName'))]"
+            "[resourceId('Microsoft.DBforMySQL/servers', variables('mySQLName'))]",
+            "[resourceId('Microsoft.DBforMySQL/servers/databases', variables('mySQLName'), variables('mySQLDatabaseName'))]"
           ]
         }
       ]
