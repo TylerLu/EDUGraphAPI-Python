@@ -180,7 +180,8 @@
           "type": "config",
           "name": "appsettings",
           "dependsOn": [
-            "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]"
+            "[resourceId('Microsoft.Web/sites/', variables('webSiteName'))]",
+            "[resourceId('Microsoft.Web/Sites/siteextensions', variables('webSiteName'), variables('pythonSiteExtensionName'))]"
           ],
           "properties": {
             "ClientId": "[parameters('clientId')]",
