@@ -148,6 +148,15 @@ For production, you should you own certifcate:
 
      Click **Save**, then copy aside the **VALUE** of the key. 
 
+   - Click **Reply URLs**, then add the following two reply URLs:
+
+     - `http://127.0.0.1:8000/Auth/O365/Callback`
+     - `http://127.0.0.1:8000/Admin/ProcessCode`
+
+     ![](Images/aad-create-app-12.png)
+
+     Click **Save**.
+
    Close the Settings window.
 
 6. Add keyCredential
@@ -312,17 +321,23 @@ The following softwares are required:
 
    ![](Images/azure-web-app.png)
 
-   Copy the URL aside and change the schema to **https**. This is the replay URL and will be used in next step.
+   Add two suffixes to the **URL** seperately:
+
+   * `/Auth/O365/Callback`
+   * `/Admin/ProcessCode`
+
+   We will get two reply URLs:
+
+   - `https://edugraphapi.azurewebsites.net/Auth/O365/Callback`
+   - `https://edugraphapi.azurewebsites.net/Admin/ProcessCode`
 
 3. Navigate to the app registration in the new Azure portal, then open the setting windows.
 
-   Add the reply URL:
+   Add the two reply URLs:
 
    ![](Images/aad-add-reply-url.png)
 
-   > Note: to debug the sample locally, make sure that http://127.0.0.1:8000/ is in the reply URLs.
-
-4. Click **SAVE**.
+   Click **SAVE**.
 
 ## Understand the code
 
