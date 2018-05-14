@@ -1,4 +1,5 @@
 # web app
+django==2.0.5
 adal==0.4.7
 msgraph==0.1.2
 PyJWT==1.6.1
