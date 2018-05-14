@@ -205,7 +205,7 @@ The following softwares are required:
 
      > Note: the **ClientCertificatePath** and **ClientCertificatePassword** variables are only required by the WebJob.
 
-   - **SourceCodeRepositoryURL**: the URL of this repository.
+   - **SourceCodeRepositoryUrl**: the URL of this repository.
 
    - **MySQLHost**/**MySQLPort**: the host and port of the MySQL server.
 
