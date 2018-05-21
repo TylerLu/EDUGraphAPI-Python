@@ -137,7 +137,7 @@ For production, you should you own certifcate:
 
      | API                            | Application Permissions       | Delegated Permissions                                        |
      | ------------------------------ | ----------------------------- | ------------------------------------------------------------ |
-     | Microsoft Graph                | Read all users' full profiles | Read directory data<br>Access directory as the signed in user<br>Sign users in<br> Have full access to all files user can access<br> Have full access to user files<br> Read and write users' class assignments and their grades<br>Read users' view of the roster |
+     | Microsoft Graph                | Read all users' full profiles | Read directory data<br>Access directory as the signed in user<br>Sign users in<br> Have full access to all files user can access<br> Have full access to user files<br> Read and write users' class assignments and their grades<br>Read users' view of the roster<br>Read all groups |
      | Windows Azure Active Directory |                               | Sign in and read user profile<br>Read and write directory data |
 
      ![](Images/aad-create-app-06.png)
