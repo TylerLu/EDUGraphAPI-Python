@@ -437,7 +437,7 @@ For more information, see [Build a multi-tenant SaaS web application using Azure
 
 The sync data WebJob is a standalone Python app. It is located in `/webjobs/sync_data` folder and will be deployed to `/App_Data/jobs/triggered/` folder of the Web App after the deployment.
 
-This app was created to demonstrate differential query. Please check [Differential query](differential-query) section for more details.
+This app was created to demonstrate differential query. Please check [Differential query](#differential-query) section for more details.
 
 ### Office 365 Education API
 
