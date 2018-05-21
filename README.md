@@ -117,7 +117,7 @@ For production, you should you own certifcate:
 
 4. Input a **Name**, and select **Web app / API** as **Application Type**.
 
-   Input **Sign-on URL**: http://127.0.0.1:8000/
+   Input **Sign-on URL**: `http://127.0.0.1:8000/*`
 
    ![](Images/aad-create-app-02.png)
 
@@ -148,14 +148,6 @@ For production, you should you own certifcate:
 
      Click **Save**, then copy aside the **VALUE** of the key. 
 
-   - Click **Reply URLs**, then add the following two reply URLs:
-
-     - `http://127.0.0.1:8000/Auth/O365/Callback`
-     - `http://127.0.0.1:8000/Admin/ProcessCode`
-
-     ![](Images/aad-create-app-12.png)
-
-     Click **Save**.
 
    Close the Settings window.
 
@@ -321,15 +313,7 @@ The following softwares are required:
 
    ![](Images/azure-web-app.png)
 
-   Add two suffixes to the **URL** seperately:
-
-   * `/Auth/O365/Callback`
-   * `/Admin/ProcessCode`
-
-   We will get two reply URLs:
-
-   - `https://edugraphapi.azurewebsites.net/Auth/O365/Callback`
-   - `https://edugraphapi.azurewebsites.net/Admin/ProcessCode`
+   Copy the URL aside, then append `/*` . We get the reply URL `https://edugraphapi.azurewebsites.net/*`.
 
 3. Navigate to the app registration in the new Azure portal, then open the setting windows.
 
