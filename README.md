@@ -371,7 +371,7 @@ Below are the tables:
 | ------------------------------ | ------------------------------------------------------------ |
 | auth_user                      | Django built-in user table which contains users' authentication information: username, email, password... |
 | user_roles                     | Contains users' roles. Three roles are used in this sample: admin, teacher, and student. |
-| profiles                       | Contains users' extra information: *favoriteColor*, *organization_id*,  *o365UserId*, and *o365Email*. The later two are used to connect the local user with an O365 user. |
+| profiles                       | Contains users' extra information: *favoriteColor*, *organization_id*,  *o365UserId*, and *o365Email*. The latter two are used to connect the local user with an O365 user. |
 | organizations                  | A row in this table represents a tenant in AAD.<br>*isAdminConsented* column records if the tenant consented by an administrator. |
 | token_cache                    | Contains the users' access/refresh tokens.                   |
 | classroom_seating_arrangements | Contains the classroom seating arrangements data.            |
@@ -449,13 +449,13 @@ The **EducationServiceClient** is the core class of the library. It is used to e
 
 **Get schools**
 
-~~~typescript
+~~~python
 def get_schools(self):
     url = self.api_base_uri + 'education/schools'
     return self.rest_api_service.get_object_list(url, self.access_token, model=School)
 ~~~
 
-~~~typescript
+~~~python
 def get_school(self, object_id):
     url = self.api_base_uri + 'education/schools/%s' % school_id
     return self.rest_api_service.get_object(url, self.access_token, model=School)
@@ -463,14 +463,14 @@ def get_school(self, object_id):
 
 **Get classes**
 
-~~~typescript
+~~~python
 def get_classes(self, school_id, top=12, nextlink=''):
     skiptoken = self._get_skip_token(nextlink)
     url = self.api_base_uri + "education/schools/%s/classes?$expand=schools&$top=%s&skiptoken=%s" % (school_id, top, skiptoken)
     return self.rest_api_service.get_object_list(url, self.access_token, model=Section, next_key='odata.nextLink')
 ~~~
 
-```typescript
+```python
   def get_class(self, class_id):
         '''
         Get a section by using the object_id.
@@ -481,20 +481,22 @@ def get_classes(self, school_id, top=12, nextlink=''):
 ```
 **Manage Assignments**
 
-        def get_assignments(self,class_id):
-            '''
-            Get assignments of a class.
-            '''
-            url = self.api_base_uri + 'education/classes/' +class_id + "/assignments"     
-            return self.rest_api_service.get_object_list(url, self.access_token, model=Assignment)
+```python
+    def get_assignments(self,class_id):
+        '''
+        Get assignments of a class.
+        '''
+        url = self.api_base_uri + 'education/classes/' +class_id + "/assignments"     
+        return self.rest_api_service.get_object_list(url, self.access_token, model=Assignment)
 ```
+```python
     def add_assignment(self,class_id,name,dueDateTime):
         url = self.api_base_uri + 'education/classes/' +class_id + "/assignments"       
         data={"displayName":name,"status":"draft","dueDateTime":dueDateTime,"allowStudentsToAddResourcesToSubmission":"true","assignTo":{"@odata.type":"#microsoft.graph.educationAssignmentClassRecipient"}}
         return self.rest_api_service.post_json(url,self.access_token,None,data)
 ```
 
-```
+```python
     def get_Assignment_Resources(self,class_id,assignment_id):
         url = self.api_base_uri + "education/classes/"+class_id+"/assignments/"+assignment_id+"/resources";
         return self.rest_api_service.get_object_list(url, self.access_token, model=AssignmentResource)
