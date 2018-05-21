@@ -313,11 +313,11 @@ The following softwares are required:
 
    ![](Images/azure-web-app.png)
 
-   Copy the URL aside, then append `/*` . We get the reply URL `https://edugraphapi.azurewebsites.net/*`.
+   Copy the URL aside, then append `/*` . We get a new reply URL `https://edugraphapi.azurewebsites.net/*`.
 
 3. Navigate to the app registration in the new Azure portal, then open the setting windows.
 
-   Add the two reply URLs:
+   Add the reply URL:
 
    ![](Images/aad-add-reply-url.png)
 
