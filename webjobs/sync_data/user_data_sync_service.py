@@ -53,6 +53,7 @@ class UserDataSyncService(object):
                     else:
                         self._update_profile(profile, user)
                 else:
+                    # Note: for real-world projects, you may need to add users to the database.
                     print("\tSkipping updating user {} who does not exist in the local database.".format(user['id']))
             if next_link:
                 users, next_link, delta_link = client.get_users(next_link)
